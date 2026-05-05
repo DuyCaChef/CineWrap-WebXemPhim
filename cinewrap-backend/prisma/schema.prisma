@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================= NHÓM 1: QUẢN LÝ NGƯỜI DÙNG =================
+model User {
+  id                Int             @id @default(autoincrement())
+  email             String          @unique
+  password          String
+  full_name         String?
+  avatar            String?
+  role              String          @default("USER") // ADMIN hoặc USER
+  subscription_type String          @default("FREE") // FREE hoặc VIP
+  created_at        DateTime        @default(now())
+  
+  subscriptions     Subscription[]
+  reviews           Review[]
+  comments          Comment[]
+  favorites         Favorite[]
+  history           History[]
+}
+
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  start_date DateTime @default(now())
+  end_date   DateTime
+  status     String   @default("ACTIVE") // ACTIVE hoặc EXPIRED
+  
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+// ================= NHÓM 2: MASTER DATA (PHIM & THỂ LOẠI) =================
+model Movie {
+  id             Int       @id @default(autoincrement())
+  title          String
+  slug           String    @unique
+  description    String?   @db.Text
+  thumbnail      String?
+  poster_url     String?
+  trailer_url    String?
+  type           String    // MOVIE (Phim lẻ) hoặc SERIES (Phim bộ)
+  is_vip         Boolean   @default(false)
+  age_rating     String?   // VD: "13+", "18+"
+  release_year   Int?
+  duration       Int?      // Thời lượng (phút)
+  view_count     Int       @default(0)
+  average_rating Float     @default(0)
+  created_at     DateTime  @default(now())
+
+  genres         Genre[]   // Bảng trung gian tạo tự động bởi Prisma
+  countries      Country[] // Bảng trung gian tạo tự động bởi Prisma
+  
+  seasons        Season[]
+  episodes       Episode[]
+  reviews        Review[]
+  comments       Comment[]
+  favorites      Favorite[]
+}
+
+model Genre {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  slug   String  @unique
+  movies Movie[]
+}
+
+model Country {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  code   String  @unique // VD: VN, US, KR
+  movies Movie[]
+}
+
+// ================= NHÓM 3: CẤU TRÚC TẬP PHIM & SERVER =================
+model Season {
+  id            Int       @id @default(autoincrement())
+  movie_id      Int
+  season_number Int
+  title         String?
+  
+  movie         Movie     @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+  episodes      Episode[]
+}
+
+model Episode {
+  id             Int             @id @default(autoincrement())
+  movie_id       Int?            // Dành cho phim lẻ không có Season
+  season_id      Int?            // Dành cho phim bộ
+  episode_number Int
+  title          String?
+  description    String?         @db.Text
+  
+  movie          Movie?          @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+  season         Season?         @relation(fields: [season_id], references: [id], onDelete: Cascade)
+  servers        VideoServer[]
+  history        History[]
+}
+
+model VideoServer {
+  id          Int      @id @default(autoincrement())
+  episode_id  Int
+  server_name String   // VD: "Server VIP", "Server Dự Phòng"
+  url         String
+  quality     String   // VD: "720p", "1080p", "4K"
+  
+  episode     Episode  @relation(fields: [episode_id], references: [id], onDelete: Cascade)
+}
+
+// ================= NHÓM 4: TƯƠNG TÁC NGƯỜI DÙNG =================
+model Review {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  movie_id   Int
+  rating     Int      // 1 đến 5
+  content    String?  @db.Text
+  created_at DateTime @default(now())
+  
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  movie      Movie    @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  movie_id   Int
+  parent_id  Int?      // Trỏ về id của comment cha (nếu là reply)
+  content    String    @db.Text
+  created_at DateTime  @default(now())
+  
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  movie      Movie     @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+  parent     Comment?  @relation("CommentToComment", fields: [parent_id], references: [id])
+  replies    Comment[] @relation("CommentToComment")
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  movie_id   Int
+  created_at DateTime @default(now())
+  
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  movie      Movie    @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, movie_id]) // Một user chỉ được thích 1 phim 1 lần
+}
+
+model History {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  episode_id   Int
+  watched_time Int      // Lưu số giây đã xem để làm tính năng "Xem tiếp"
+  updated_at   DateTime @updatedAt
+  
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  episode      Episode  @relation(fields: [episode_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, episode_id])
+}
