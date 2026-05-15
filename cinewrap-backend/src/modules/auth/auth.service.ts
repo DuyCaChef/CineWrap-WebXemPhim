@@ -6,13 +6,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service'; // Đường dẫn trỏ tới Prisma module
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-
-// Định nghĩa rõ ràng khuôn dữ liệuDTO cho đăng ký người dùng
-export interface RegisterDto {
-  email: string;
-  password: string;
-  full_name?: string;
-}
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -56,7 +50,9 @@ export class AuthService {
     if (!isMatch)
       throw new UnauthorizedException('Email hoặc Mật khẩu không đúng');
 
-    return user;
+    const { password, ...safeUser } = user;
+    void password;
+    return safeUser;
   }
 
   // --- LUỒNG 3: TẠO TOKEN ---
