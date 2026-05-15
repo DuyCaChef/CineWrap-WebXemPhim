@@ -6,6 +6,7 @@ import {
   Res,
   UseGuards,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response, Request } from 'express';
@@ -73,6 +74,48 @@ export class AuthController {
     return {
       message: 'Thông tin profile của bạn',
       userInfo: req.user, // Thông tin user được lấy từ token, là cục { userId, username, role } ta return ở file Strategy
+    };
+  }
+
+  // --- LUỒNG 4: API ĐĂNG XUẤT ---
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    // Lễ tân dọn dẹp sạch sẽ chiếc vé refresh_token khỏi Cookie
+    res.clearCookie('refresh_token');
+    return { message: 'Đăng xuất thành công' };
+  }
+
+  // --- LUỒNG 6: API ĐỔI VÉ ---
+  @Post('refresh')
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    console.log('🔍 Toàn bộ Cookies nhận được:', req.cookies);
+
+    // 1. Lấy Refresh Token từ cookie
+    const refreshToken = req.cookies['refresh_token'] as string;
+    if (!refreshToken) {
+      throw new UnauthorizedException(
+        'Không tìm thấy Refresh Token trong Cookie!',
+      );
+    }
+
+    // 2. Gọi service để làm mới token
+    const tokens = await this.authService.refreshToken(refreshToken);
+
+    // 3. Gửi Access Token mới về cho client (trong body) và cập nhật Refresh Token mới trong cookie
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    });
+
+    // 4. Trả về Access Token mới cho client
+    return {
+      message: 'Làm mới token thành công',
+      accessToken: tokens.accessToken,
     };
   }
 }

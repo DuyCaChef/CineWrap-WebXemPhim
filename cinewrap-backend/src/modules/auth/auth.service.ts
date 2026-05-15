@@ -63,7 +63,7 @@ export class AuthService {
       // Access Token có thời gian sống ngắn (15 phút)
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
-        expiresIn: '15m',
+        expiresIn: '1m',
       }), // Access Token sống 15 phút
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
@@ -72,5 +72,28 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  // --- LUỒNG 5: LÀM MỚI TOKEN (REFRESH TOKEN) ---
+  async refreshToken(refreshToken: string) {
+    try {
+      // 1. Xác minh Refresh Token
+      const payload = await this.jwtService.verifyAsync<{
+        sub: number;
+        username: string;
+        role: string;
+      }>(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      // 2. Nếu token hợp lệ, tạo mới Access Token
+      // Truyền đúng thứ tự tham số: userId, email, role
+      return this.generateToken(payload.sub, payload.username, payload.role);
+    } catch {
+      // Nếu hacker cố tình truyền token láo, hoặc thẻ đã quá 7 ngày -> Đuổi ra!
+      throw new UnauthorizedException(
+        'Refresh Token không hợp lệ hoặc đã hết hạn!',
+      );
+    }
   }
 }
