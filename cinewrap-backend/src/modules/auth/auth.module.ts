@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt'; // Kéo thư viện JWT vào
 import { PrismaModule } from '../../prisma/prisma.module';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { PrismaModule } from '../../prisma/prisma.module';
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy], // Đăng ký JwtStrategy để Passport có thể sử dụng chiến lược này khi xác thực JWT
 })
 export class AuthModule {}

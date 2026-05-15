@@ -56,8 +56,8 @@ export class AuthService {
   }
 
   // --- LUỒNG 3: TẠO TOKEN ---
-  async generateToken(userId: number, role: string) {
-    const payload = { sub: userId, role };
+  async generateToken(userId: number, email: string, role: string) {
+    const payload = { sub: userId, username: email, role: role };
 
     const [accessToken, refreshToken] = await Promise.all([
       // Access Token có thời gian sống ngắn (15 phút)
