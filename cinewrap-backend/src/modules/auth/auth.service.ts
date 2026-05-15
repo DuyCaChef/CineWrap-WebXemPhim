@@ -63,7 +63,7 @@ export class AuthService {
       // Access Token có thời gian sống ngắn (15 phút)
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
-        expiresIn: '1m',
+        expiresIn: '15m',
       }), // Access Token sống 15 phút
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
