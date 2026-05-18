@@ -12,7 +12,7 @@ export class UsersService {
       data: {
         email: createUserDto.email,
         password: createUserDto.password,
-        name: createUserDto.name,
+        full_name: createUserDto.full_name,
       },
     });
   }
