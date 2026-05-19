@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -71,6 +75,21 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    // Trước khi cập nhật, cần kiểm tra xem người dùng với ID đó có tồn tại không. Nếu không tồn tại, ném ra lỗi NotFoundException (HTTP 404)
+    const existingUser = await this.prisma.user.findUnique({ where: { id } });
+    if (!existingUser) {
+      throw new NotFoundException(`Không tìm thấy người dùng với ID là ${id}`);
+    }
+
+    // Nếu updateUserDto có chứa trường password, cần hash lại mật khẩu trước khi cập nhật vào database
+    if (updateUserDto.password) {
+      const saltRounds = 10;
+      updateUserDto.password = await bcrypt.hash(
+        updateUserDto.password,
+        saltRounds,
+      );
+    }
+
     return this.prisma.user.update({
       where: { id: id },
       data: updateUserDto,
