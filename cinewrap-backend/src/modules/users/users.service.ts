@@ -4,6 +4,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
+// TẠO BIẾN DÙNG CHUNG: Nơi quy định những trường được phép trả về cho Frontend
+const userSelectOptions = {
+  id: true,
+  email: true,
+  full_name: true,
+  avatar: true,
+  role: true,
+  subscription_type: true,
+  created_at: true,
+  // TUYỆT ĐỐI KHÔNG CÓ password: true Ở ĐÂY
+};
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -28,16 +40,20 @@ export class UsersService {
         role: createUserDto.role,
         subscription_type: createUserDto.subscription_type,
       },
+      select: userSelectOptions, // Chỉ trả về những trường được định nghĩa trong userSelectOptions
     });
   }
 
   async findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      select: userSelectOptions,
+    });
   }
 
   async findOne(id: number) {
     return this.prisma.user.findUnique({
       where: { id: id },
+      select: userSelectOptions,
     });
   }
 
@@ -45,12 +61,14 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id: id },
       data: updateUserDto,
+      select: userSelectOptions,
     });
   }
 
   async remove(id: number) {
     return this.prisma.user.delete({
       where: { id: id },
+      select: userSelectOptions,
     });
   }
 }
