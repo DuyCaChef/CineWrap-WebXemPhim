@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -21,6 +21,18 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    // Kiểm tra xem email đã tồn tại trong database chưa, nếu có thì ném ra lỗi ConflictException (HTTP 409)
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: createUserDto.email },
+    });
+
+    // Nếu existingUser khác null nghĩa là đã có người dùng với email đó, nên ném lỗi
+    if (existingUser) {
+      throw new ConflictException(
+        'Email đã được sử dụng, vui lòng chọn email khác!',
+      );
+    }
+
     // Mật khẩu sẽ được hash trước khi lưu vào database, cấu hình số vòng salt là 10 (mặc định của bcrypt)
     const saltRounds = 10;
 
@@ -29,6 +41,7 @@ export class UsersService {
       createUserDto.password,
       saltRounds,
     );
+
     return this.prisma.user.create({
       data: {
         email: createUserDto.email,
