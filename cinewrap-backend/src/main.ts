@@ -1,10 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Kích hoạt Validation toàn cầu để tự động validate dữ liệu đầu vào dựa trên các DTO đã định nghĩa (CreateUserDto, UpdateUserDto, v.v...)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Pro-tip: Tự động loại bỏ các trường "rác" mà hacker cố tình nhét vào body (không có trong DTO)
+      forbidNonWhitelisted: true, // Ném lỗi luôn nếu có trường rác
+    }),
+  );
+
   // 1. Chống XSS bằng Helmet(Bảo vệ các HTTP Header)
   app.use(helmet());
 
