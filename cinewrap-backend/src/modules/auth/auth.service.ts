@@ -1,6 +1,6 @@
 import {
   Injectable,
-  BadRequestException,
+  ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service'; // Đường dẫn trỏ tới Prisma module
@@ -22,7 +22,7 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (userExists) {
-      throw new BadRequestException('Email đã được sử dụng');
+      throw new ConflictException('Email đã được sử dụng');
     }
 
     // 2. Hash mật khẩu trước khi lưu vào DB (mã hoá 10 vòng)
@@ -44,11 +44,16 @@ export class AuthService {
   // --- LUỒNG 2: KIỂM TRA MẬT KHẨU ---
   async validateUser(email: string, pass: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Người dùng không tồn tại');
+    if (!user)
+      throw new UnauthorizedException(
+        'Tài khoản hoặc mật khẩu không chính xác',
+      );
 
     const isMatch = await bcrypt.compare(pass, user.password);
     if (!isMatch)
-      throw new UnauthorizedException('Email hoặc Mật khẩu không đúng');
+      throw new UnauthorizedException(
+        'Tài khoản hoặc mật khẩu không chính xác',
+      );
 
     const { password, ...safeUser } = user;
     void password;
