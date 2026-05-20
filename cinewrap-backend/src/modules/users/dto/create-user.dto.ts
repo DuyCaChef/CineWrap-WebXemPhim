@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer/types/decorators/transform.decorator';
 import {
   IsEmail,
   IsNotEmpty,
@@ -12,16 +13,25 @@ export class CreateUserDto {
   // 1. Phải là định dạng Email, không được bỏ trống
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   @IsNotEmpty({ message: 'Email không được để trống' })
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  ) // Tự động cắt khoảng trắng thừa và viết thường email
   email!: string;
 
   // 2. Mật khẩu phải có ít nhất 6 ký tự
   @IsString()
   @MinLength(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  ) // Ngăn chặn lách luật bằng chuỗi toàn khoảng trắng "     "
   password!: string;
 
   // 3. Họ tên là tùy chọn
   @IsOptional()
   @IsString()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  ) // Chỉ gọt khoảng trắng rác ở hai đầu
   full_name?: string;
 
   // 4. Vai trò là tùy chọn, chỉ cho phép 1 tron 3 giá trị: USER, ADMIN, MODERATOR
