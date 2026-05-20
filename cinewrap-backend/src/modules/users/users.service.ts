@@ -105,14 +105,17 @@ export class UsersService {
     // Tận dụng hàm findOne ở trên để tự động kiểm tra ID có tồn tại không (Nếu không có sẽ tự ném lỗi 404)
     await this.findOne(id, currentUser);
 
-    // Nếu người dùng muốn cập nhật email mới, phải check xem email đó có bị trùng với ai khác trong DB không
+    // Kiểm tra chặn trùng lặp email khi cập nhật (Đã giữ lại 1 khối lệnh tối ưu duy nhất)
     if (updateUserDto.email) {
       const emailConflict = await this.prisma.user.findUnique({
         where: { email: updateUserDto.email },
       });
-      // Nếu có người khác trùng email này (emailConflict.id khác id người đang sửa), chặn lại ngay!
+
+      // Nếu email này đã có người sử dụng và người đó KHÔNG PHẢI là chính mình (id)
       if (emailConflict && emailConflict.id !== id) {
-        throw new ConflictException('Email mới này đã có người sử dụng!');
+        throw new ConflictException(
+          'Email mới này đã được sử dụng bởi một tài khoản khác. Vui lòng chọn email khác!',
+        );
       }
     }
 
@@ -138,7 +141,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(
-        `Không tìm thấy người dùng với tài khoản ID ${id}`,
+        `Không tìm thấy người dùng với tài khoản ID ${id} để thực hiện lệnh xóa!`,
       );
     }
 
