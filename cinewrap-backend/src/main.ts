@@ -27,6 +27,9 @@ async function bootstrap() {
     credentials: true, // BẮT BUỘC để FE gửi được Cookie (Refresh Token) lên BE
   });
 
+  // 4. Kích hoạt Validation toàn cầu để tự động validate dữ liệu đầu vào dựa trên các DTO đã định nghĩa (CreateUserDto, UpdateUserDto, v.v...)
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+
   await app.listen(3001); // BE và FE chạy trên 2 cổng khác nhau để dễ dàng cấu hình CORS (3000 cho FE, 3001 cho BE)
 }
 bootstrap();
