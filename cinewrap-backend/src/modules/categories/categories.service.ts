@@ -3,10 +3,12 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { Category } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryStatus, Prisma } from '@prisma/client';
+import { QueryCategoryDto } from './dto/query-category.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -200,6 +202,113 @@ export class CategoriesService {
     return {
       success: true,
       message: 'Xóa mềm danh mục thành công!',
+    };
+  }
+
+  // ====================================================================
+  // HÀM HỖ TRỢ NỘI BỘ: PHÂN RÃ ĐA NGÔN NGỮ (LOCALE RESOLVER)
+  // ====================================================================
+  private formatLocale(category: Category, locale?: string) {
+    // Nếu Client không yêu cầu ngôn ngữ cụ thể, trả về nguyên gốc object JSON
+    if (!locale) {
+      return category;
+    }
+
+    // Ép kiểu an toàn (Safe Type Casting) để TypeScript hiểu cấu trúc JSON đa ngôn ngữ
+    const nameObj = category.name as Record<string, string>;
+    const descriptionObj = category.description as Record<
+      string,
+      string
+    > | null;
+    const displayNameObj = category.displayName as Record<
+      string,
+      string
+    > | null;
+
+    return {
+      ...category,
+      // Cố gắng lấy ngôn ngữ được yêu cầu (Vd: en).
+      // Nếu không có, lui về (fallback) lấy tiếng Việt (vi).
+      // Nếu vẫn không có, trả về giá trị gốc để không bị null.
+      name: nameObj?.[locale] || nameObj?.['vi'] || category.name,
+      description: descriptionObj
+        ? descriptionObj[locale] || descriptionObj['vi']
+        : category.description,
+      displayName: displayNameObj
+        ? displayNameObj[locale] || displayNameObj['vi']
+        : category.displayName,
+    };
+  }
+
+  // ====================================================================
+  // 5. TÍNH NĂNG: LẤY DANH SÁCH & PHÂN TRANG NÂNG CAO (FIND ALL)
+  // ====================================================================
+  async findAll(query: QueryCategoryDto) {
+    // Bóc tách toàn bộ các tham số mà Client gửi lên từ thanh URL
+    // BÓC TÁCH VÀ GÁN GIÁ TRỊ MẶC ĐỊNH (Chống lỗi undefined của TypeScript)
+    const {
+      status,
+      type,
+      isFeatured,
+      locale,
+      sortBy = 'order', // Mặc định sort theo 'order' nếu không truyền
+      sortOrder = 'asc', // Mặc định tăng dần
+      page = 1, // Mặc định trang 1
+      limit = 10, // Mặc định 10 dòng
+    } = query;
+
+    // 1.Tính toán Phân trang (Pagination Math)
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // 2.Xây dựng Điều kiện Lọc động (Dynamic Filter)
+    // Cấp kiểu Prisma.CategoryWhereInput để TypeScript hỗ trợ gợi ý code an toàn
+    const where: Prisma.CategoryWhereInput = {};
+
+    if (status) {
+      where.status = status; // Lọc theo trạng thái Admin yêu cầu (Vd: DRAFT)
+    } else {
+      // MẶC ĐỊNH AN TOÀN: Bỏ qua toàn bộ các danh mục đã xóa mềm
+      where.status = { not: CategoryStatus.DELETED };
+    }
+
+    if (type) {
+      where.type = type; // Lọc theo loại danh mục (Vd: THEME, GENRE)
+    }
+
+    if (isFeatured !== undefined) {
+      where.isFeatured = isFeatured; // Lọc theo danh mục nổi bật (true/false)
+    }
+
+    // 3.Truy vấn Song song Tốc độ cao (Parallel Transaction)
+    // Chạy đồng thời lệnh lấy dữ liệu và lệnh đếm tổng số bản ghi
+    const [categories, total] = await this.prisma.$transaction([
+      this.prisma.category.findMany({
+        where, // Đưa bộ lọc động vào
+        orderBy: { [sortBy]: sortOrder }, // Sắp xếp theo yêu cầu của Client
+        skip, // Bỏ qua số bản ghi
+        take, // Lấy về số bản ghi
+      }),
+      this.prisma.category.count({ where }), // Đếm tổng số lượng thỏa mãn điều kiện
+    ]);
+
+    // 4. Định dạng Đa ngôn ngữ (Locale Formatting)
+    // Chạy qua vòng lặp để dịch cấu trúc JSON của từng danh mục
+    const formattedCategories = categories.map((cat) =>
+      this.formatLocale(cat, locale),
+    );
+
+    // 5. Tính toán Tổng số trang và Trả về chuẩn Enterprise
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: formattedCategories,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
     };
   }
 }
