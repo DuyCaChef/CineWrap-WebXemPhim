@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsInt,
   Min,
+  IsIn,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { CategoryStatus, CategoryType } from '@prisma/client';
@@ -21,9 +22,28 @@ export class QueryCategoryDto {
   type?: CategoryType;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true) // So sánh trực tiếp, không gọi hàm nên hoàn toàn an toàn
+  @Transform(({ value }) => {
+    if (value === undefined) return undefined;
+    return value === 'true' || value === true;
+  })
   @IsBoolean({ message: 'isFeatured phải là kiểu true hoặc false' })
   isFeatured?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined) return undefined;
+    return value === 'true' || value === true;
+  })
+  @IsBoolean()
+  showInMenu?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined) return undefined;
+    return value === 'true' || value === true;
+  })
+  @IsBoolean()
+  showInHome?: boolean;
 
   @IsOptional()
   @IsString({ message: 'Locale phải là chuỗi ký tự (Vd: vi, en)' })
@@ -31,6 +51,9 @@ export class QueryCategoryDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['asc', 'desc'], {
+    message: 'sortOrder chỉ được phép là asc hoặc desc',
+  })
   sortBy?: string = 'order';
 
   @IsOptional()
