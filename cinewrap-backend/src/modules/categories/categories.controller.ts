@@ -20,6 +20,10 @@ import { QueryCategoryDto } from './dto/query-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  CurrentUser,
+  UserPayload,
+} from '../../common/decorators/current-user.decorator';
 
 // Tạo một Interface mở rộng để TypeScript biết trong Request có chứa user
 interface RequestWithUser extends Request {
@@ -41,27 +45,29 @@ export class CategoriesController {
   @Post()
   create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @Req() req: RequestWithUser,
+    @CurrentUser() user: UserPayload, // Sử dụng @CurrentUser để lấy thông tin người dùng đã được xác thực
   ) {
-    // Tạm thời hardcode userId = 1 (Người tạo mặc định) khi chưa tích hợp Token
-    const userId = req.user?.id ? Number(req.user.id) : 1;
-    return this.categoriesService.create(createCategoryDto, userId);
+    return this.categoriesService.create(createCategoryDto, user.id);
   }
 
   // ====================================================================
   // 2. LẤY DANH SÁCH & PHÂN TRANG (API Public cho mọi người dùng)
   // ====================================================================
   @Get()
-  findAll(@Query() query: QueryCategoryDto) {
-    return this.categoriesService.findAll(query);
+  findAll(@Query() query: QueryCategoryDto, @CurrentUser() user?: UserPayload) {
+    return this.categoriesService.findAll(query, user);
   }
 
   // ====================================================================
   // 3. XEM CHI TIẾT THEO ID (API Public)
   // ====================================================================
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.categoriesService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('locale') locale?: string,
+    @CurrentUser() user?: UserPayload,
+  ) {
+    return this.categoriesService.findOne(id, locale, user);
   }
 
   // ====================================================================
@@ -73,10 +79,9 @@ export class CategoriesController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
-    @Req() req: RequestWithUser,
+    @CurrentUser() user: UserPayload,
   ) {
-    const userId = req.user?.id ? Number(req.user.id) : 1;
-    return this.categoriesService.update(id, updateCategoryDto, userId);
+    return this.categoriesService.update(id, updateCategoryDto, user.id);
   }
 
   // ====================================================================
@@ -91,8 +96,18 @@ export class CategoriesController {
   }
 
   // ====================================================================
-  // 6. ATTACH: GÁN DANH MỤC VÀO PHIM (Chỉ Admin/Mod)
+  //  KHÔI PHỤC DANH MỤC TỪ ARCHIVED/DELETED
   // ====================================================================
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id/restore')
+  restore(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.categoriesService.restore(id, user.id);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MODERATOR')
   @Post(':id/movies/:movieId')
@@ -103,9 +118,6 @@ export class CategoriesController {
     return this.categoriesService.attachToMovie(categoryId, movieId);
   }
 
-  // ====================================================================
-  // 7. DETACH: GỠ DANH MỤC KHỎI PHIM (Chỉ Admin/Mod)
-  // ====================================================================
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MODERATOR')
   @Delete(':id/movies/:movieId')
