@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserPayload } from '../../common/decorators/current-user.decorator';
 import * as bcrypt from 'bcrypt';
+import { CreateAdminDto } from './dto/create-admin.dto';
 
 // Nơi quy định những trường an toàn được phép trả về cho Frontend (Tuyệt đối giấu password)
 const userSelectOptions = {
@@ -25,7 +26,7 @@ const userSelectOptions = {
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. CREATE: Tạo tài khoản (Thường do Admin tạo nội bộ)
+  // 1. CREATE: Tạo tài khoản (Đăng ký thường qua luồng công khai)
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: createUserDto.email },
@@ -48,8 +49,9 @@ export class UsersService {
         email: createUserDto.email,
         password: hashedPassword,
         full_name: createUserDto.full_name,
-        role: createUserDto.role,
-        subscription_type: createUserDto.subscription_type,
+        // ÉP CỨNG GIÁ TRỊ TẠI ĐÂY: Người dùng bình thường không thể tự gán role
+        role: 'USER',
+        subscription_type: 'FREE',
       },
       select: userSelectOptions,
     });
@@ -148,6 +150,32 @@ export class UsersService {
     return this.prisma.user.delete({
       where: { id },
       select: { id: true, email: true }, // Chỉ cần trả về id và email đã xóa thành công
+    });
+  }
+
+  // 6. Luồng tạo Admin nội bộ (Không qua đăng ký, chỉ do Admin khác tạo)
+  async createSystemAccount(createAdminDto: CreateAdminDto) {
+    // 1. Kiểm tra trùng email
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: createAdminDto.email },
+    });
+    if (existingUser) {
+      throw new ConflictException('Email đã tồn tại!');
+    }
+
+    // 2. Hash mật khẩu
+    const hashedPassword = await bcrypt.hash(createAdminDto.password, 10);
+
+    // 3. Lưu vào DB (Lưu ý: truyền đủ các trường role/subscription_type)
+    return this.prisma.user.create({
+      data: {
+        email: createAdminDto.email,
+        password: hashedPassword,
+        full_name: createAdminDto.full_name,
+        role: createAdminDto.role || 'USER', // Nếu Admin để trống role, mặc định là USER
+        subscription_type: createAdminDto.subscription_type || 'FREE',
+      },
+      select: userSelectOptions, // Trả về thông tin an toàn
     });
   }
 }

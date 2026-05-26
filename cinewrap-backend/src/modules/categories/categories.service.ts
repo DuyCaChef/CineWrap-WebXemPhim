@@ -311,4 +311,23 @@ export class CategoriesService {
       },
     };
   }
+
+  // ====================================================================
+  // 6. GÁN DANH MỤC VÀO PHIM (ATTACH)
+  // ====================================================================
+  async attachToMovie(categoryId: number, movieId: number) {
+    return this.prisma.movieCategory.create({
+      data: { categoryId, movieId },
+    });
+  }
+
+  // ====================================================================
+  // 7. GỠ DANH MỤC KHỎI PHIM (DETACH)
+  // ====================================================================
+  async detachFromMovie(categoryId: number, movieId: number) {
+    return this.prisma.movieCategory.delete({
+      // Sử dụng Khóa chính phức hợp (Composite Key) đã thiết kế trong schema
+      where: { movieId_categoryId: { categoryId, movieId } },
+    });
+  }
 }

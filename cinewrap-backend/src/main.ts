@@ -12,6 +12,7 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true, // Pro-tip: Tự động loại bỏ các trường "rác" mà hacker cố tình nhét vào body (không có trong DTO)
       forbidNonWhitelisted: true, // Ném lỗi luôn nếu có trường rác
+      transform: true, // Tự động chuyển đổi kiểu dữ liệu dựa trên type đã định nghĩa trong DTO (ví dụ: "age": "30" => age: 30)
     }),
   );
 
