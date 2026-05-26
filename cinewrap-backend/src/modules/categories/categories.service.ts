@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -9,6 +10,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryStatus, Prisma } from '@prisma/client';
 import { QueryCategoryDto } from './dto/query-category.dto';
+import { UserPayload } from 'src/common/decorators/current-user.decorator';
 
 @Injectable()
 export class CategoriesService {
@@ -74,18 +76,27 @@ export class CategoriesService {
   // ====================================================================
   // 2. TÍNH NĂNG: XEM CHI TIẾT DANH MỤC (RETRIEVE DETAIL)
   // ====================================================================
-  async findOne(id: number) {
+  async findOne(id: number, locale?: string, user?: UserPayload) {
     const category = await this.prisma.category.findUnique({
       where: { id },
     });
 
-    if (!category || category.status === CategoryStatus.DELETED) {
-      throw new NotFoundException(
-        `Danh mục với ID ${id} không tồn tại hoặc đã bị xóa khỏi hệ thống.`,
-      );
+    // Nếu không tìm thấy, ném lỗi ngay để dừng luồng
+    if (!category) {
+      throw new NotFoundException(`Danh mục với ID ${id} không tồn tại.`);
     }
 
-    return category;
+    // Logic bảo mật: Nếu trạng thái không phải ACTIVE, chỉ Admin/Mod mới được xem
+    const isPublicUser =
+      !user || (user.role !== 'ADMIN' && user.role !== 'MODERATOR');
+
+    if (category.status !== CategoryStatus.ACTIVE && isPublicUser) {
+      // Vẫn báo NotFound để che giấu danh mục đang nháp/xóa khỏi người dùng
+      throw new NotFoundException(`Danh mục với ID ${id} không tồn tại.`);
+    }
+
+    // Truyền category (đã chắc chắn không null) vào hàm format
+    return this.formatLocale(category, locale);
   }
 
   // ====================================================================
@@ -205,6 +216,20 @@ export class CategoriesService {
     };
   }
 
+  // HÀM MỚI: RESTORE
+  async restore(id: number, userId: number) {
+    const category = await this.prisma.category.findUnique({ where: { id } });
+    if (!category) throw new NotFoundException('Không tìm thấy danh mục');
+
+    return this.prisma.category.update({
+      where: { id },
+      data: {
+        status: CategoryStatus.DRAFT, // Phục hồi thành Nháp để Admin duyệt lại
+        updatedBy: userId,
+      },
+    });
+  }
+
   // ====================================================================
   // HÀM HỖ TRỢ NỘI BỘ: PHÂN RÃ ĐA NGÔN NGỮ (LOCALE RESOLVER)
   // ====================================================================
@@ -243,13 +268,15 @@ export class CategoriesService {
   // ====================================================================
   // 5. TÍNH NĂNG: LẤY DANH SÁCH & PHÂN TRANG NÂNG CAO (FIND ALL)
   // ====================================================================
-  async findAll(query: QueryCategoryDto) {
+  async findAll(query: QueryCategoryDto, user?: UserPayload) {
     // Bóc tách toàn bộ các tham số mà Client gửi lên từ thanh URL
     // BÓC TÁCH VÀ GÁN GIÁ TRỊ MẶC ĐỊNH (Chống lỗi undefined của TypeScript)
     const {
       status,
       type,
       isFeatured,
+      showInMenu,
+      showInHome,
       locale,
       sortBy = 'order', // Mặc định sort theo 'order' nếu không truyền
       sortOrder = 'asc', // Mặc định tăng dần
@@ -265,11 +292,12 @@ export class CategoriesService {
     // Cấp kiểu Prisma.CategoryWhereInput để TypeScript hỗ trợ gợi ý code an toàn
     const where: Prisma.CategoryWhereInput = {};
 
-    if (status) {
-      where.status = status; // Lọc theo trạng thái Admin yêu cầu (Vd: DRAFT)
+    // [LOGIC BẢO MẬT: Bịt lỗ hổng lộ Dữ liệu cho Public User
+    const isPublicUser = !user || user.role !== 'ADMIN';
+    if (isPublicUser) {
+      where.status = CategoryStatus.ACTIVE; // Khán giả chỉ được xem phim ACTIVE
     } else {
-      // MẶC ĐỊNH AN TOÀN: Bỏ qua toàn bộ các danh mục đã xóa mềm
-      where.status = { not: CategoryStatus.DELETED };
+      where.status = status || { not: CategoryStatus.DELETED }; // Admin xem được theo Query
     }
 
     if (type) {
@@ -279,6 +307,9 @@ export class CategoriesService {
     if (isFeatured !== undefined) {
       where.isFeatured = isFeatured; // Lọc theo danh mục nổi bật (true/false)
     }
+
+    if (showInMenu !== undefined) where.showInMenu = showInMenu;
+    if (showInHome !== undefined) where.showInHome = showInHome;
 
     // 3.Truy vấn Song song Tốc độ cao (Parallel Transaction)
     // Chạy đồng thời lệnh lấy dữ liệu và lệnh đếm tổng số bản ghi
@@ -316,18 +347,40 @@ export class CategoriesService {
   // 6. GÁN DANH MỤC VÀO PHIM (ATTACH)
   // ====================================================================
   async attachToMovie(categoryId: number, movieId: number) {
-    return this.prisma.movieCategory.create({
-      data: { categoryId, movieId },
-    });
+    try {
+      return await this.prisma.movieCategory.create({
+        data: { categoryId, movieId },
+      });
+    } catch (error: unknown) {
+      // [FIX LỖI 4]: Ép kiểu chuẩn xác cho Prisma Error để ESLint không chửi "any"
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002')
+          throw new ConflictException(
+            'Phim này đã nằm trong danh mục này rồi!',
+          );
+        if (error.code === 'P2003')
+          throw new NotFoundException('Không tìm thấy danh mục hoặc phim!');
+      }
+      throw error;
+    }
   }
 
   // ====================================================================
   // 7. GỠ DANH MỤC KHỎI PHIM (DETACH)
   // ====================================================================
   async detachFromMovie(categoryId: number, movieId: number) {
-    return this.prisma.movieCategory.delete({
-      // Sử dụng Khóa chính phức hợp (Composite Key) đã thiết kế trong schema
-      where: { movieId_categoryId: { categoryId, movieId } },
-    });
+    try {
+      return await this.prisma.movieCategory.delete({
+        where: { movieId_categoryId: { categoryId, movieId } },
+      });
+    } catch (error: unknown) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025')
+          throw new NotFoundException(
+            'Liên kết giữa phim và danh mục không tồn tại!',
+          );
+      }
+      throw error;
+    }
   }
 }
