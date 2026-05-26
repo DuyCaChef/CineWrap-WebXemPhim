@@ -51,8 +51,8 @@ export class QueryCategoryDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['asc', 'desc'], {
-    message: 'sortOrder chỉ được phép là asc hoặc desc',
+  @IsIn(['createdAt', 'order', 'name'], {
+    message: 'sortBy chỉ được phép là createdAt, order hoặc name',
   })
   sortBy?: string = 'order';
 
