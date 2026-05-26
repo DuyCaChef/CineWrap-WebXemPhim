@@ -6,15 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  // UseGuards,
+  UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
-// import { RolesGuard } from '../../common/guards/roles/roles.guard';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CurrentUser,
   UserPayload,
@@ -22,7 +22,7 @@ import {
 import { CreateAdminDto } from './dto/create-admin.dto';
 
 @Controller('users')
-// @UseGuards(JwtAuthGuard, RolesGuard) // Áp dụng cả 2 lớp guard cho toàn bộ Controller này
+@UseGuards(JwtAuthGuard, RolesGuard) // Áp dụng cả 2 lớp guard cho toàn bộ Controller này
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -59,8 +59,11 @@ export class UsersController {
 
   @Delete(':id')
   @Roles('ADMIN') // Chỉ ADMIN mới có quyền xóa tài khoản vĩnh viễn
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload, // Lấy thông tin Admin đang đăng nhập
+  ) {
+    return this.usersService.remove(id, user); // Truyền user vào
   }
 
   // Luồng tạo Admin nội bộ (Không qua đăng ký, chỉ do Admin khác tạo)

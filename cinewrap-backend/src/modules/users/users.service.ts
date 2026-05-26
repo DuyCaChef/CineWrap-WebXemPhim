@@ -138,13 +138,24 @@ export class UsersService {
   }
 
   // 5. DELETE: Xóa người dùng (Chỉ ADMIN được gọi dựa trên Controller)
-  async remove(id: number) {
-    // Tìm kiếm xem người dùng có thực sự tồn tại trước khi xóa để tránh crash Prisma lỗi 500
+  async remove(id: number, currentUser: UserPayload) {
+    // 1. Kiểm tra: Chỉ ADMIN mới được phép xóa
+    if (currentUser.role !== 'ADMIN') {
+      throw new ForbiddenException(
+        'Bạn không có quyền thực hiện hành động này!',
+      );
+    }
+
+    // 2. Không cho phép Admin xóa chính mình (nếu cần thiết)
+    if (currentUser.id === id) {
+      throw new ForbiddenException(
+        'Bạn không thể tự xóa tài khoản của chính mình!',
+      );
+    }
+
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException(
-        `Không tìm thấy người dùng với tài khoản ID ${id} để thực hiện lệnh xóa!`,
-      );
+      throw new NotFoundException(`Không tìm thấy người dùng ID ${id}`);
     }
 
     return this.prisma.user.delete({
