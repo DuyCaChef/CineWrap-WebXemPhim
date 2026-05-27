@@ -81,7 +81,7 @@ export class CategoriesController {
     @Body() updateCategoryDto: UpdateCategoryDto,
     @CurrentUser() user: UserPayload,
   ) {
-    return this.categoriesService.update(id, updateCategoryDto, user.id);
+    return this.categoriesService.update(id, updateCategoryDto, user);
   }
 
   // ====================================================================

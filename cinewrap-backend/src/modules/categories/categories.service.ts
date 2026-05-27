@@ -105,12 +105,14 @@ export class CategoriesService {
   async update(
     id: number,
     updateCategoryDto: UpdateCategoryDto,
-    userId: number,
+    user: UserPayload, // Nhận toàn bộ object user thay vì chỉ nhận userId lẻ loi
   ) {
     // Đảm bảo danh mục phải tồn tại trước khi cho phép sửa
-    await this.findOne(id);
+    // 1. Kiểm tra tồn tại: Truyền thêm 'user' vào findOne để nếu danh mục có là DRAFT/ARCHIVED/DELETED,
+    // hệ thống vẫn cho phép Admin đi qua cửa soi chiếu, thay vì chặn đứng bằng lỗi 404.
+    await this.findOne(id, undefined, user);
 
-    // Nếu cập nhật lại slug, phải kiểm tra trùng lặp
+    // 2.Nếu cập nhật lại slug, phải kiểm tra trùng lặp
     if (updateCategoryDto.slug) {
       const existingSlug = await this.prisma.category.findFirst({
         where: {
@@ -125,7 +127,7 @@ export class CategoriesService {
       }
     }
 
-    // Nếu cập nhật lại Tên, kiểm tra trùng lặp trong dữ liệu JSON
+    // 3.Nếu cập nhật lại Tên, kiểm tra trùng lặp trong dữ liệu JSON
     if (updateCategoryDto.name?.vi) {
       const existingName = await this.prisma.category.findFirst({
         where: {
@@ -159,7 +161,7 @@ export class CategoriesService {
         ...(displayName && {
           displayName: displayName as unknown as Prisma.InputJsonValue,
         }),
-        updatedBy: userId,
+        updatedBy: user.id, // Sử dụng user.id trực tiếp từ object user đã được xác thực, đảm bảo tính nhất quán và an toàn hơn là chỉ truyền lẻ userId
       },
     });
   }
