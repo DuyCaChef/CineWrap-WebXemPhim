@@ -55,18 +55,31 @@ enum CategoryStatus {
   DELETED     // Xóa mềm
 }
 
+// Thêm Enum cho Phim
+enum MovieType {
+  SINGLE      // Phim lẻ (chiếu rạp, 1 tập)
+  SERIES      // Phim bộ (nhiều tập, có thể có mùa)
+}
+
+enum MovieStatus {
+  DRAFT       // Nháp, đang nhập liệu
+  PENDING     // Chờ duyệt
+  PUBLISHED   // Đã xuất bản, hiển thị trên web
+  ARCHIVED    // Đã lưu trữ/ẩn
+}
+
 model Category {
-  id              Int            @id @default(autoincrement())
-  type            CategoryType   @default(GENRE)
-  slug            String         @unique
-  status          CategoryStatus @default(DRAFT)
-  order           Int            @default(0) // Sắp xếp thủ công
+  id              Int              @id @default(autoincrement())
+  type            CategoryType     @default(GENRE)
+  slug            String           @unique
+  status          CategoryStatus   @default(DRAFT)
+  order           Int              @default(0) // Sắp xếp thủ công
   icon            String?
   banner          String?
-  color           String?        // Mã màu HEX định dạng giao diện UI
-  isFeatured      Boolean        @default(false)
-  showInMenu      Boolean        @default(false)
-  showInHome      Boolean        @default(false)
+  color           String?          // Mã màu HEX định dạng giao diện UI
+  isFeatured      Boolean          @default(false)
+  showInMenu      Boolean          @default(false)
+  showInHome      Boolean          @default(false)
   
   // Hỗ trợ đa ngôn ngữ lưu dạng JSON: { "vi": "Hành động", "en": "Action" }
   name            Json
@@ -78,13 +91,13 @@ model Category {
   metaDescription String?
 
   // Lịch sử giám sát (Audit Logs)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-  createdBy       Int?           
-  updatedBy       Int?           
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  createdBy       Int?             
+  updatedBy       Int?             
 
-  creator         User?          @relation("CategoryCreator", fields: [createdBy], references: [id], onDelete: SetNull)
-  updater         User?          @relation("CategoryUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+  creator         User?            @relation("CategoryCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater         User?            @relation("CategoryUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
 
   movies          MovieCategory[]
   episodes        EpisodeCategory[]
@@ -111,36 +124,44 @@ model EpisodeCategory {
 }
 
 model Movie {
-  id             Int             @id @default(autoincrement())
-  title          String
-  slug           String          @unique
-  description    String?         @db.Text
-  thumbnail      String?
-  poster_url     String?
-  trailer_url    String?
-  type           String          // MOVIE (Phim lẻ) hoặc SERIES (Phim bộ)
-  is_vip         Boolean         @default(false)
-  age_rating     String?         // VD: "13+", "18+"
-  release_year   Int?
-  duration       Int?            // Thời lượng (phút)
-  view_count     Int             @default(0)
-  average_rating Float           @default(0)
-  created_at     DateTime        @default(now())
-
-  categories     MovieCategory[]
-  countries      Country[]       // Bảng trung gian tạo tự động bởi Prisma
+  id              Int              @id @default(autoincrement())
+  title           String
+  original_title  String?          // Tên gốc tiếng Anh/Hàn/Trung...
+  slug            String           @unique
+  description     String?          @db.Text
+  thumbnail       String?
+  poster_url      String?
+  backdrop_url    String?          // Ảnh ngang làm banner chi tiết phim
+  trailer_url     String?
   
-  seasons        Season[]
-  episodes       Episode[]
-  reviews        Review[]
-  comments       Comment[]
-  favorites      Favorite[]
+  type            MovieType        @default(SINGLE)
+  status          MovieStatus      @default(DRAFT)
+  
+  is_vip          Boolean          @default(false)
+  age_rating      String?          // VD: "13+", "18+"
+  release_date    DateTime?        // Ngày phát hành chính xác
+  release_year    Int?
+  duration        Int?             // Thời lượng (phút) - dùng chính cho phim lẻ
+  view_count      Int              @default(0)
+  average_rating  Float            @default(0)
+  
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  categories      MovieCategory[]
+  countries       Country[]        // Bảng trung gian tạo tự động bởi Prisma
+  
+  seasons         Season[]
+  episodes        Episode[]
+  reviews         Review[]
+  comments        Comment[]
+  favorites       Favorite[]
 }
 
 model Country {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique
-  code   String  @unique // VD: VN, US, KR
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  code   String   @unique // VD: VN, US, KR
   movies Movie[]
 }
 
@@ -150,6 +171,9 @@ model Season {
   movie_id      Int
   season_number Int
   title         String?
+  
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
   
   movie         Movie     @relation(fields: [movie_id], references: [id], onDelete: Cascade)
   episodes      Episode[]
@@ -162,6 +186,10 @@ model Episode {
   episode_number Int
   title          String?
   description    String?           @db.Text
+  duration       Int?              // Thời lượng riêng của tập này (phút)
+  
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
   
   movie          Movie?            @relation(fields: [movie_id], references: [id], onDelete: Cascade)
   season         Season?           @relation(fields: [season_id], references: [id], onDelete: Cascade)
@@ -172,13 +200,13 @@ model Episode {
 }
 
 model VideoServer {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   episode_id  Int
-  server_name String  // VD: "Server VIP", "Server Dự Phòng"
+  server_name String   // VD: "Server VIP", "Server Dự Phòng"
   url         String
-  quality     String  // VD: "720p", "1080p", "4K"
+  quality     String   // VD: "720p", "1080p", "4K"
   
-  episode     Episode @relation(fields: [episode_id], references: [id], onDelete: Cascade)
+  episode     Episode  @relation(fields: [episode_id], references: [id], onDelete: Cascade)
 }
 
 // ================= NHÓM 4: TƯƠNG TÁC NGƯỜI DÙNG =================
@@ -201,6 +229,7 @@ model Comment {
   parent_id  Int?      // Trỏ về id của comment cha (nếu là reply)
   content    String    @db.Text
   created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
   
   user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   movie      Movie     @relation(fields: [movie_id], references: [id], onDelete: Cascade)
