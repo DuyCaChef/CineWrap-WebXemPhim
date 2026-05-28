@@ -14,12 +14,14 @@ export class MoviesService {
 
   // 1. TẠO MỚI PHIM
   async create(createMovieDto: CreateMovieDto) {
+    // Bóc synopsis ra để xử lý riêng
     const {
       categoryIds,
       releaseDate,
       originalTitle,
       posterUrl,
       backdropUrl,
+      synopsis,
       ...movieData
     } = createMovieDto;
 
@@ -36,6 +38,7 @@ export class MoviesService {
     return this.prisma.movie.create({
       data: {
         ...movieData,
+        description: synopsis, // Sửa lỗi gán nhầm trường synopsis thành description
         original_title: originalTitle || null,
         poster_url: posterUrl || null,
         backdrop_url: backdropUrl || null,
@@ -57,8 +60,8 @@ export class MoviesService {
 
   // 2. LẤY DANH SÁCH PHIM
   async findAll(
-    page: number = 1,
-    limit: number = 10,
+    page: number,
+    limit: number,
     keyword?: string,
     status?: MovieStatus,
   ) {
@@ -72,8 +75,8 @@ export class MoviesService {
       ];
     }
 
+    // Nếu có status thì lọc theo status, nếu không có thì mặc định lấy tất cả
     if (status) {
-      // ĐÃ SỬA: Loại bỏ hoàn toàn ép kiểu dư thừa "as ...", gán trực tiếp an toàn
       whereCondition.status = status;
     }
 
@@ -90,12 +93,7 @@ export class MoviesService {
 
     return {
       data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
   }
 
@@ -124,6 +122,7 @@ export class MoviesService {
       originalTitle,
       posterUrl,
       backdropUrl,
+      synopsis,
       ...movieData
     } = updateMovieDto;
 
@@ -145,10 +144,7 @@ export class MoviesService {
       data: {
         title: movieData.title !== undefined ? movieData.title : movie.title,
         slug: movieData.slug !== undefined ? movieData.slug : movie.slug,
-        synopsis:
-          movieData.synopsis !== undefined
-            ? movieData.synopsis
-            : movie.description,
+        description: synopsis !== undefined ? synopsis : movie.description, // Sửa lỗi gán nhầm trường synopsis thành description
         type: movieData.type !== undefined ? movieData.type : movie.type,
         status:
           movieData.status !== undefined ? movieData.status : movie.status,
