@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { FilterMovieDto } from './dto/filter-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -21,7 +22,8 @@ import { MovieStatus } from '@prisma/client';
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
-  // POST: Chỉ Admin/Content Editor được tạo
+  // ================= ADMIN API =================
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MODERATOR')
   @Post()
@@ -29,31 +31,15 @@ export class MoviesController {
     return this.moviesService.create(createMovieDto);
   }
 
-  // GET: Ai cũng xem được, nhưng có thể truyền query để phân trang/tìm kiếm
-  @Get()
-  findAll(
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-    @Query('keyword') keyword: string,
-    @Query('status') status?: MovieStatus,
-  ) {
-    // Ép kiểu từ query string sang number
-    const pageNumber = parseInt(page, 10) || 1;
-    const limitNumber = parseInt(limit, 10) || 10;
-
-    // TODO: Ở đây cần logic chặn User thường truyền status=DRAFT.
-    // Nếu không có Token Admin, force status = 'PUBLISHED'.
-
-    return this.moviesService.findAll(pageNumber, limitNumber, keyword, status);
+  // Khóa lại: Chỉ admin mới xem được danh sách tất cả các loại phim (DRAFT, PENDING...)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'MODERATOR')
+  @Get('admin')
+  findAllForAdmin(@Query() query: FilterMovieDto) {
+    const { page = 1, limit = 10, keyword, status } = query;
+    return this.moviesService.findAll(page, limit, keyword, status);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.moviesService.findOne(+id);
-  }
-
-  // API Cập nhật phim
-  // Route: PATCH /movies/:id
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MODERATOR')
   @Patch(':id')
@@ -61,10 +47,31 @@ export class MoviesController {
     return this.moviesService.update(+id, updateMovieDto);
   }
 
-  // API Xóa phim
-  // Route: DELETE /movies/:id
+  // Khóa lại: Đã thêm khóa bảo vệ DELETE
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'MODERATOR')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.moviesService.remove(+id);
+  }
+
+  // ================= PUBLIC API (Cho User thường) =================
+
+  // Mở public: Bất cứ ai cũng gọi được, nhưng bị ÉP BUỘC chỉ trả về phim PUBLISHED
+  @Get()
+  findAllPublic(@Query() query: FilterMovieDto) {
+    const { page = 1, limit = 10, keyword } = query;
+    // Cố tình truyền 'PUBLISHED' cứng vào hàm findAll để phớt lờ query status của User
+    return this.moviesService.findAll(
+      page,
+      limit,
+      keyword,
+      MovieStatus.PUBLISHED,
+    );
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.moviesService.findOne(+id);
   }
 }
