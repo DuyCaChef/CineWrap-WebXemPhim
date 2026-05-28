@@ -36,8 +36,15 @@ export class MoviesController {
   @Roles('ADMIN', 'MODERATOR')
   @Get('admin')
   findAllForAdmin(@Query() query: FilterMovieDto) {
-    const { page = 1, limit = 10, keyword, status } = query;
-    return this.moviesService.findAll(page, limit, keyword, status);
+    const { page = 1, limit = 10, keyword, status, sortBy, sortOrder } = query;
+    return this.moviesService.findAll(
+      page,
+      limit,
+      keyword,
+      status,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -60,13 +67,15 @@ export class MoviesController {
   // Mở public: Bất cứ ai cũng gọi được, nhưng bị ÉP BUỘC chỉ trả về phim PUBLISHED
   @Get()
   findAllPublic(@Query() query: FilterMovieDto) {
-    const { page = 1, limit = 10, keyword } = query;
+    const { page = 1, limit = 10, keyword, sortBy, sortOrder } = query;
     // Cố tình truyền 'PUBLISHED' cứng vào hàm findAll để phớt lờ query status của User
     return this.moviesService.findAll(
       page,
       limit,
       keyword,
       MovieStatus.PUBLISHED,
+      sortBy,
+      sortOrder,
     );
   }
 

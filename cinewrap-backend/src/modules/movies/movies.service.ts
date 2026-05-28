@@ -87,6 +87,8 @@ export class MoviesService {
     limit: number,
     keyword?: string,
     status?: MovieStatus,
+    sortBy: string = 'created_at', // Mặc định sắp xếp theo ngày tạo
+    sortOrder: 'asc' | 'desc' = 'desc', // Mặc định là mới nhất đưa lên đầu (desc)
   ) {
     const skip = (page - 1) * limit;
     const whereCondition: Prisma.MovieWhereInput = {};
@@ -102,13 +104,20 @@ export class MoviesService {
       whereCondition.status = status;
     }
 
+    // TẠO CÚ PHÁP SẮP XẾP ĐỘNG CHO PRISMA
+    // Ví dụ nếu người dùng truyền: sortBy = 'view_count', sortOrder = 'desc'
+    // Biến này sẽ trở thành: { view_count: 'desc' }
+    const orderByCondition = {
+      [sortBy]: sortOrder,
+    } as Prisma.MovieOrderByWithRelationInput;
+
     const [data, total] = await Promise.all([
       this.prisma.movie.findMany({
         where: whereCondition,
         skip: skip,
         take: limit,
         include: { categories: { include: { category: true } } },
-        orderBy: { created_at: 'desc' },
+        orderBy: orderByCondition, // <--- Nhúng biến sắp xếp động vào đây
       }),
       this.prisma.movie.count({ where: whereCondition }),
     ]);
