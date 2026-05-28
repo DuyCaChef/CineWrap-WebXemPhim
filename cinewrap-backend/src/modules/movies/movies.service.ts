@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -12,9 +13,27 @@ import { Prisma, MovieStatus } from '@prisma/client';
 export class MoviesService {
   constructor(private prisma: PrismaService) {}
 
+  //================== HÀM HỖ TRỢ DÙNG CHUNG ==================
+  // Viết 1 hàm nhỏ để kiểm tra mảng categoryIds có hợp lệ không
+  private async validateCategoriesExist(categoryIds: number[]) {
+    if (!categoryIds || categoryIds.length === 0) return;
+
+    // Tìm tất cả các category có ID nằm trong mảng categoryIds
+    const existingCategories = await this.prisma.category.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true }, // Chỉ lấy ID cho nhẹ
+    });
+
+    // Nếu số lượng tìm thấy không bằng số lượng gửi lên -> Có ID ảo
+    if (existingCategories.length !== categoryIds.length) {
+      throw new BadRequestException(
+        'Một hoặc nhiều ID Thể loại không tồn tại trong hệ thống.',
+      );
+    }
+  }
+
   // 1. TẠO MỚI PHIM
   async create(createMovieDto: CreateMovieDto) {
-    // Bóc synopsis ra để xử lý riêng
     const {
       categoryIds,
       releaseDate,
@@ -25,31 +44,35 @@ export class MoviesService {
       ...movieData
     } = createMovieDto;
 
+    // Bước 1: Kiểm tra xem slug đã tồn tại chưa
     const existingMovie = await this.prisma.movie.findUnique({
       where: { slug: movieData.slug },
     });
-
     if (existingMovie) {
       throw new ConflictException(
         'Slug phim đã tồn tại, vui lòng chọn slug khác.',
       );
     }
 
+    // Bước 2: Validate Category IDs trước khi tạo
+    const parsedCategoryIds = Array.isArray(categoryIds)
+      ? categoryIds.map(Number)
+      : [];
+    await this.validateCategoriesExist(parsedCategoryIds);
+
+    // Bước 3: Tạo phim
     return this.prisma.movie.create({
       data: {
         ...movieData,
-        description: synopsis, // Sửa lỗi gán nhầm trường synopsis thành description
+        description: synopsis,
         original_title: originalTitle || null,
         poster_url: posterUrl || null,
         backdrop_url: backdropUrl || null,
         release_date: releaseDate ? new Date(releaseDate) : null,
-
         categories: {
-          create: Array.isArray(categoryIds)
-            ? categoryIds.map((id) => ({
-                categoryId: Number(id),
-              }))
-            : [],
+          create: parsedCategoryIds.map((id) => ({
+            categoryId: id,
+          })),
         },
       },
       include: {
@@ -75,7 +98,6 @@ export class MoviesService {
       ];
     }
 
-    // Nếu có status thì lọc theo status, nếu không có thì mặc định lấy tất cả
     if (status) {
       whereCondition.status = status;
     }
@@ -93,7 +115,12 @@ export class MoviesService {
 
     return {
       data,
-      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -134,9 +161,16 @@ export class MoviesService {
       const existingSlug = await this.prisma.movie.findUnique({
         where: { slug: movieData.slug },
       });
-      if (existingSlug) {
+      if (existingSlug)
         throw new ConflictException('Slug phim mới đã tồn tại trên hệ thống.');
-      }
+    }
+
+    // MỚI: Validate Category IDs trước khi update
+    const parsedCategoryIds = Array.isArray(categoryIds)
+      ? categoryIds.map(Number)
+      : undefined;
+    if (parsedCategoryIds) {
+      await this.validateCategoriesExist(parsedCategoryIds);
     }
 
     return this.prisma.movie.update({
@@ -144,7 +178,7 @@ export class MoviesService {
       data: {
         title: movieData.title !== undefined ? movieData.title : movie.title,
         slug: movieData.slug !== undefined ? movieData.slug : movie.slug,
-        description: synopsis !== undefined ? synopsis : movie.description, // Sửa lỗi gán nhầm trường synopsis thành description
+        description: synopsis !== undefined ? synopsis : movie.description,
         type: movieData.type !== undefined ? movieData.type : movie.type,
         status:
           movieData.status !== undefined ? movieData.status : movie.status,
@@ -154,17 +188,24 @@ export class MoviesService {
             : movie.duration,
 
         original_title:
-          originalTitle !== undefined ? originalTitle : movie.original_title,
-        poster_url: posterUrl !== undefined ? posterUrl : movie.poster_url,
+          originalTitle !== undefined
+            ? (originalTitle as string | null)
+            : movie.original_title,
+        poster_url:
+          posterUrl !== undefined
+            ? (posterUrl as string | null)
+            : movie.poster_url,
         backdrop_url:
-          backdropUrl !== undefined ? backdropUrl : movie.backdrop_url,
+          backdropUrl !== undefined
+            ? (backdropUrl as string | null)
+            : movie.backdrop_url,
         release_date: releaseDate ? new Date(String(releaseDate)) : undefined,
 
-        categories: Array.isArray(categoryIds)
+        categories: parsedCategoryIds
           ? {
               deleteMany: {},
-              create: categoryIds.map((catId) => ({
-                categoryId: Number(catId),
+              create: parsedCategoryIds.map((catId) => ({
+                categoryId: catId,
               })),
             }
           : undefined,
@@ -175,18 +216,19 @@ export class MoviesService {
     });
   }
 
-  // 5. XÓA PHIM
+  // 5. XÓA MỀM PHIM
   async remove(id: number) {
     const movie = await this.prisma.movie.findUnique({ where: { id } });
-    if (!movie)
-      throw new NotFoundException('Không tìm thấy bộ phim này để xóa.');
+    if (!movie) throw new NotFoundException('Không tìm thấy bộ phim này.');
 
-    await this.prisma.movie.delete({
+    // Thay vì dùng this.prisma.movie.delete(), ta chuyển status thành ARCHIVED
+    await this.prisma.movie.update({
       where: { id },
+      data: { status: MovieStatus.ARCHIVED },
     });
 
     return {
-      message: `Xóa thành công bộ phim "${movie.title}" và toàn bộ các dữ liệu liên quan.`,
+      message: `Đã đưa phim "${movie.title}" vào lưu trữ (Soft Delete) thành công.`,
     };
   }
 }
