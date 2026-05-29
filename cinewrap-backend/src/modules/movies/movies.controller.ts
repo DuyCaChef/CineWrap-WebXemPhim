@@ -24,6 +24,25 @@ export class MoviesController {
 
   // ================= ADMIN API =================
 
+  // Kịch bản A: Gọi cào hàng loạt phim của một trang bất kỳ (Ví dụ: Trang 1)
+  // POST http://localhost:3001/movies/sync-page?page=1
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'MODERATOR')
+  @Post('sync-page')
+  syncPage(@Query('page') page: string): any {
+    const pageNumber = parseInt(page) || 1;
+    return this.moviesService.syncEntirePageFromSource(pageNumber);
+  }
+
+  // Kịch bản B: Gọi cào đơn lẻ đích danh một bộ phim qua mã slug
+  // POST http://localhost:3001/movies/sync/sat-nhan-huu-y-phan-2
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'MODERATOR')
+  @Post('sync/:slug')
+  syncSingleMovie(@Param('slug') slug: string) {
+    return this.moviesService.crawlAndSyncFromSource(slug);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MODERATOR')
   @Post()
