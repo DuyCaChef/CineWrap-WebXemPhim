@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { MoviesModule } from './modules/movies/movies.module';
+import { EpisodesModule } from './modules/episodes/episodes.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { MoviesModule } from './modules/movies/movies.module';
     AuthModule,
     UsersModule,
     CategoriesModule,
-    MoviesModule, // Cắm tính năng Auth vào
+    MoviesModule,
+    EpisodesModule, // Cắm tính năng Auth vào
   ],
   controllers: [],
   providers: [],
