@@ -188,6 +188,7 @@ model Episode {
   slug           String?           @default("DRAFT") // Phục vụ luật "Public chỉ xem PUBLISHED"
   description    String?           @db.Text
   duration       Int?              // Thời lượng riêng của tập này (phút)
+  status         String            @default("DRAFT")
   
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt
