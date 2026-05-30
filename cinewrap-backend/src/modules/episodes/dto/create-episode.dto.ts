@@ -1,4 +1,11 @@
-import { IsInt, IsOptional, IsString, Min, IsEnum } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+  IsEnum,
+  IsNotEmpty,
+} from 'class-validator';
 
 export enum EpisodeStatus {
   DRAFT = 'DRAFT',
@@ -15,6 +22,7 @@ export class CreateEpisodeDto {
   @IsInt({ message: 'Season ID phải là số nguyên' })
   season_id?: number;
 
+  @IsNotEmpty({ message: 'Số tập không được để trống' })
   @IsInt({ message: 'Số tập phải là số nguyên' })
   @Min(1, { message: 'Số tập không được nhỏ hơn hoặc bằng 0' })
   episode_number!: number;

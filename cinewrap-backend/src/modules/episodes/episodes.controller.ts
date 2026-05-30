@@ -9,6 +9,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { EpisodesService } from './episodes.service';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
@@ -57,11 +58,10 @@ export class EpisodesController {
   @Get('public/movie/:movieId')
   findAllByMovie(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    // Tự động ép kiểu số, nếu không truyền sẽ lấy mặc định là 1 và 20
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) pageNum: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limitNum: number,
   ) {
-    const pageNum = page ? parseInt(page, 10) : 1;
-    const limitNum = limit ? parseInt(limit, 10) : 20;
     return this.episodesService.findAllPublicByMovie(
       movieId,
       pageNum,

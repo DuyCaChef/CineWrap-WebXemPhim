@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEpisodeDto, EpisodeStatus } from './dto/create-episode.dto';
 import { UpdateEpisodeDto } from './dto/update-episode.dto';
@@ -15,63 +16,61 @@ export class EpisodesService {
   // ==========================================
   // 1. CORE ADMIN: TẠO TẬP PHIM (Có kiểm tra Phim lẻ / Phim bộ)
   // ==========================================
-  async create(createEpisodeDto: CreateEpisodeDto) {
-    const { movie_id, season_id, episode_number } = createEpisodeDto;
-
+  async create(dto: CreateEpisodeDto) {
     // Kiểm tra tính hợp lệ: Không được để trống cả 2, hoặc điền cả 2
-    if (!movie_id && !season_id) {
+    if (!dto.movie_id && !dto.season_id) {
       throw new BadRequestException(
         'Tập phim phải thuộc về một Movie hoặc một Season cụ thể!',
       );
     }
-    if (movie_id && season_id) {
+    if (dto.movie_id && dto.season_id) {
       throw new BadRequestException(
         'Không thể điền cả Movie ID và Season ID cùng lúc. Hãy chọn 1 trong 2.',
       );
     }
 
     // Trường hợp 1: Tập phim thuộc về một SEASON (Phim bộ)
-    if (season_id) {
+    if (dto.season_id) {
       const seasonExists = await this.prisma.season.findUnique({
-        where: { id: season_id },
+        where: { id: dto.season_id },
       });
       if (!seasonExists)
         throw new NotFoundException(
-          `Không tìm thấy Season với ID ${season_id}`,
+          `Không tìm thấy Season với ID ${dto.season_id}`,
         );
 
       // Kiểm tra xem số tập này đã tồn tại trong Season này chưa
       const dupEpisode = await this.prisma.episode.findFirst({
-        where: { season_id, episode_number },
+        where: { season_id: dto.season_id, episode_number: dto.episode_number },
       });
       if (dupEpisode)
         throw new ConflictException(
-          `Season này đã có tập số ${episode_number} rồi!`,
+          `Season này đã có tập số ${dto.episode_number} rồi!`,
         );
     }
 
     // Trường hợp 2: Tập phim thuộc thẳng về MOVIE (Phim lẻ / Phim không chia season)
-    if (movie_id) {
+    if (dto.movie_id) {
       const movieExists = await this.prisma.movie.findUnique({
-        where: { id: movie_id },
+        where: { id: dto.movie_id },
       });
       if (!movieExists)
         throw new NotFoundException(
-          `Không tìm thấy bộ phim với ID ${movie_id}`,
+          `Không tìm thấy bộ phim với ID ${dto.movie_id}`,
         );
 
       const dupEpisode = await this.prisma.episode.findFirst({
-        where: { movie_id, episode_number },
+        where: { movie_id: dto.movie_id, episode_number: dto.episode_number },
       });
       if (dupEpisode)
         throw new ConflictException(
-          `Bộ phim này đã có tập số ${episode_number} rồi!`,
+          `Bộ phim này đã có tập số ${dto.episode_number} rồi!`,
         );
     }
 
     // Nếu vượt qua tất cả các chốt chặn dữ liệu -> Tiến hành lưu vào DB
     return this.prisma.episode.create({
-      data: createEpisodeDto,
+      data: dto,
     });
   }
 
@@ -85,22 +84,24 @@ export class EpisodesService {
   ) {
     const skip = (page - 1) * limit;
 
-    // Logic nâng cao: Người dùng truyền vào Movie ID.
-    // Chúng ta phải tìm xem tập phim nằm trực tiếp ở Movie đó HOẶC nằm trong các Season thuộc Movie đó.
+    const whereCondition = {
+      status: EpisodeStatus.PUBLISHED, // Tập phim phải PUBLISHED
+      OR: [
+        // BỔ SUNG CHẶN TỪ GỐC MOVIE: Phim lẻ gốc cũng phải PUBLISHED
+        { movie_id: movieId, movie: { status: 'PUBLISHED' } },
+
+        // BỔ SUNG CHẶN TỪ GỐC MOVIE: Hoặc Movie của Phim bộ cũng phải PUBLISHED
+        { season: { movie_id: movieId, movie: { status: 'PUBLISHED' } } },
+      ],
+    } as unknown as Prisma.EpisodeWhereInput; // Ép kiểu để tránh lỗi OR với điều kiện liên quan đến Movie
+
     const [episodes, total] = await Promise.all([
       this.prisma.episode.findMany({
-        where: {
-          status: EpisodeStatus.PUBLISHED, // Rule bảo mật công khai
-          OR: [
-            { movie_id: movieId }, // Hoặc thuộc phim lẻ này
-            { season: { movie_id: movieId } }, // Hoặc thuộc một Season bất kỳ của bộ phim này (Prisma Relation Filter)
-          ],
-        },
-        orderBy: { episode_number: 'asc' }, // Sắp xếp theo thứ tự tập phim tăng dần
+        where: whereCondition,
+        orderBy: { episode_number: 'asc' },
         skip,
         take: limit,
         select: {
-          // Trả "Payload nhẹ" tối ưu dung lượng mạng mạng cho danh sách tập
           id: true,
           episode_number: true,
           title: true,
@@ -108,12 +109,7 @@ export class EpisodesService {
           duration: true,
         },
       }),
-      this.prisma.episode.count({
-        where: {
-          status: EpisodeStatus.PUBLISHED,
-          OR: [{ movie_id: movieId }, { season: { movie_id: movieId } }],
-        },
-      }),
+      this.prisma.episode.count({ where: whereCondition }),
     ]);
 
     return {
@@ -129,8 +125,10 @@ export class EpisodesService {
     const episodes = await this.prisma.episode.findMany({
       where: {
         season_id: seasonId,
-        status: EpisodeStatus.PUBLISHED,
-      },
+        status: EpisodeStatus.PUBLISHED, // Tập phim PUBLISHED
+        // BỔ SUNG CHẶN TỪ GỐC MOVIE: Xuyên qua Season, kiểm tra Movie gốc phải PUBLISHED
+        season: { movie: { status: 'PUBLISHED' } },
+      } as unknown as Prisma.EpisodeWhereInput, // Ép kiểu để tránh lỗi OR với điều kiện liên quan đến Movie
       orderBy: { episode_number: 'asc' },
       select: {
         id: true,
@@ -151,19 +149,21 @@ export class EpisodesService {
     // Tìm tập phim dựa trên Slug của phim gốc kết hợp với số tập
     const episode = await this.prisma.episode.findFirst({
       where: {
-        status: EpisodeStatus.PUBLISHED,
+        status: EpisodeStatus.PUBLISHED, // Tập phim PUBLISHED
         episode_number: episodeNumber,
         OR: [
-          { movie: { slug: movieSlug } }, // Nếu là phim lẻ gắn trực tiếp slug
-          { season: { movie: { slug: movieSlug } } }, // Nếu là phim bộ xuyên qua bảng Season tới Movie lấy slug
+          // BỔ SUNG CHẶN TỪ GỐC MOVIE:
+          { movie: { slug: movieSlug, status: 'PUBLISHED' } },
+          {
+            season: { movie: { slug: movieSlug, status: 'PUBLISHED' } },
+          },
         ],
-      },
+      } as unknown as Prisma.EpisodeWhereInput, // Ép kiểu để tránh lỗi OR với điều kiện liên quan đến Movie
       include: {
-        servers: true, // Gắn kèm danh sách nguồn phát (VideoServer) phục vụ Player xem phim
+        servers: true,
       },
     });
 
-    // Lỗi chuẩn hóa 404: Che giấu các tập chưa PUBLISHED hoặc điền sai URL
     if (!episode) {
       throw new NotFoundException(
         'Tập phim không tồn tại hoặc chưa được xuất bản.',
