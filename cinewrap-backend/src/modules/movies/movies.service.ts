@@ -83,35 +83,28 @@ export class MoviesService {
     const { movie, episodes } = rawData;
     const serverData = episodes?.[0]?.server_data || [];
 
-    // 1. XỬ LÝ THỂ LOẠI (MAPPED THEO ĐỊNH DẠNG JSON ĐA NGÔN NGỮ CỦA DB)
+    // 1. XỬ LÝ THỂ LOẠI
     const categoryIds: number[] = [];
     if (Array.isArray(movie.category)) {
       for (const cat of movie.category) {
         const catSlug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
-
-        // Chuẩn hóa tên thể loại thành đối tượng JSON { vi: "Tên" } để khớp với DB của bạn
         const nameJson = { vi: cat.name } as unknown as Prisma.InputJsonValue;
 
         const categoryRecord = await this.prisma.category.upsert({
           where: { slug: catSlug },
           update: {},
-          create: {
-            name: nameJson, // Nạp đối tượng JSON chuẩn chỉnh vào đây
-            slug: catSlug,
-          },
+          create: { name: nameJson, slug: catSlug },
         });
         categoryIds.push(categoryRecord.id);
       }
     }
 
-    // Tách thời lượng phim an toàn sang số nguyên (Ví dụ: "56 phút/tập" -> 56)
     const durationNum = parseInt(movie.time.split(' ')[0], 10) || null;
-
-    // Ánh xạ chuỗi chữ từ nguồn sang đúng định dạng Enum thiết lập trong Database của bạn
     const computedType =
       movie.type === 'single' ? MovieType.SINGLE : MovieType.SERIES;
 
     // 2. LƯU HOẶC CẬP NHẬT PHIM (MOVIE UPSERT)
+    // 💡 BỔ SUNG: Sửa status thành PUBLISHED để cào về là chiếu lên Web luôn
     const savedMovie = await this.prisma.movie.upsert({
       where: { slug: movie.slug },
       update: {
@@ -133,7 +126,7 @@ export class MoviesService {
         description: movie.content,
         poster_url: movie.thumb_url,
         type: computedType,
-        status: MovieStatus.DRAFT,
+        status: MovieStatus.PUBLISHED, // 💡 BỔ SUNG Ở ĐÂY
         duration: durationNum,
         categories: {
           create: categoryIds.map((id) => ({ categoryId: id })),
@@ -141,19 +134,60 @@ export class MoviesService {
       },
     });
 
-    // 3. XỬ LÝ ĐỔ DANH SÁCH TẬP PHIM HÀNG LOẠT (BULK INSERT EPISODES)
-    await this.prisma.episode.deleteMany({
-      where: { movie_id: savedMovie.id },
-    });
+    // =========================================================
+    // 💡 BỔ SUNG LOGIC SEASON (PHẦN PHIM) DÀNH RIÊNG CHO PHIM BỘ
+    // =========================================================
+    let activeSeasonId: number | null = null;
 
+    if (computedType === MovieType.SERIES) {
+      // Vì API nguồn không cung cấp tên Phần, ta tự động tạo "Phần 1"
+      const defaultSeason = await this.prisma.season.upsert({
+        where: {
+          // Ràng buộc 1 bộ phim có 1 Phần 1
+          movie_id_season_number: { movie_id: savedMovie.id, season_number: 1 },
+        },
+        update: {},
+        create: {
+          movie_id: savedMovie.id,
+          season_number: 1,
+          title: 'Phần 1',
+        },
+      });
+      activeSeasonId = defaultSeason.id;
+    }
+
+    // 3. XỬ LÝ ĐỔ DANH SÁCH TẬP PHIM HÀNG LOẠT
+
+    // Xóa tập cũ để tránh trùng lặp khi cào lại
+    console.log(
+      `Đang chuẩn bị lưu ${serverData.length} tập phim cho phim: ${savedMovie.title}`,
+    );
+    console.log('Dữ liệu tập 1 trông như thế này:', serverData[0]);
+    if (computedType === MovieType.SERIES && activeSeasonId) {
+      await this.prisma.episode.deleteMany({
+        where: { season_id: activeSeasonId },
+      });
+    } else {
+      await this.prisma.episode.deleteMany({
+        where: { movie_id: savedMovie.id },
+      });
+    }
+
+    // Đổ tập mới vào
     if (serverData.length > 0) {
       await this.prisma.episode.createMany({
         data: serverData.map((ep, index) => ({
-          movie_id: savedMovie.id,
-          episode_number: index + 1, // Điền giá trị trường bắt buộc theo DB của bạn
+          // 💡 ĐIỀU HƯỚNG THÔNG MINH:
+          // Nếu là phim lẻ -> Nhét vào movie_id.
+          // Nếu là phim bộ -> movie_id = null, nhét vào season_id.
+          movie_id: computedType === MovieType.SINGLE ? savedMovie.id : null,
+          season_id: activeSeasonId,
+
+          episode_number: index + 1,
           title: ep.name,
           slug: ep.slug,
-          video_url: ep.link_m3u8,
+          // video_url: ep.link_m3u8,
+          status: 'PUBLISHED', // 💡 MỞ KHÓA API EPISODES: Cào về là hiện lên public luôn
         })),
       });
     }

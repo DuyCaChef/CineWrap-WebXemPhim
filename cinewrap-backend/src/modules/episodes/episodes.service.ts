@@ -4,10 +4,11 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, EpisodeStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateEpisodeDto, EpisodeStatus } from './dto/create-episode.dto';
+import { CreateEpisodeDto } from './dto/create-episode.dto';
 import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { QueryEpisodeDto } from './dto/query-episode.dto';
 
 @Injectable()
 export class EpisodesService {
@@ -183,6 +184,22 @@ export class EpisodesService {
       throw new NotFoundException(`Không tìm thấy tập phim với ID ${id}`);
     }
 
+    // Vá lỗi 409: Nếu Admin đổi số tập, phải check xem số mới có bị trùng với tập khác cùng phim không
+    if (updateEpisodeDto.episode_number) {
+      const isDuplicate = await this.prisma.episode.findFirst({
+        where: {
+          id: { not: id }, // Ngoại trừ chính nó
+          episode_number: updateEpisodeDto.episode_number,
+          movie_id: episode.movie_id,
+          season_id: episode.season_id,
+        },
+      });
+      if (isDuplicate)
+        throw new ConflictException(
+          `Số tập ${updateEpisodeDto.episode_number} đã tồn tại!`,
+        );
+    }
+
     // 2. Thực hiện update (Đã bỏ check video_url vì link phim được quản lý riêng ở bảng VideoServer)
     return this.prisma.episode.update({
       where: { id },
@@ -206,5 +223,95 @@ export class EpisodesService {
         status: EpisodeStatus.ARCHIVED, // Hoặc 'DELETED' tùy bạn quy định
       },
     });
+  }
+
+  // ==========================================
+  // 7. ADMIN API: LẤY DANH SÁCH & LỌC (FILTER/PAGINATION)
+  // ==========================================
+  async findAllAdmin(query: QueryEpisodeDto) {
+    const { page = 1, limit = 20, status, search } = query;
+    const skip = (page - 1) * limit;
+
+    const whereCondition: Prisma.EpisodeWhereInput = {};
+    if (status) whereCondition.status = status;
+    if (search) {
+      whereCondition.title = { contains: search, mode: 'insensitive' };
+    }
+
+    const [episodes, total] = await Promise.all([
+      this.prisma.episode.findMany({
+        where: whereCondition,
+        orderBy: { created_at: 'desc' }, // Admin thường thích xem tập mới tạo trước
+        skip,
+        take: limit,
+        include: {
+          movie: { select: { title: true } },
+          season: true, // Kèm thông tin Season để Admin dễ quản lý
+        }, // Kèm tên phim/season để Admin dễ quản lý
+      }),
+      this.prisma.episode.count({ where: whereCondition }),
+    ]);
+
+    return {
+      data: episodes,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  // ==========================================
+  // 8. ADMIN API: KHÔI PHỤC TẬP PHIM (RESTORE)
+  // ==========================================
+  async restore(id: number) {
+    const episode = await this.prisma.episode.findUnique({ where: { id } });
+    if (!episode) throw new NotFoundException('Không tìm thấy tập phim');
+    if (episode.status !== EpisodeStatus.ARCHIVED) {
+      throw new BadRequestException(
+        'Tập phim này không ở trạng thái ARCHIVED để khôi phục.',
+      );
+    }
+
+    return this.prisma.episode.update({
+      where: { id },
+      data: { status: EpisodeStatus.DRAFT }, // Trả về DRAFT để Admin duyệt lại trước khi Publish
+    });
+  }
+
+  // ==========================================
+  // 9. ADMIN API: IMPORT HÀNG LOẠT (BULK CREATE)
+  // ==========================================
+  async bulkCreate(dtos: CreateEpisodeDto[]) {
+    // Dùng createMany của Prisma. skipDuplicates: true giúp bỏ qua các tập bị trùng (unique) thay vì báo lỗi sập toàn bộ
+    const result = await this.prisma.episode.createMany({
+      data: dtos,
+      skipDuplicates: true,
+    });
+    return { message: `Đã import thành công ${result.count} tập phim.` };
+  }
+
+  // ==========================================
+  // [PHASE 2 - ADMIN]: ĐỔI SỐ TẬP HÀNG LOẠT (REORDER)
+  // ==========================================
+  async reorder(updates: { id: number; episode_number: number }[]) {
+    // THUẬT TOÁN HOÁN VỊ (Tránh lỗi P2002 Unique Constraint)
+
+    // Bước 1: Bắt tất cả các tập phim cần đổi "đứng lên", gán tạm số tập thành SỐ ÂM (dùng -id để đảm bảo không trùng nhau)
+    const tempPromises = updates.map((item) =>
+      this.prisma.episode.update({
+        where: { id: item.id },
+        data: { episode_number: -item.id }, // Gắn giá trị tạm như -75, -77
+      }),
+    );
+    await this.prisma.$transaction(tempPromises);
+
+    // Bước 2: Khi các "ghế" đã trống, tiến hành gán số tập chính thức mới
+    const finalPromises = updates.map((item) =>
+      this.prisma.episode.update({
+        where: { id: item.id },
+        data: { episode_number: item.episode_number },
+      }),
+    );
+    await this.prisma.$transaction(finalPromises);
+
+    return { message: 'Cập nhật số tập thành công.' };
   }
 }

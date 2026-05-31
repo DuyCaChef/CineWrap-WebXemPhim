@@ -10,6 +10,7 @@ import {
   Delete,
   UseGuards,
   DefaultValuePipe,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { EpisodesService } from './episodes.service';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
@@ -20,6 +21,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum'; // Enum chứa 'ADMIN', 'MODERATOR', 'USER'
+import { ReorderEpisodeDto } from './dto/reorder-episode.dto';
+import { QueryEpisodeDto } from './dto/query-episode.dto';
 
 @Controller('episodes')
 export class EpisodesController {
@@ -28,6 +31,7 @@ export class EpisodesController {
   // ==================== PHẠM VI ADMIN ====================
   // Chỉ Admin và Mod mới được gọi 3 API dưới đây
 
+  // API tạo tập phim mới
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard) // 💡 Khóa cửa: Yêu cầu Token hợp lệ
   @Roles(Role.ADMIN, Role.MODERATOR) // 💡 Kiểm tra thẻ nhân viên: Chỉ cho ADMIN/MOD
@@ -35,6 +39,7 @@ export class EpisodesController {
     return this.episodesService.create(createEpisodeDto);
   }
 
+  // API cập nhật thông tin tập phim
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
@@ -45,11 +50,52 @@ export class EpisodesController {
     return this.episodesService.update(id, updateEpisodeDto);
   }
 
+  // API xóa mềm tập phim (soft delete)
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.episodesService.remove(id); // Gọi hàm xóa mềm
+  }
+
+  // API lấy danh sách tập phim cho Admin, có phân trang và lọc nâng cao
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  findAllAdmin(@Query() query: QueryEpisodeDto) {
+    // Controller cực sạch, ValidationPipe tự ép kiểu page/limit qua QueryEpisodeDto
+    return this.episodesService.findAllAdmin(query);
+  }
+
+  // API khôi phục tập phim đã xóa mềm
+  @Patch('admin/:id/restore')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  restore(@Param('id', ParseIntPipe) id: number) {
+    return this.episodesService.restore(id);
+  }
+
+  // API tạo hàng loạt tập phim (Bulk Create) - Dành cho Admin/Mod khi cần nhập nhiều tập cùng lúc
+  @Post('admin/bulk')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  bulkCreate(
+    @Body(new ParseArrayPipe({ items: CreateEpisodeDto }))
+    dtos: CreateEpisodeDto[],
+  ) {
+    // ParseArrayPipe giúp validate TỪNG PHẦN TỬ trong mảng JSON gửi lên
+    return this.episodesService.bulkCreate(dtos);
+  }
+
+  // API sắp xếp lại thứ tự tập phim (Reorder) - Dành cho Admin/Mod
+  @Patch('admin/reorder')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  reorder(
+    @Body(new ParseArrayPipe({ items: ReorderEpisodeDto }))
+    updates: ReorderEpisodeDto[],
+  ) {
+    return this.episodesService.reorder(updates);
   }
 
   // ==================== PHẠM VI PUBLIC ====================
