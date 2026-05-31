@@ -160,7 +160,7 @@ export class EpisodesService {
       include: {
         servers: true, // Lấy toàn bộ link m3u8, mp4...
         movie: { select: { title: true, slug: true, poster_url: true } },
-        season: { select: { name: true, season_number: true } },
+        season: { select: { title: true, season_number: true } },
       },
     });
 
@@ -320,7 +320,7 @@ export class EpisodesService {
   }
 
   // ==========================================
-  // [PHASE 2 - ADMIN]: ĐỔI SỐ TẬP HÀNG LOẠT (REORDER)
+  // 11. ADMIN API: ĐỔI SỐ TẬP HÀNG LOẠT (REORDER)
   // ==========================================
   async reorder(updates: { id: number; episode_number: number }[]) {
     // THUẬT TOÁN HOÁN VỊ (Tránh lỗi P2002 Unique Constraint)
@@ -344,5 +344,45 @@ export class EpisodesService {
     await this.prisma.$transaction(finalPromises);
 
     return { message: 'Cập nhật số tập thành công.' };
+  }
+
+  // ==========================================
+  // 12. PUBLIC API: TĂNG LƯỢT XEM TẬP PHIM
+  // ==========================================
+  async increaseViewCount(id: number) {
+    const episode = await this.prisma.episode.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        movie_id: true,
+        season: { select: { movie_id: true } },
+      },
+    });
+
+    if (!episode) throw new NotFoundException('Không tìm thấy tập phim');
+
+    // Xác định ID của bộ phim gốc để tăng view cho cả Movie
+    const rootMovieId = episode.movie_id || episode.season?.movie_id;
+
+    // Chạy Transaction để tăng View cho cả Tập và Phim gốc cùng lúc
+    const updates: any[] = [
+      this.prisma.episode.update({
+        where: { id },
+        data: { view_count: { increment: 1 } },
+      }),
+    ];
+
+    if (rootMovieId) {
+      updates.push(
+        this.prisma.movie.update({
+          where: { id: rootMovieId },
+          data: { view_count: { increment: 1 } },
+        }),
+      );
+    }
+
+    await this.prisma.$transaction(updates);
+
+    return { success: true, message: 'Đã ghi nhận +1 lượt xem' };
   }
 }

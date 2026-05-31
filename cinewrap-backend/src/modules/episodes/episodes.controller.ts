@@ -133,4 +133,10 @@ export class EpisodesController {
       episodeNumber,
     );
   }
+
+  // API Ghi nhận lượt xem (Gọi ngầm khi Player bắt đầu phát video)
+  @Post('public/:id/view')
+  increaseViewCount(@Param('id', ParseIntPipe) id: number) {
+    return this.episodesService.increaseViewCount(id);
+  }
 }
