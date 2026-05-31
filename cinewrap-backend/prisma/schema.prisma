@@ -206,6 +206,8 @@ model Episode {
   servers        VideoServer[]
   history        History[]
 
+  view_count     Int               @default(0)
+
   categories     EpisodeCategory[]
 
   // Đảm bảo trong một Season không trùng số tập, hoặc trong một Phim lẻ không trùng số tập

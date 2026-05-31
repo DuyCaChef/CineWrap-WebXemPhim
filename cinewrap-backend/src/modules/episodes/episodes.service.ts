@@ -144,34 +144,65 @@ export class EpisodesService {
   }
 
   // ==========================================
-  // 4. PUBLIC API: CHI TIẾT 1 TẬP THEO MOVIE SLUG + EPISODE NUMBER
+  // 4. PUBLIC API: CHI TIẾT 1 TẬP THEO MOVIE SLUG + EPISODE NUMBER (KÈM NEXT/PREV & METADTA PLAYER)
   // ==========================================
   async findOnePublicBySlugAndNumber(movieSlug: string, episodeNumber: number) {
-    // Tìm tập phim dựa trên Slug của phim gốc kết hợp với số tập
-    const episode = await this.prisma.episode.findFirst({
+    // 1. Tìm tập phim hiện tại kèm theo link Server và thông tin Phim gốc
+    const currentEpisode = await this.prisma.episode.findFirst({
       where: {
-        status: EpisodeStatus.PUBLISHED, // Tập phim PUBLISHED
+        status: EpisodeStatus.PUBLISHED,
         episode_number: episodeNumber,
         OR: [
-          // BỔ SUNG CHẶN TỪ GỐC MOVIE:
           { movie: { slug: movieSlug, status: 'PUBLISHED' } },
-          {
-            season: { movie: { slug: movieSlug, status: 'PUBLISHED' } },
-          },
+          { season: { movie: { slug: movieSlug, status: 'PUBLISHED' } } },
         ],
-      } as unknown as Prisma.EpisodeWhereInput, // Ép kiểu để tránh lỗi OR với điều kiện liên quan đến Movie
+      },
       include: {
-        servers: true,
+        servers: true, // Lấy toàn bộ link m3u8, mp4...
+        movie: { select: { title: true, slug: true, poster_url: true } },
+        season: { select: { name: true, season_number: true } },
       },
     });
 
-    if (!episode) {
+    if (!currentEpisode) {
       throw new NotFoundException(
         'Tập phim không tồn tại hoặc chưa được xuất bản.',
       );
     }
 
-    return episode;
+    // 2. Thuật toán Next/Prev: Dò tìm Tập trước và Tập sau
+    const parentCondition = currentEpisode.season_id
+      ? { season_id: currentEpisode.season_id } // Nếu là phim bộ -> dò trong cùng Phần
+      : { movie_id: currentEpisode.movie_id }; // Nếu là phim lẻ -> dò trong cùng Phim
+
+    // Chạy 2 lệnh tìm kiếm cùng lúc để tăng tốc độ phản hồi (Performance)
+    const [prevEpisode, nextEpisode] = await Promise.all([
+      this.prisma.episode.findFirst({
+        where: {
+          ...parentCondition,
+          episode_number: episodeNumber - 1,
+          status: EpisodeStatus.PUBLISHED,
+        },
+        select: { episode_number: true, slug: true },
+      }),
+      this.prisma.episode.findFirst({
+        where: {
+          ...parentCondition,
+          episode_number: episodeNumber + 1,
+          status: EpisodeStatus.PUBLISHED,
+        },
+        select: { episode_number: true, slug: true },
+      }),
+    ]);
+
+    // 3. Đóng gói Payload cực kỳ thân thiện cho Frontend Player
+    return {
+      episode: currentEpisode,
+      navigation: {
+        prev: prevEpisode || null, // Nếu là null -> FE sẽ ẩn nút "Tập trước"
+        next: nextEpisode || null, // Nếu là null -> FE sẽ ẩn nút "Tập tiếp"
+      },
+    };
   }
 
   // ==========================================
