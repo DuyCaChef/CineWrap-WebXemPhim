@@ -1,0 +1,55 @@
+# ====================================================================
+# 1. PRODUCTION BUILD & DEPENDENCIES (Thư mục cài đặt và đóng gói)
+# ====================================================================
+node_modules/
+/dist
+/dist-ssr
+*.local
+
+# ====================================================================
+# 2. ENVIRONMENT VARIABLES (Bảo mật: Chặn tuyệt đối file chứa key, bí mật)
+# ====================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ====================================================================
+# 3. LOGS & DIAGNOSTICS (Các file ghi nhận lịch sử lỗi/hệ thống)
+# ====================================================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ====================================================================
+# 4. COMPILER & TOOLS CACHE (Bộ nhớ đệm của Vite và TypeScript)
+# ====================================================================
+.vite/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# ====================================================================
+# 5. IDEs / EDITORS (Cấu hình riêng của các công cụ lập trình)
+# ====================================================================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ====================================================================
+# 6. SYSTEM FILES (File rác tự sinh của hệ điều hành máy tính)
+# ====================================================================
+.DS_Store
+Thumbs.db
+Desktop.ini
