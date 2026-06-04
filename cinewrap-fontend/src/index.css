@@ -1,1 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap");
+
+/* Khai báo hệ thống core của Tailwind v4 */
 @import "tailwindcss";
+
+/* Thiết lập Bảng màu và Font chữ theo chuẩn Native của Tailwind v4 */
+@theme {
+  /* 1. Khai báo Font chữ */
+  --font-sans: "Outfit", sans-serif;
+
+  /* 2. Cấu hình Bảng màu dự án */
+  --color-cine-bg: #0b0f19;
+  --color-cine-surface: #0f172a;
+  --color-cine-primary: #ffc107;
+  --color-cine-secondary: #e50914;
+  --color-cine-text: #ffffff;
+  --color-cine-text-muted: #9ca3af;
+}
+
+/* Áp dụng font chữ làm mặc định cho toàn bộ body */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+}
