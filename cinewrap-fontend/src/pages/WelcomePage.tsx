@@ -42,40 +42,40 @@ const IntroPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full text-cine-text font-sans bg-cine-bg selection:bg-cine-primary selection:text-cine-bg">
+    <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* HEADER: Phân vùng thanh điều hướng chính đầu trang */}
-      <header className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-cine-bg/90 backdrop-blur border-b border-white/10">
+      <header className="fixed top-0 left-0 w-full h-20 z-50 px-6 py-4 flex justify-between items-center bg-cine-bg-primary/90 backdrop-blur border-b border-white/10">
         <div className="text-2xl font-bold text-cine-secondary tracking-widest drop-shadow-md">
           CineWrap
         </div>
-        <nav className="hidden md:flex gap-8 text-sm font-medium">
+        <nav className="hidden text-[18px] md:flex gap-8 text-sm font-medium">
           <a
             href="#support"
-            className="text-cine-text hover:text-cine-text-muted transition-colors duration-300"
+            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
           >
             Hỗ trợ
           </a>
           <a
             href="#about"
-            className="text-cine-text hover:text-cine-text-muted transition-colors duration-300"
+            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
           >
             Giới thiệu
           </a>
           <a
             href="#general"
-            className="text-cine-text hover:text-cine-text-muted transition-colors duration-300"
+            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
           >
             Thông tin chung
           </a>
           <a
             href="#privacy"
-            className="text-cine-text hover:text-cine-text-muted transition-colors duration-300"
+            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
           >
             Chính sách bảo mật
           </a>
           <a
             href="#terms"
-            className="text-cine-text hover:text-cine-text-muted transition-colors duration-300"
+            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
           >
             Điều khoản sử dụng
           </a>
@@ -83,7 +83,7 @@ const IntroPage: React.FC = () => {
       </header>
 
       {/* MAIN: Khối bao bọc toàn bộ nội dung cốt lõi của trang đích */}
-      <main>
+      <main className="pt-20">
         {/* SECTION 1: Đường ray Scrollytelling chứa Video và Hero Content */}
         <section
           ref={scrollyTrackRef}
@@ -91,15 +91,15 @@ const IntroPage: React.FC = () => {
           aria-label="Giới thiệu điện ảnh cuộn phim"
         >
           {/* Khung viewport dính chặt tại đỉnh khi cuộn trong đường ray */}
-          <div className="sticky top-0 w-full h-screen overflow-hidden bg-black flex flex-col justify-center items-center text-center px-4">
+          <div className="sticky top-0 w-full h-screen overflow-hidden bg-cine-bg-primary flex flex-col justify-center items-center text-center px-4">
             {/* Lớp phủ điện ảnh (Cinema Overlay) */}
-            <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-cine-bg-primary/60 z-10 pointer-events-none" />
 
             {/* Video cuộn phim chạy mượt theo khung hình */}
             <video
               ref={videoRef}
               src="/Cuonphim.mp4"
-              className="absolute inset-0 w-full h-full object-cover opacity-75 z-0"
+              className="absolute inset-0 w-full h-full object-cover contrast-110 z-0"
               muted
               playsInline
               preload="auto"
