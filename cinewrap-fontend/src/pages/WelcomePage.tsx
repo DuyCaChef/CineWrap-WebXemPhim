@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 
 const IntroPage: React.FC = () => {
   const navigate = useNavigate();
   const scrollyTrackRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [active, setActive] = useState<string>("welcome");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,53 +43,147 @@ const IntroPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Scrollspy: use scroll position to reliably determine which section is active
+  useEffect(() => {
+    const ids = ["welcome", "general", "privacy", "terms", "support"];
+    let rafId: number | null = null;
+
+    const updateActive = () => {
+      const headerEl = document.querySelector("header");
+      const headerHeight = headerEl
+        ? (headerEl as HTMLElement).offsetHeight
+        : 0;
+      // Point slightly below header to test which section is 'under' the header
+      const point = headerHeight + 20;
+
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= point && rect.bottom >= point) {
+          setActive(id);
+          return;
+        }
+      }
+
+      // fallback: pick the section whose top is closest to the point
+      let closest: { id: string; distance: number } | null = null;
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        const distance = Math.abs(rect.top - point);
+        if (!closest || distance < closest.distance) closest = { id, distance };
+      }
+      if (closest) setActive(closest.id);
+    };
+
+    const onScroll = () => {
+      if (rafId != null) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateActive);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // run once to initialise
+    updateActive();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId != null) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* HEADER: Phân vùng thanh điều hướng chính đầu trang */}
-      <header className="fixed top-0 left-0 w-full h-20 z-50 px-6 py-4 flex justify-between items-center bg-cine-bg-primary/90 backdrop-blur border-b border-white/10">
-        <div className="text-2xl font-bold text-cine-secondary tracking-widest drop-shadow-md">
-          CineWrap
-        </div>
-        <nav className="hidden text-[18px] md:flex gap-8 text-sm font-medium">
+      <header className="fixed top-0 left-0 w-full h-20 z-50 px-6 py-4 flex justify-between items-center bg-cine-bg-primary/95 backdrop-blur-sm border-b border-white/10">
+        <img
+          src={Typo_CineWrap}
+          alt="CineWrap Typo"
+          className="w-32 md:w-52 mr-6 ml-3 md:ml-6 cursor-pointer"
+          onClick={() => navigate("/")}
+        />
+        <nav className="hidden text-[16px] md:flex gap-8 text-sm font-medium md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
           <a
-            href="#support"
-            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
+            href="#welcome"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("welcome")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
+              active === "welcome" ? "text-cine-primary underline" : ""
+            }`}
           >
-            Hỗ trợ
-          </a>
-          <a
-            href="#about"
-            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
-          >
-            Giới thiệu
+            Chào mừng
           </a>
           <a
             href="#general"
-            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("general")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
+              active === "general" ? "text-cine-primary underline" : ""
+            }`}
           >
             Thông tin chung
           </a>
           <a
             href="#privacy"
-            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("privacy")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
+              active === "privacy" ? "text-cine-primary underline" : ""
+            }`}
           >
             Chính sách bảo mật
           </a>
           <a
             href="#terms"
-            className="text-cine-text hover:text-cine-text-muted active:text-cine-primary active:underline transition-colors duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("terms")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
+              active === "terms" ? "text-cine-primary underline" : ""
+            }`}
           >
             Điều khoản sử dụng
+          </a>
+          <a
+            href="#support"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("support")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
+              active === "support" ? "text-cine-primary underline" : ""
+            }`}
+          >
+            Hỗ trợ
           </a>
         </nav>
       </header>
 
       {/* MAIN: Khối bao bọc toàn bộ nội dung cốt lõi của trang đích */}
-      <main className="pt-20">
-        {/* SECTION 1: Đường ray Scrollytelling chứa Video và Hero Content */}
+      <main className="pt-20 relative w-full min-h-screen">
+        {/* SECTION 1 (Chào mừng): Đường ray Scrollytelling chứa Video và Hero Content */}
         <section
+          id="welcome"
           ref={scrollyTrackRef}
-          className="relative w-full h-[200vh] z-10"
+          className="relative w-full h-[300vh] z-10"
           aria-label="Giới thiệu điện ảnh cuộn phim"
         >
           {/* Khung viewport dính chặt tại đỉnh khi cuộn trong đường ray */}
@@ -137,9 +233,11 @@ const IntroPage: React.FC = () => {
             </div>
           </div>
         </section>
-
         {/* SECTION 2: Phân vùng thông tin chi tiết với màu nền Surface mới biệt lập */}
-        <section className="relative z-20 w-full bg-cine-surface py-32 px-6 border-t border-white/5">
+        <section
+          id="general"
+          className="relative z-20 w-full bg-cine-surface py-32 px-6 border-t border-white/5"
+        >
           <div className="max-w-6xl mx-auto flex flex-col items-center gap-48">
             {/* Khối bài viết ngữ nghĩa số 1 */}
             <article className="w-full max-w-3xl text-center">
@@ -188,6 +286,36 @@ const IntroPage: React.FC = () => {
                 cùng cộng đồng những người đam mê điện ảnh thực thụ.
               </motion.p>
             </article>
+          </div>
+        </section>
+
+        {/* Privacy, Terms, Support placeholder sections so nav can highlight when scrolled */}
+        <section id="privacy" className="w-full py-40 px-6 bg-cine-surface/95">
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-2xl font-bold text-cine-text mb-4">
+              Chính sách bảo mật
+            </h3>
+            <p className="text-cine-text-muted">
+              Nội dung chính sách bảo mật...
+            </p>
+          </div>
+        </section>
+
+        <section id="terms" className="w-full py-40 px-6 bg-cine-surface/95">
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-2xl font-bold text-cine-text mb-4">
+              Điều khoản sử dụng
+            </h3>
+            <p className="text-cine-text-muted">
+              Nội dung điều khoản sử dụng...
+            </p>
+          </div>
+        </section>
+
+        <section id="support" className="w-full py-40 px-6 bg-cine-surface/95">
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-2xl font-bold text-cine-text mb-4">Hỗ trợ</h3>
+            <p className="text-cine-text-muted">Thông tin liên hệ, FAQ...</p>
           </div>
         </section>
       </main>
