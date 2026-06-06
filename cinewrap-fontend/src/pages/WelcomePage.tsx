@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
+import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
 
 const IntroPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const IntroPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Scrollspy: use scroll position to reliably determine which section is active
+  // Scrollspy: sử dụng vị trí cuộn để xác định chính xác phần nào đang hoạt động.
   useEffect(() => {
     const ids = ["welcome", "general", "privacy", "terms", "support"];
     let rafId: number | null = null;
@@ -53,7 +54,7 @@ const IntroPage: React.FC = () => {
       const headerHeight = headerEl
         ? (headerEl as HTMLElement).offsetHeight
         : 0;
-      // Point slightly below header to test which section is 'under' the header
+      // Chĩa xuống phía dưới tiêu đề một chút để kiểm tra xem phần nào nằm "bên dưới" tiêu đề.
       const point = headerHeight + 20;
 
       for (const id of ids) {
@@ -66,7 +67,7 @@ const IntroPage: React.FC = () => {
         }
       }
 
-      // fallback: pick the section whose top is closest to the point
+      // Phương án dự phòng: chọn đoạn có đỉnh gần điểm nhất.
       let closest: { id: string; distance: number } | null = null;
       for (const id of ids) {
         const el = document.getElementById(id);
@@ -113,7 +114,7 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "welcome" ? "text-cine-primary underline" : ""
+              active === "welcome" ? "!text-cine-primary underline" : ""
             }`}
           >
             Chào mừng
@@ -127,7 +128,7 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "general" ? "text-cine-primary underline" : ""
+              active === "general" ? "!text-cine-primary underline" : ""
             }`}
           >
             Thông tin chung
@@ -141,7 +142,7 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "privacy" ? "text-cine-primary underline" : ""
+              active === "privacy" ? "!text-cine-primary underline" : ""
             }`}
           >
             Chính sách bảo mật
@@ -155,7 +156,7 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "terms" ? "text-cine-primary underline" : ""
+              active === "terms" ? "!text-cine-primary underline" : ""
             }`}
           >
             Điều khoản sử dụng
@@ -169,7 +170,7 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "support" ? "text-cine-primary underline" : ""
+              active === "support" ? "!text-cine-primary underline" : ""
             }`}
           >
             Hỗ trợ
@@ -209,11 +210,17 @@ const IntroPage: React.FC = () => {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="flex flex-col items-center mb-8"
               >
-                {/* Logo dự án lấy từ thư mục src/assets thông qua module import hoặc public path */}
+                {/* Logo dự án  */}
                 <img
-                  src="/image_e8e19b.png"
+                  src={Logo_CineWrap}
                   alt="CineWrap Logo"
-                  className="w-36 md:w-52 mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]"
+                  className="w-44 md:w-60 drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]"
+                />
+                {/* Logo Typography */}
+                <img
+                  src={Typo_CineWrap}
+                  alt="CineWrap Typo"
+                  className="w-84 md:w-100 mb-8 drop-shadow-[0_10px_10px_rgba(0,0,0,1)]"
                 />
                 {/* Khẩu hiệu khớp chuẩn 100% yêu cầu */}
                 <p className="text-xl md:text-2xl text-gray-200 font-light tracking-wide drop-shadow-md">
