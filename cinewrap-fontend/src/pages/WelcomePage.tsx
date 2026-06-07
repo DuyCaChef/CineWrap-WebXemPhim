@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { TypewriterText } from "../components/TypewriterText";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
 
@@ -203,7 +204,7 @@ const IntroPage: React.FC = () => {
             />
 
             {/* Nội dung chính hiển thị đè lên Video */}
-            <div className="relative z-20 flex flex-col items-center">
+            <div className="relative bottom-7 z-20 flex flex-col items-center">
               <motion.div
                 initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -214,18 +215,25 @@ const IntroPage: React.FC = () => {
                 <img
                   src={Logo_CineWrap}
                   alt="CineWrap Logo"
-                  className="w-44 md:w-60 drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]"
+                  className="w-44 md:w-60 -mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]"
                 />
                 {/* Logo Typography */}
                 <img
                   src={Typo_CineWrap}
                   alt="CineWrap Typo"
-                  className="w-84 md:w-100 mb-8 drop-shadow-[0_10px_10px_rgba(0,0,0,1)]"
+                  className="w-84 md:w-100 mb-7 drop-shadow-[0_10px_10px_rgba(0,0,0,1)]"
                 />
                 {/* Khẩu hiệu khớp chuẩn 100% yêu cầu */}
-                <p className="text-xl md:text-2xl text-gray-200 font-light tracking-wide drop-shadow-md">
-                  Phim Hay Đóng Máy | It's a Wrap! Enjoy the Film
-                </p>
+                <TypewriterText
+                  text="Phim Hay Đóng Máy | It's a Wrap! Enjoy the Film"
+                  delayStart={0}
+                  className="text-xl md:text-2xl mb-4.5 text-gray-200 font-semibold tracking-widest drop-shadow-[0_4px_4px_rgba(0,0,0,1)] text-center"
+                />
+                <TypewriterText
+                  text="Đến với CineWrap - Không chỉ là xem phim, đó là nghệ thuật thưởng thức!"
+                  delayStart={1.5}
+                  className="text-xl md:text-2xl text-gray-200 font-semibold tracking-widest drop-shadow-[0_4px_4px_rgba(0,0,0,1)] text-center"
+                />
               </motion.div>
 
               <motion.button
