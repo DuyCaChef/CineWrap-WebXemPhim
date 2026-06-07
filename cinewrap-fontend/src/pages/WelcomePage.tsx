@@ -187,6 +187,32 @@ const IntroPage: React.FC = () => {
             Hỗ trợ
           </a>
         </nav>
+        <motion.button
+          // Hiệu ứng xuất hiện nhẹ nhàng khi load trang
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          // Hiệu ứng tương tác khi hover và bấm
+          whileHover={{
+            scale: 1.05,
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            borderColor: "#06b6d4", // Đổi sang viền màu cyan khi hover để tiệp màu nút chính
+          }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/TrailerHot")}
+          // Style Tailwind: Nút kính mờ, viền mảnh, chữ viết hoa, bo góc thể thao
+          className="flex items-center gap-2 px-5 py-2 text-sm font-bold tracking-widest text-white uppercase bg-white/5 backdrop-blur-sm border border-white/20 rounded-full shadow-lg transition-colors duration-300"
+        >
+          {/* Icon ngọn lửa phát sáng đại diện cho chữ "HOT" */}
+          <svg
+            className="w-4 h-4 text-cyan-400 fill-current animate-pulse"
+            viewBox="0 0 24 24"
+          >
+            <path d="M17.66 11.57c-.77-3.95-2.92-5.35-4.49-6.3-1-.6-1.57-1.12-1.57-1.27 0-.25.23-.42.43-.37.3.08 1.48.5 2.1 2.37.52 1.57 2.07 2.15 2.4 3.7.35 1.63-.03 3.32-.93 4.47l.46-.6zM11.53 21c-2.82 0-5.53-2.13-5.53-5.83 0-1.87.82-3.32 1.6-4.43.32-.47.67-.9 1-1.35.45-.63.85-1.4 1.15-2.12.13-.3.6-.22.6.13.03.88.35 2.22 1.6 3.25 1.23 1.02 1.7 2.23 1.7 3.65C15.65 18.23 13.82 21 11.53 21z" />
+          </svg>
+
+          <span>Trailer Hot</span>
+        </motion.button>
       </header>
 
       {/* MAIN: Khối bao bọc toàn bộ nội dung cốt lõi của trang đích */}
