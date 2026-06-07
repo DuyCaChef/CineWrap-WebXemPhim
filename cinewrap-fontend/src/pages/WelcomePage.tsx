@@ -201,14 +201,14 @@ const IntroPage: React.FC = () => {
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate("/TrailerHot")}
           // Style Tailwind: Nút kính mờ, viền mảnh, chữ viết hoa, bo góc thể thao
-          className="flex items-center gap-2 px-5 py-2 text-sm font-bold tracking-widest text-white uppercase bg-white/5 backdrop-blur-sm border border-white/20 rounded-full shadow-lg transition-colors duration-300"
+          className="flex items-center mr-8 gap-2 px-5 py-3 text-sm font-bold tracking-widest text-white uppercase bg-white/5 backdrop-blur-sm border border-white/20 rounded-full shadow-lg transition-colors duration-300"
         >
           {/* Icon ngọn lửa phát sáng đại diện cho chữ "HOT" */}
           <svg
-            className="w-4 h-4 text-cyan-400 fill-current animate-pulse"
+            className="w-5 h-5 text-cyan-400 fill-current"
             viewBox="0 0 24 24"
           >
-            <path d="M17.66 11.57c-.77-3.95-2.92-5.35-4.49-6.3-1-.6-1.57-1.12-1.57-1.27 0-.25.23-.42.43-.37.3.08 1.48.5 2.1 2.37.52 1.57 2.07 2.15 2.4 3.7.35 1.63-.03 3.32-.93 4.47l.46-.6zM11.53 21c-2.82 0-5.53-2.13-5.53-5.83 0-1.87.82-3.32 1.6-4.43.32-.47.67-.9 1-1.35.45-.63.85-1.4 1.15-2.12.13-.3.6-.22.6.13.03.88.35 2.22 1.6 3.25 1.23 1.02 1.7 2.23 1.7 3.65C15.65 18.23 13.82 21 11.53 21z" />
+            <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4zm-6.75 11.25L10 18l-1.25-2.75L6 14l2.75-1.25L10 10l1.25 2.75L14 14l-2.75 1.25z" />
           </svg>
 
           <span>Trailer Hot</span>
