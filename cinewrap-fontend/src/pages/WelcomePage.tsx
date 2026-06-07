@@ -240,10 +240,15 @@ const IntroPage: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/home")}
-                className="px-12 py-4 bg-cine-secondary hover:bg-red-700 text-cine-text text-xl font-bold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cine-secondary/30 active:scale-95"
+                className="flex items-center justify-center gap-3 px-8 py-4 bg-cine-secondary hover:bg-cine-primary text-cine-text text-xl font-bold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cine-secondary/30 active:scale-95"
               >
-                Bắt đầu
+                <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />{" "}
+                  {/* Icon Play hình tam giác kinh điển */}
+                </svg>
+                Bắt đầu thưởng thức ngay
               </motion.button>
             </div>
           </div>
