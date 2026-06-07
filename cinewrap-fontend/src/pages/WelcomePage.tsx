@@ -115,7 +115,9 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "welcome" ? "!text-cine-primary underline" : ""
+              active === "welcome"
+                ? "!text-cine-primary underline font-extrabold"
+                : ""
             }`}
           >
             Chào mừng
@@ -129,7 +131,9 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "general" ? "!text-cine-primary underline" : ""
+              active === "general"
+                ? "!text-cine-primary underline font-extrabold"
+                : ""
             }`}
           >
             Thông tin chung
@@ -143,7 +147,9 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "privacy" ? "!text-cine-primary underline" : ""
+              active === "privacy"
+                ? "!text-cine-primary underline font-extrabold"
+                : ""
             }`}
           >
             Chính sách bảo mật
@@ -157,7 +163,9 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "terms" ? "!text-cine-primary underline" : ""
+              active === "terms"
+                ? "!text-cine-primary underline font-extrabold"
+                : ""
             }`}
           >
             Điều khoản sử dụng
@@ -171,7 +179,9 @@ const IntroPage: React.FC = () => {
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
             className={`text-cine-text hover:text-cine-text-muted transition-colors duration-200 ${
-              active === "support" ? "!text-cine-primary underline" : ""
+              active === "support"
+                ? "!text-cine-primary underline font-extrabold"
+                : ""
             }`}
           >
             Hỗ trợ
