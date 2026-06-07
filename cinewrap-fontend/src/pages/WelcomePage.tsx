@@ -197,6 +197,7 @@ const IntroPage: React.FC = () => {
             scale: 1.05,
             backgroundColor: "rgba(255, 255, 255, 0.1)",
             borderColor: "#06b6d4", // Đổi sang viền màu cyan khi hover để tiệp màu nút chính
+            transition: { duration: 0.15, ease: "easeOut" },
           }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate("/TrailerHot")}
