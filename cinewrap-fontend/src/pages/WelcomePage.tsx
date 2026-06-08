@@ -95,6 +95,141 @@ const IntroPage: React.FC = () => {
     };
   }, []);
 
+  // Dữ liệu cho Section General và Tab nội dung chi tiết
+  const [activeTab, setActiveTab] = useState("tong-quan");
+
+  const FEATURE_CARDS = [
+    {
+      icon: (
+        <svg
+          className="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <path
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      title: "Tốc độ vượt trội",
+      desc: "Công nghệ nén video tiên tiến giúp truyền tải hình ảnh 4K mượt mà ngay cả trên kết nối internet tiêu chuẩn, không giật lag.",
+      accent: "border-l-cine-secondary",
+      iconBg: "bg-cine-secondary/10 text-cine-secondary",
+    },
+    {
+      icon: (
+        <svg
+          className="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <rect
+            x="2"
+            y="3"
+            width="20"
+            height="14"
+            rx="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path d="M8 21h8M12 17v4" strokeLinecap="round" />
+        </svg>
+      ),
+      title: "Đa nền tảng",
+      desc: "Trải nghiệm đồng nhất từ Smart TV, máy tính bảng đến điện thoại di động — giao diện thích ứng hoàn hảo trên mọi thiết bị.",
+      accent: "border-l-cine-primary",
+      iconBg: "bg-cine-primary/10 text-cine-primary",
+    },
+    {
+      icon: (
+        <svg
+          className="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <path
+            d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      title: "Bảo mật tuyệt đối",
+      desc: "Quyền riêng tư và dữ liệu của bạn được bảo vệ bởi các tiêu chuẩn mã hóa end-to-end hàng đầu thế giới.",
+      accent: "border-l-emerald-500",
+      iconBg: "bg-emerald-500/10 text-emerald-400",
+    },
+  ];
+
+  const TABS = [
+    { id: "tong-quan", label: "Tổng quan" },
+    { id: "goi-dich-vu", label: "Gói dịch vụ" },
+    { id: "doi-tac", label: "Đối tác nội dung" },
+    { id: "ben-vung", label: "Phát triển bền vững" },
+  ];
+
+  const TAB_ITEMS: Record<
+    string,
+    { icon: string; title: string; desc: string }[]
+  > = {
+    "tong-quan": [
+      {
+        icon: "📜",
+        title: "Lịch sử hình thành",
+        desc: "Khởi nguồn từ một nhóm những người yêu điện ảnh vào năm 2024, CineWrap đã vươn mình trở thành biểu tượng của chất lượng streaming cao cấp tại khu vực Đông Nam Á.",
+      },
+      {
+        icon: "🌍",
+        title: "Sứ mệnh toàn cầu",
+        desc: "Phá bỏ rào cản ngôn ngữ thông qua công nghệ dịch thuật chuyên biệt, giúp khán giả tiếp cận với những tinh hoa văn hóa tri thức khắp nơi trên thế giới.",
+      },
+    ],
+    "goi-dich-vu": [
+      {
+        icon: "🎬",
+        title: "Gói Cơ bản",
+        desc: "Truy cập hàng nghìn bộ phim chất lượng HD với giá ưu đãi. Phù hợp cho người dùng cá nhân muốn khám phá CineWrap.",
+      },
+      {
+        icon: "⭐",
+        title: "Gói Premium",
+        desc: "Toàn bộ kho nội dung 4K + Dolby Atmos, xem offline, không quảng cáo và ưu tiên truy cập nội dung độc quyền ra mắt sớm.",
+      },
+    ],
+    "doi-tac": [
+      {
+        icon: "🏢",
+        title: "Hãng phim quốc tế",
+        desc: "Hợp tác với Universal Pictures, Warner Bros., Sony Pictures và hơn 200 hãng phim lớn nhỏ trên toàn thế giới để mang nội dung đỉnh cao.",
+      },
+      {
+        icon: "🇻🇳",
+        title: "Điện ảnh Việt Nam",
+        desc: "Đồng hành cùng Thiên Ngân, Galaxy Studio, BHD và các nhà sản xuất nội dung độc lập trong nước, tự hào giới thiệu điện ảnh Việt ra thế giới.",
+      },
+    ],
+    "ben-vung": [
+      {
+        icon: "🌱",
+        title: "Hạ tầng xanh",
+        desc: "100% năng lượng tái tạo cho toàn bộ hệ thống máy chủ. CineWrap cam kết đạt trung hòa carbon vào năm 2027.",
+      },
+      {
+        icon: "🤝",
+        title: "Cộng đồng điện ảnh",
+        desc: "Quỹ CineWrap Foundation hỗ trợ tài chính cho các nhà làm phim trẻ tại Đông Nam Á, thúc đẩy đa dạng văn hóa trong điện ảnh.",
+      },
+    ],
+  };
+
   return (
     <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* HEADER: Phân vùng thanh điều hướng chính đầu trang */}
@@ -290,59 +425,309 @@ const IntroPage: React.FC = () => {
             </div>
           </div>
         </section>
-        {/* SECTION 2: Phân vùng thông tin chi tiết với màu nền Surface mới biệt lập */}
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            SECTION 2: THÔNG TIN CHUNG
+        ═══════════════════════════════════════════════════════════════════ */}
         <section
           id="general"
-          className="relative z-20 w-full bg-cine-surface py-32 px-6 border-t border-white/5"
+          className="relative z-20 w-full bg-cine-bg-primary py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
         >
-          <div className="max-w-6xl mx-auto flex flex-col items-center gap-48">
-            {/* Khối bài viết ngữ nghĩa số 1 */}
-            <article className="w-full max-w-3xl text-center">
-              <motion.h2
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6 }}
-                className="text-3xl md:text-5xl font-bold mb-6 text-cine-text"
-              >
-                Thế Giới Điện Ảnh Trong Tầm Tay
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg text-cine-text-muted leading-relaxed"
-              >
-                Khám phá hàng ngàn bộ phim bom tấn, từ hành động nghẹt thở đến
-                những câu chuyện tình cảm sâu lắng. Trải nghiệm chất lượng hình
-                ảnh sắc nét, mượt mà chưa từng có trên mọi thiết bị của bạn.
-              </motion.p>
-            </article>
+          {/* Ambient glow blobs — trang trí nền */}
+          <div className="pointer-events-none absolute top-0 left-1/4 w-[500px] h-[500px] bg-cine-secondary/5 rounded-full blur-[120px]" />
+          <div className="pointer-events-none absolute bottom-1/3 right-0 w-[400px] h-[400px] bg-cine-primary/5 rounded-full blur-[100px]" />
 
-            {/* Khối bài viết ngữ nghĩa số 2 */}
-            <article className="w-full max-w-3xl text-center">
-              <motion.h2
+          <div className="max-w-6xl mx-auto flex flex-col gap-28 relative">
+            {/* ── PHẦN 1: Hero tagline ─────────────────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <p className="text-cine-secondary text-xs uppercase tracking-[0.3em] font-semibold mb-4">
+                Nghệ thuật điện ảnh
+              </p>
+              <h2 className="text-4xl md:text-6xl font-extrabold text-cine-text leading-tight mb-6">
+                Mang Trải Nghiệm{" "}
+                <span className="text-cine-primary">Rạp Phim</span>
+                <br />
+                Về Nhà
+              </h2>
+              <p className="text-cine-text-muted text-lg max-w-2xl mx-auto leading-relaxed">
+                CineWrap không chỉ là nơi xem phim — đây là không gian bạn sống
+                cùng từng thước phim. Chất lượng 4K, âm thanh vòm, và kho nội
+                dung không giới hạn chờ đón bạn mỗi ngày.
+              </p>
+            </motion.div>
+
+            {/* ── PHẦN 2: Bento Grid ──────────────────────────────────── */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Card lớn: Tầm nhìn */}
+              <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="text-3xl md:text-5xl font-bold mb-6 text-cine-primary"
+                className="md:col-span-2 bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-md min-h-[320px]"
               >
-                Trải Nghiệm Đỉnh Cao
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
+                <div>
+                  <h3 className="text-2xl font-bold text-cine-text mb-4">
+                    Tầm nhìn của chúng tôi
+                  </h3>
+                  <p className="text-cine-text-muted text-sm leading-relaxed max-w-xl">
+                    Chúng tôi tin rằng mỗi bộ phim là một tác phẩm nghệ thuật
+                    cần được thưởng thức với độ phân giải hoàn hảo và âm thanh
+                    trung thực nhất. CineWrap xóa bỏ ranh giới giữa rạp chiếu
+                    chuyên nghiệp và phòng khách của bạn.
+                  </p>
+                </div>
+                {/* Decorative wave SVG */}
+                <div className="absolute right-0 bottom-12 w-1/2 opacity-20 pointer-events-none">
+                  <svg viewBox="0 0 200 100" className="w-full h-auto">
+                    <path
+                      d="M0,50 Q25,20 50,50 T100,50 T150,50 T200,50"
+                      fill="none"
+                      stroke="#00a3ff"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M0,50 Q25,70 50,50 T100,50 T150,50 T200,50"
+                      fill="none"
+                      stroke="#ffc107"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </div>
+                {/* Stat badges */}
+                <div className="flex gap-8 mt-8 border-t border-white/5 pt-6">
+                  {[
+                    { value: "4K+", label: "Độ phân giải" },
+                    { value: "Dolby", label: "Âm thanh vòm" },
+                    { value: "50K+", label: "Đầu phim" },
+                    { value: "4M+", label: "Người dùng" },
+                  ].map((s) => (
+                    <div key={s.label}>
+                      <span className="text-xl md:text-2xl font-extrabold text-cine-text block">
+                        {s.value}
+                      </span>
+                      <span className="text-xs text-cine-text-muted uppercase tracking-wider">
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Card dọc: Tuyển chọn cao cấp */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg text-cine-text-muted leading-relaxed"
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center justify-center backdrop-blur-md min-h-[320px]"
               >
-                Hệ thống truyền tải thông minh, không giật lag. Tìm kiếm và
-                thưởng thức bộ phim yêu thích chỉ với vài cú click. Tham gia
-                cùng cộng đồng những người đam mê điện ảnh thực thụ.
-              </motion.p>
-            </article>
+                <div className="w-14 h-14 rounded-full bg-cine-primary/10 flex items-center justify-center mb-6 border border-cine-primary/25 shadow-[0_0_20px_rgba(255,193,7,0.15)]">
+                  <svg
+                    className="w-7 h-7 text-cine-primary"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-cine-text mb-3">
+                  Tuyển chọn cao cấp
+                </h3>
+                <p className="text-cine-text-muted text-sm leading-relaxed">
+                  Đội ngũ chuyên gia lựa chọn kỹ lưỡng từng đầu phim, đảm bảo
+                  mọi nội dung trên CineWrap đều đạt tiêu chuẩn điện ảnh khắt
+                  khe nhất.
+                </p>
+              </motion.div>
+
+              {/* 3 Feature cards hàng dưới */}
+              {FEATURE_CARDS.map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className={`bg-[#0d1527]/60 border border-white/10 border-l-2 ${card.accent} rounded-2xl p-6 backdrop-blur-md flex flex-col gap-3`}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center`}
+                  >
+                    {card.icon}
+                  </div>
+                  <h4 className="text-base font-bold text-cine-text">
+                    {card.title}
+                  </h4>
+                  <p className="text-cine-text-muted text-xs leading-relaxed">
+                    {card.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* ── PHẦN 3: Showcase (hình trái + checklist phải) ───────── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              {/* Trái: Cinema mockup */}
+              <motion.div
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="relative"
+              >
+                <div className="relative rounded-xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl group aspect-video flex items-center justify-center">
+                  <img
+                    src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1025&auto=format&fit=crop"
+                    alt="Trải nghiệm điện ảnh CineWrap"
+                    className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {/* Play button overlay */}
+                  <div className="relative z-10 w-16 h-16 rounded-full bg-cine-primary/20 border-2 border-cine-primary/60 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
+                    <svg
+                      className="w-7 h-7 text-cine-primary fill-current ml-1"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                  {/* Quality badge */}
+                  <div className="absolute bottom-4 right-4 bg-cine-primary text-cine-bg-primary text-xs font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-[0_0_16px_rgba(255,193,7,0.4)]">
+                    4K · Dolby
+                  </div>
+                </div>
+                {/* Decorative ring */}
+                <div className="absolute -inset-3 rounded-2xl border border-cine-secondary/10 pointer-events-none" />
+              </motion.div>
+
+              {/* Phải: Text + checklist */}
+              <motion.div
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="flex flex-col justify-center"
+              >
+                <p className="text-cine-secondary text-xs uppercase tracking-[0.25em] font-semibold mb-3">
+                  Cam kết chất lượng
+                </p>
+                <h3 className="text-2xl md:text-3xl font-bold text-cine-text mb-5 leading-tight">
+                  Định nghĩa lại trải nghiệm xem
+                </h3>
+                <div className="text-cine-text-muted text-sm leading-relaxed space-y-4 mb-8">
+                  <p>
+                    Chúng tôi hiểu rằng điện ảnh không chỉ là hình ảnh chuyển
+                    động; đó là cảm xúc, là sự kết nối. Tại CineWrap, chúng tôi
+                    tập trung vào những chi tiết nhỏ nhất — từ cách hiển thị phụ
+                    đề thanh thoát đến việc điều chỉnh chính xác tông màu HDR
+                    theo đúng ý đồ của đạo diễn.
+                  </p>
+                  <p>
+                    Với chúng tôi, "Thông tin chung" không chỉ là dữ liệu. Đó là
+                    lời cam kết về sự minh bạch và chất lượng phục vụ không
+                    ngừng nghỉ.
+                  </p>
+                </div>
+                <ul className="space-y-3.5">
+                  {[
+                    "Không quảng cáo gây gián đoạn",
+                    "Hỗ trợ âm thanh không nén (Lossless)",
+                    "Cập nhật nội dung đặc quyền hàng tuần",
+                    "Gợi ý phim thông minh theo sở thích",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-3 text-sm font-medium text-cine-text"
+                    >
+                      <span className="w-5 h-5 rounded-full bg-cine-primary/10 border border-cine-primary/40 flex items-center justify-center flex-shrink-0">
+                        <svg
+                          className="w-3 h-3 text-cine-primary"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M2 6l3 3 5-5" />
+                        </svg>
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
+
+            {/* ── PHẦN 4: Tabs thông tin chi tiết ────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full border-t border-white/5 pt-20 flex flex-col items-center"
+            >
+              <div className="text-center mb-10">
+                <h3 className="text-2xl md:text-3xl font-bold text-cine-text mb-2">
+                  Thông tin chi tiết
+                </h3>
+                <p className="text-cine-text-muted text-sm">
+                  Mọi điều bạn cần biết về hệ sinh thái CineWrap
+                </p>
+              </div>
+
+              {/* Tab bar */}
+              <div className="flex flex-wrap justify-center gap-2 md:gap-0 border-b border-white/10 pb-px mb-8 w-full max-w-2xl">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`text-sm py-3 px-4 md:px-6 transition-all relative font-medium ${
+                      activeTab === tab.id
+                        ? "text-cine-primary font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-cine-primary after:content-['']"
+                        : "text-cine-text-muted hover:text-cine-text"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab content */}
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full max-w-3xl flex flex-col gap-4"
+              >
+                {TAB_ITEMS[activeTab].map((item) => (
+                  <div
+                    key={item.title}
+                    className="bg-[#0d1527]/40 border border-white/5 rounded-xl p-5 flex items-start gap-4 hover:border-white/10 transition-colors duration-200"
+                  >
+                    <div className="p-3 rounded-lg bg-cine-bg-secondary text-xl flex-shrink-0 mt-0.5">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-cine-text mb-1.5">
+                        {item.title}
+                      </h4>
+                      <p className="text-cine-text-muted text-xs leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
