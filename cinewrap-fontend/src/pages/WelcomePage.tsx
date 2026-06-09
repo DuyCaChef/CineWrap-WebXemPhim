@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import { TypewriterText } from "../components/TypewriterText";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
+import Cinemax_CineWrap from "../assets/images/CineWrap_Cinemax.png";
 
-const IntroPage: React.FC = () => {
+const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const scrollyTrackRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -172,8 +173,8 @@ const IntroPage: React.FC = () => {
   const TABS = [
     { id: "tong-quan", label: "Tổng quan" },
     { id: "goi-dich-vu", label: "Gói dịch vụ" },
-    { id: "doi-tac", label: "Đối tác nội dung" },
-    { id: "ben-vung", label: "Phát triển bền vững" },
+    { id: "tieu-chuan-dich-vu", label: "Tiêu chuẩn dịch vụ" },
+    { id: "gia-tri-mang-lai", label: "Giá trị mang lại" },
   ];
 
   const TAB_ITEMS: Record<
@@ -182,50 +183,50 @@ const IntroPage: React.FC = () => {
   > = {
     "tong-quan": [
       {
-        icon: "📜",
-        title: "Lịch sử hình thành",
-        desc: "Khởi nguồn từ một nhóm những người yêu điện ảnh vào năm 2024, CineWrap đã vươn mình trở thành biểu tượng của chất lượng streaming cao cấp tại khu vực Đông Nam Á.",
+        icon: "🎬",
+        title: "Điện ảnh theo cách của bạn",
+        desc: "Mang đến giao diện hiện đại, tập trung vào trải nghiệm người dùng, CineWrap đã tái định nghĩa cách chúng ta thưởng thức điện ảnh tại nhà, giúp bạn dễ dàng hòa mình vào mạch cảm xúc của bộ phim.",
       },
       {
-        icon: "🌍",
-        title: "Sứ mệnh toàn cầu",
-        desc: "Phá bỏ rào cản ngôn ngữ thông qua công nghệ dịch thuật chuyên biệt, giúp khán giả tiếp cận với những tinh hoa văn hóa tri thức khắp nơi trên thế giới.",
+        icon: "🍿",
+        title: "Khám phá không giới hạn",
+        desc: "Không chỉ dừng lại ở việc phát video, nền tảng phân loại phim theo các chủ đề nghệ thuật, dòng thời gian và đạo diễn. Giúp người dùng dễ dàng tiếp cận những tác phẩm phù hợp với tâm trạng và gu thẩm mỹ riêng.",
       },
     ],
     "goi-dich-vu": [
       {
-        icon: "🎬",
+        icon: "🎟️",
         title: "Gói Cơ bản",
         desc: "Truy cập hàng nghìn bộ phim chất lượng HD với giá ưu đãi. Phù hợp cho người dùng cá nhân muốn khám phá CineWrap.",
       },
       {
         icon: "⭐",
         title: "Gói Premium",
-        desc: "Toàn bộ kho nội dung 4K + Dolby Atmos, xem offline, không quảng cáo và ưu tiên truy cập nội dung độc quyền ra mắt sớm.",
+        desc: "Truy cập nội dung 4K +, kho phim độc quyền và trải nghiệm dịch vụ không giới hạn.",
       },
     ],
-    "doi-tac": [
+    "tieu-chuan-dich-vu": [
       {
-        icon: "🏢",
-        title: "Hãng phim quốc tế",
-        desc: "Hợp tác với Universal Pictures, Warner Bros., Sony Pictures và hơn 200 hãng phim lớn nhỏ trên toàn thế giới để mang nội dung đỉnh cao.",
+        icon: "📱",
+        title: "Tương thích đa thiết bị",
+        desc: "Hệ thống được thiết kế linh hoạt để hiển thị hoàn hảo từ màn hình lớn của máy tính đến các thiết bị di động nhỏ gọn. Bạn có thể chuyển đổi thiết bị xem liên tục mà không làm gián đoạn trải nghiệm.",
       },
       {
-        icon: "🇻🇳",
-        title: "Điện ảnh Việt Nam",
-        desc: "Đồng hành cùng Thiên Ngân, Galaxy Studio, BHD và các nhà sản xuất nội dung độc lập trong nước, tự hào giới thiệu điện ảnh Việt ra thế giới.",
+        icon: "👁️‍🗨️",
+        title: "Trọn vẹn từng câu thoại",
+        desc: "Hệ thống phụ đề được thiết kế với font chữ chuyên dụng, đổ bóng điện ảnh dễ đọc và đồng bộ chính xác theo từng khung hình, tôn trọng tuyệt đối ý đồ truyền tải của nhà làm phim.",
       },
     ],
-    "ben-vung": [
+    "gia-tri-mang-lai": [
       {
         icon: "🌱",
-        title: "Hạ tầng xanh",
-        desc: "100% năng lượng tái tạo cho toàn bộ hệ thống máy chủ. CineWrap cam kết đạt trung hòa carbon vào năm 2027.",
+        title: "Không gian xem phim sạch",
+        desc: "CineWrap nói không với các quảng cáo pop-up, banner che khuất tầm nhìn hay các liên kết độc hại thường gặp trên các web xem phim lậu. Mang đến một môi trường xem phim an toàn, sạch sẽ và văn minh.",
       },
       {
-        icon: "🤝",
-        title: "Cộng đồng điện ảnh",
-        desc: "Quỹ CineWrap Foundation hỗ trợ tài chính cho các nhà làm phim trẻ tại Đông Nam Á, thúc đẩy đa dạng văn hóa trong điện ảnh.",
+        icon: "🔒",
+        title: "Bảo mật và Riêng tư",
+        desc: "Toàn bộ lịch sử xem, danh sách phim yêu thích và thông tin tùy chỉnh cá nhân của bạn được lưu trữ an toàn, bảo mật tuyệt đối, đảm bảo quyền riêng tư trọn vẹn cho từng người dùng.",
       },
     ],
   };
@@ -457,8 +458,9 @@ const IntroPage: React.FC = () => {
               </h2>
               <p className="text-cine-text-muted text-lg max-w-2xl mx-auto leading-relaxed">
                 CineWrap không chỉ là nơi xem phim — đây là không gian bạn sống
-                cùng từng thước phim. Chất lượng 4K, âm thanh vòm, và kho nội
-                dung không giới hạn chờ đón bạn mỗi ngày.
+                cùng từng thước phim. Trang web mang lại cho bạn trải nghiệm xem
+                phim thú vị, sống động và chân thực nhất, với chất lượng hình
+                ảnh và âm thanh đỉnh cao, ngay tại phòng khách của bạn.
               </p>
             </motion.div>
 
@@ -500,12 +502,12 @@ const IntroPage: React.FC = () => {
                     />
                   </svg>
                 </div>
-                {/* Stat badges */}
+                {/* Stat badges - Huy hiệu thống kê */}
                 <div className="flex gap-8 mt-8 border-t border-white/5 pt-6">
                   {[
                     { value: "4K+", label: "Độ phân giải" },
                     { value: "Dolby", label: "Âm thanh vòm" },
-                    { value: "50K+", label: "Đầu phim" },
+                    { value: "5K+", label: "Đầu phim" },
                     { value: "4M+", label: "Người dùng" },
                   ].map((s) => (
                     <div key={s.label}>
@@ -520,7 +522,7 @@ const IntroPage: React.FC = () => {
                 </div>
               </motion.div>
 
-              {/* Card dọc: Tuyển chọn cao cấp */}
+              {/* Card dọc: Góc phim yêu thích */}
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -538,12 +540,14 @@ const IntroPage: React.FC = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-cine-text mb-3">
-                  Tuyển chọn cao cấp
+                  Góc phim yêu thích
                 </h3>
                 <p className="text-cine-text-muted text-sm leading-relaxed">
-                  Đội ngũ chuyên gia lựa chọn kỹ lưỡng từng đầu phim, đảm bảo
-                  mọi nội dung trên CineWrap đều đạt tiêu chuẩn điện ảnh khắt
-                  khe nhất.
+                  Kho dữ liệu mẫu được tổng hợp từ những bộ phim điện ảnh kinh
+                  điển và các đoạn trailer bom tấn hot nhất. Đa dạng thể loại và
+                  điện ảnh các nước Mỹ, Hàn, Nhật, Trung, Việt,... Tất cả được
+                  sắp xếp theo các danh mục trực quan để phục vụ cho việc kiểm
+                  thử tính năng tìm kiếm và phân loại nội dung.
                 </p>
               </motion.div>
 
@@ -584,20 +588,11 @@ const IntroPage: React.FC = () => {
               >
                 <div className="relative rounded-xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl group aspect-video flex items-center justify-center">
                   <img
-                    src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1025&auto=format&fit=crop"
+                    src={Cinemax_CineWrap}
                     alt="Trải nghiệm điện ảnh CineWrap"
                     className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  {/* Play button overlay */}
-                  <div className="relative z-10 w-16 h-16 rounded-full bg-cine-primary/20 border-2 border-cine-primary/60 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
-                    <svg
-                      className="w-7 h-7 text-cine-primary fill-current ml-1"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
                   {/* Quality badge */}
                   <div className="absolute bottom-4 right-4 bg-cine-primary text-cine-bg-primary text-xs font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-[0_0_16px_rgba(255,193,7,0.4)]">
                     4K · Dolby
@@ -711,9 +706,9 @@ const IntroPage: React.FC = () => {
                 {TAB_ITEMS[activeTab].map((item) => (
                   <div
                     key={item.title}
-                    className="bg-[#0d1527]/40 border border-white/5 rounded-xl p-5 flex items-start gap-4 hover:border-white/10 transition-colors duration-200"
+                    className="bg-cine-bg-secondary border border-white/5 rounded-xl p-5 flex items-start gap-4 hover:border-white/10 transition-colors duration-200"
                   >
-                    <div className="p-3 rounded-lg bg-cine-bg-secondary text-xl flex-shrink-0 mt-0.5">
+                    <div className="p-3 rounded-lg bg-cine-surface text-xl flex-shrink-0 mt-0.5">
                       {item.icon}
                     </div>
                     <div>
@@ -773,4 +768,4 @@ const IntroPage: React.FC = () => {
   );
 };
 
-export default IntroPage;
+export default WelcomePage;
