@@ -444,7 +444,7 @@ const WelcomePage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 1, ease: "easeOut" }}
               className="relative w-full rounded-3xl overflow-hidden border border-white/10 p-8 md:p-16 lg:p-20 min-h-[400px] flex items-center shadow-2xl group cursor-pointer"
             >
@@ -495,12 +495,21 @@ const WelcomePage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 1.5 }}
                 className="md:col-span-2 bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-md min-h-[320px]"
               >
-                <div>
-                  <h3 className="text-2xl font-bold text-cine-text mb-4">
+                {/* ── HIỆU ỨNG GRADIENT TRÒN (AMBIENT GLOW) ── */}
+                {/* Đốm sáng góc trên trái (Màu xanh Cyan) */}
+                <div className="absolute -top-24 -left-24 w-72 h-72 bg-cine-secondary/20 rounded-full blur-[80px] pointer-events-none transition-all duration-700 group-hover:bg-cine-secondary/30 group-hover:scale-125" />
+
+                {/* Đốm sáng góc dưới phải (Màu vàng Cam) */}
+                <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-cine-primary/10 rounded-full blur-[100px] pointer-events-none transition-all duration-700 group-hover:bg-cine-primary/20 group-hover:scale-110" />
+                {/* ─────────────────────────────────────────────────── */}
+
+                {/* Bọc nội dung chữ trong relative z-10 để nó luôn nổi bật trên lớp Glow */}
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold text-cine-primary mb-4">
                     Tầm nhìn của chúng tôi
                   </h3>
                   <p className="text-cine-text-muted text-sm leading-relaxed max-w-xl">
@@ -510,23 +519,7 @@ const WelcomePage: React.FC = () => {
                     chuyên nghiệp và phòng khách của bạn.
                   </p>
                 </div>
-                {/* Decorative wave SVG */}
-                <div className="absolute right-0 bottom-12 w-1/2 opacity-20 pointer-events-none">
-                  <svg viewBox="0 0 200 100" className="w-full h-auto">
-                    <path
-                      d="M0,50 Q25,20 50,50 T100,50 T150,50 T200,50"
-                      fill="none"
-                      stroke="#00a3ff"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M0,50 Q25,70 50,50 T100,50 T150,50 T200,50"
-                      fill="none"
-                      stroke="#ffc107"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
-                </div>
+
                 {/* Stat badges - Huy hiệu thống kê */}
                 <div className="flex gap-8 mt-8 border-t border-white/5 pt-6">
                   {[
@@ -551,9 +544,9 @@ const WelcomePage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 1.5, delay: 0.1 }}
-                className="bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center justify-center backdrop-blur-md min-h-[320px]"
+                className="bg-gradient-to-br from-cine-primary/20 to-cine-secondary/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center justify-center backdrop-blur-md min-h-[320px]"
               >
                 <div className="w-14 h-14 rounded-full bg-cine-primary/10 flex items-center justify-center mb-6 border border-cine-primary/25 shadow-[0_0_20px_rgba(255,193,7,0.15)]">
                   <svg
@@ -564,10 +557,10 @@ const WelcomePage: React.FC = () => {
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-cine-text mb-3">
+                <h3 className="text-xl font-bold text-cine-primary mb-3">
                   Góc phim yêu thích
                 </h3>
-                <p className="text-cine-text-muted text-sm leading-relaxed">
+                <p className="text-cine-text-muted text-justify text-sm leading-relaxed">
                   Kho dữ liệu mẫu được tổng hợp từ những bộ phim điện ảnh kinh
                   điển và các đoạn trailer bom tấn hot nhất. Đa dạng thể loại và
                   điện ảnh các nước Mỹ, Hàn, Nhật, Trung, Việt,... Tất cả được
@@ -582,9 +575,9 @@ const WelcomePage: React.FC = () => {
                   key={card.title}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false, amount: 0.3 }}
                   transition={{ duration: 1.5, delay: i * 0.5 }}
-                  className={`bg-[#0d1527]/60 border border-white/10 border-l-2 ${card.accent} rounded-2xl p-6 backdrop-blur-md flex flex-col gap-3`}
+                  className={`bg-gradient-to-l from-cine-primary/10 to-cine-secondary/5 border border-white/10 border-l-2 ${card.accent} rounded-2xl p-6 backdrop-blur-md flex flex-col gap-3`}
                 >
                   <div
                     className={`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center`}
@@ -607,7 +600,7 @@ const WelcomePage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 1.5 }}
                 className="relative"
               >
@@ -631,8 +624,8 @@ const WelcomePage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{ duration: 1.5 }}
                 className="flex flex-col justify-center"
               >
                 <p className="text-cine-secondary text-xs uppercase tracking-[0.25em] font-semibold mb-3">
@@ -690,7 +683,7 @@ const WelcomePage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 1.5 }}
               className="w-full border-t border-white/5 pt-20 flex flex-col items-center"
             >
@@ -737,7 +730,7 @@ const WelcomePage: React.FC = () => {
                       {item.icon}
                     </div>
                     <div>
-                      <h4 className="text-base font-bold text-cine-text mb-1.5">
+                      <h4 className="text-base font-bold text-cine-primary mb-1.5">
                         {item.title}
                       </h4>
                       <p className="text-cine-text-muted text-xs leading-relaxed">
