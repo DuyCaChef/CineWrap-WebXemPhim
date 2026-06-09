@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { TypewriterText } from "../components/TypewriterText";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
+import WatchingFilm from "../assets/images/watchingFilm.jpg";
 import Cinemax_CineWrap from "../assets/images/CineWrap_Cinemax.png";
 
 const WelcomePage: React.FC = () => {
@@ -438,30 +439,51 @@ const WelcomePage: React.FC = () => {
           <div className="pointer-events-none absolute top-0 left-1/4 w-[500px] h-[500px] bg-cine-secondary/5 rounded-full blur-[120px]" />
           <div className="pointer-events-none absolute bottom-1/3 right-0 w-[400px] h-[400px] bg-cine-primary/5 rounded-full blur-[100px]" />
 
-          <div className="max-w-6xl mx-auto flex flex-col gap-28 relative">
+          <div className="max-w-8xl mx-auto flex flex-col gap-28 relative">
             {/* ── PHẦN 1: Hero tagline ─────────────────────────────────── */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center"
+              className="relative w-full rounded-3xl overflow-hidden border border-white/10 p-8 md:p-16 lg:p-20 min-h-[400px] flex items-center shadow-2xl group cursor-pointer"
             >
-              <p className="text-cine-secondary text-xs uppercase tracking-[0.3em] font-semibold mb-4">
-                Nghệ thuật điện ảnh
-              </p>
-              <h2 className="text-4xl md:text-6xl font-extrabold text-cine-text leading-tight mb-6">
-                Mang Trải Nghiệm{" "}
-                <span className="text-cine-primary">Rạp Phim</span>
-                <br />
-                Về Nhà
-              </h2>
-              <p className="text-cine-text-muted text-lg max-w-2xl mx-auto leading-relaxed">
-                CineWrap không chỉ là nơi xem phim — đây là không gian bạn sống
-                cùng từng thước phim. Trang web mang lại cho bạn trải nghiệm xem
-                phim thú vị, sống động và chân thực nhất, với chất lượng hình
-                ảnh và âm thanh đỉnh cao, ngay tại phòng khách của bạn.
-              </p>
+              {/* LỚP 1: Hình ảnh nền (Nằm dưới cùng z-0) */}
+              <motion.img
+                src={WatchingFilm}
+                alt="Background Trải Nghiệm Rạp Phim"
+                className="absolute inset-0 w-full h-full object-cover z-0 filter brightness-75"
+                // Hiệu ứng phóng to nhẹ ảnh nền khi rê chuột vào khung
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              />
+
+              {/* LỚP 2: Màng phủ Gradient mờ (Nằm giữa z-10) */}
+              {/* Giúp bên trái tối màu để chữ nổi bật, bên phải trong suốt để thấy hình */}
+              <div className="absolute inset-0 bg-gradient-to-r from-cine-bg-primary via-cine-bg-primary/80 to-transparent z-10 pointer-events-none" />
+
+              {/* LỚP 3: Nội dung chữ (Nằm trên cùng z-20) */}
+              <div className="relative z-20 w-full max-w-2xl text-left flex flex-col items-start pointer-events-none">
+                {/* Dòng 1: Nghệ thuật điện ảnh */}
+                <motion.p className="text-cine-secondary text-xs md:text-sm uppercase tracking-[0.3em] font-semibold mb-4 drop-shadow-md transition-transform duration-500 group-hover:-translate-y-1">
+                  Nghệ thuật điện ảnh
+                </motion.p>
+
+                {/* Dòng 2: Mang trải nghiệm rạp phim về nhà */}
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 drop-shadow-lg transition-transform duration-500 delay-75 group-hover:-translate-y-1">
+                  Mang Trải Nghiệm <br className="hidden md:block" />
+                  <span className="text-cine-primary">Rạp Phim</span> Về Nhà
+                </h2>
+
+                {/* Dòng 3: Đoạn văn mô tả */}
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed drop-shadow-md transition-transform duration-500 delay-100 group-hover:-translate-y-1">
+                  CineWrap không chỉ là nơi xem phim — đây là không gian bạn
+                  sống cùng từng thước phim. Trang web mang lại cho bạn trải
+                  nghiệm xem phim thú vị, sống động và chân thực nhất, với chất
+                  lượng hình ảnh và âm thanh đỉnh cao, ngay tại phòng khách của
+                  bạn.
+                </p>
+              </div>
             </motion.div>
 
             {/* ── PHẦN 2: Bento Grid ──────────────────────────────────── */}
