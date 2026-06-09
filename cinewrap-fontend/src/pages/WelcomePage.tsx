@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { TypewriterText } from "../components/TypewriterText";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
-import WatchingFilm from "../assets/images/watchingFilm.jpg";
+import Popcorn from "../assets/images/popcorn.jpg";
 import Cinemax_CineWrap from "../assets/images/CineWrap_Cinemax.png";
 
 const WelcomePage: React.FC = () => {
@@ -382,7 +382,7 @@ const WelcomePage: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
                 className="flex flex-col items-center mb-8"
               >
                 {/* Logo dự án  */}
@@ -413,7 +413,7 @@ const WelcomePage: React.FC = () => {
               <motion.button
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
+                transition={{ duration: 1, delay: 0.4 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/home")}
                 className="flex items-center justify-center gap-3 px-8 py-4 bg-cine-secondary hover:bg-cine-primary text-cine-text text-xl font-bold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cine-secondary/30 active:scale-95"
@@ -445,16 +445,19 @@ const WelcomePage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 1, ease: "easeOut" }}
               className="relative w-full rounded-3xl overflow-hidden border border-white/10 p-8 md:p-16 lg:p-20 min-h-[400px] flex items-center shadow-2xl group cursor-pointer"
             >
               {/* LỚP 1: Hình ảnh nền (Nằm dưới cùng z-0) */}
               <motion.img
-                src={WatchingFilm}
+                src={Popcorn}
                 alt="Background Trải Nghiệm Rạp Phim"
                 className="absolute inset-0 w-full h-full object-cover z-0 filter brightness-75"
                 // Hiệu ứng phóng to nhẹ ảnh nền khi rê chuột vào khung
-                whileHover={{ scale: 1.05 }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.8, ease: "easeOut" },
+                }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
 
@@ -493,7 +496,7 @@ const WelcomePage: React.FC = () => {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 1.5 }}
                 className="md:col-span-2 bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-md min-h-[320px]"
               >
                 <div>
@@ -549,7 +552,7 @@ const WelcomePage: React.FC = () => {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 }}
+                transition={{ duration: 1.5, delay: 0.1 }}
                 className="bg-[#0d1527]/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center justify-center backdrop-blur-md min-h-[320px]"
               >
                 <div className="w-14 h-14 rounded-full bg-cine-primary/10 flex items-center justify-center mb-6 border border-cine-primary/25 shadow-[0_0_20px_rgba(255,193,7,0.15)]">
@@ -580,7 +583,7 @@ const WelcomePage: React.FC = () => {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  transition={{ duration: 1.5, delay: i * 0.5 }}
                   className={`bg-[#0d1527]/60 border border-white/10 border-l-2 ${card.accent} rounded-2xl p-6 backdrop-blur-md flex flex-col gap-3`}
                 >
                   <div
@@ -605,7 +608,7 @@ const WelcomePage: React.FC = () => {
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
+                transition={{ duration: 1.5 }}
                 className="relative"
               >
                 <div className="relative rounded-xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl group aspect-video flex items-center justify-center">
@@ -688,7 +691,7 @@ const WelcomePage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 1.5 }}
               className="w-full border-t border-white/5 pt-20 flex flex-col items-center"
             >
               <div className="text-center mb-10">
