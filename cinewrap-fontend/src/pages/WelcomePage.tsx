@@ -359,7 +359,7 @@ const WelcomePage: React.FC = () => {
         <section
           id="welcome"
           ref={scrollyTrackRef}
-          className="relative w-full h-[300vh] z-10"
+          className="relative w-full h-[600vh] z-10"
           aria-label="Giới thiệu điện ảnh cuộn phim"
         >
           {/* Khung viewport dính chặt tại đỉnh khi cuộn trong đường ray */}
