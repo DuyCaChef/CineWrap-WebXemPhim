@@ -778,7 +778,7 @@ const WelcomePage: React.FC = () => {
               <p className="text-cine-text-muted text-sm leading-relaxed max-w-md md:text-right">
                 Chúng tôi cam kết minh bạch về cách dữ liệu của bạn được thu
                 thập, sử dụng và bảo vệ. Cập nhật lần cuối:{" "}
-                <span className="text-cine-text font-semibold">01/06/2025</span>
+                <span className="text-cine-text font-semibold">11/06/2026</span>
               </p>
             </motion.div>
 
@@ -1451,7 +1451,13 @@ const WelcomePage: React.FC = () => {
 
                     {/* Title + summary */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-cine-text font-bold text-sm md:text-base">
+                      <p
+                        className={` font-bold text-sm md:text-base duration-300 ${
+                          openPrivacy === item.id
+                            ? "text-cine-primary"
+                            : "text-cine-text group-hover:text-cine-primary/80"
+                        }`}
+                      >
                         {item.title}
                       </p>
                       <p className="text-cine-text-muted text-xs mt-0.5 truncate">
