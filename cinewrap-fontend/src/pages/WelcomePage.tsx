@@ -1542,32 +1542,6 @@ const WelcomePage: React.FC = () => {
                   Điều Khoản <span className="text-cine-primary">Sử Dụng</span>
                 </h2>
               </div>
-              <div className="flex flex-col items-start md:items-end gap-2">
-                <p className="text-cine-text-muted text-sm leading-relaxed max-w-md md:text-right">
-                  Bằng cách sử dụng CineWrap, bạn đồng ý với các điều khoản dưới
-                  đây. Vui lòng đọc kỹ trước khi tiếp tục.
-                </p>
-                <span className="inline-flex items-center gap-1.5 text-xs text-cine-text-muted border border-white/10 rounded-full px-3 py-1 bg-white/5">
-                  <svg
-                    className="w-3.5 h-3.5 text-cine-primary"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path
-                      d="M12 8v4l3 3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Cập nhật lần cuối:{" "}
-                  <span className="text-cine-text font-semibold">
-                    11/06/2026
-                  </span>
-                </span>
-              </div>
             </motion.div>
 
             {/* ── BANNER CAM KẾT ────────────────────────────────────────── */}
@@ -1583,7 +1557,8 @@ const WelcomePage: React.FC = () => {
 
               <div className="pl-4 flex-1">
                 <p className="text-cine-primary font-bold text-base mb-1">
-                  Tóm tắt trong 1 câu
+                  Tuân thủ điều khoản sử dụng khi truy cập và sử dụng dịch vụ
+                  của CineWrap
                 </p>
                 <p className="text-cine-text-muted text-sm leading-relaxed">
                   Bạn được quyền xem phim hợp pháp, tôn trọng bản quyền và không
@@ -1596,9 +1571,9 @@ const WelcomePage: React.FC = () => {
               {/* 3 chip nhanh */}
               <div className="pl-4 md:pl-0 flex flex-wrap md:flex-col gap-2 flex-shrink-0">
                 {[
-                  { icon: "✅", text: "Miễn phí đọc điều khoản" },
-                  { icon: "📄", text: "Không legalese khó hiểu" },
-                  { icon: "🔔", text: "Thông báo khi có thay đổi" },
+                  { icon: "🤝", text: "Tôn trọng quyền riêng tư" },
+                  { icon: "📜", text: "Cam kết minh bạch dịch vụ" },
+                  { icon: "🔔", text: "Thông báo trước mọi thay đổi" },
                 ].map((chip) => (
                   <span
                     key={chip.text}
