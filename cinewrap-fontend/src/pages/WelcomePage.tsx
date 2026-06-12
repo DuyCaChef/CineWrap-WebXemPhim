@@ -2623,9 +2623,9 @@ const WelcomePage: React.FC = () => {
                 <div className="flex md:flex-col gap-4 md:gap-3 flex-shrink-0">
                   {[
                     {
-                      value: "< 2 giờ",
-                      label: "Thời gian phản hồi trung bình",
-                      icon: "⚡",
+                      value: "Tự động",
+                      label: "Hồi đáp biểu mẫu & Cấp lại mật khẩu",
+                      icon: "🤖",
                     },
                     {
                       value: "97%",
@@ -2846,6 +2846,26 @@ const WelcomePage: React.FC = () => {
                       id: "faq-5",
                       q: "Tôi quên mật khẩu, phải làm gì?",
                       a: 'Bấm "Quên mật khẩu" tại màn hình đăng nhập, nhập email đã đăng ký. Bạn sẽ nhận link đặt lại mật khẩu trong vòng 5 phút. Kiểm tra cả thư mục Spam nếu không thấy email.',
+                    },
+                    {
+                      id: "faq-6",
+                      q: "Tại sao tôi đã thanh toán nhưng tài khoản vẫn chưa lên Premium?",
+                      a: "Thường hệ thống mất từ 1 đến 3 phút để đồng bộ hóa với cổng ngân hàng. Hãy thử đăng xuất tài khoản ra và đăng nhập lại để hệ thống cập nhật. Nếu sau 15 phút tài khoản vẫn chưa được nâng cấp, bạn hãy gửi mã giao dịch (mã Ticket) qua Form hỗ trợ bên cạnh để được xử lý tự động.",
+                    },
+                    {
+                      id: "faq-7",
+                      q: "CineWrap có hỗ trợ xem phim độ phân giải 4K trên trình duyệt web không?",
+                      a: "Có. Tuy nhiên, để xem được chất lượng 4K chuẩn HDR, trình duyệt và thiết bị của bạn phải hỗ trợ giải mã phần cứng tương thích (khuyến khích sử dụng Microsoft Edge trên Windows hoặc Safari trên macOS) và tốc độ đường truyền internet tối thiểu phải đạt 25 Mbps.",
+                    },
+                    {
+                      id: "faq-8",
+                      q: "Làm thế nào để tôi yêu cầu cập nhật bộ phim hoặc bộ tập tiếp theo mà mình yêu thích?",
+                      a: "Chúng tôi luôn lắng nghe gu điện ảnh của bạn! Bạn có thể gửi tên bộ phim, tên đạo diễn hoặc tập phim còn thiếu thông qua Form hỗ trợ ở góc phải, chọn danh mục 'Nội dung & Bản quyền'. Đội ngũ biên tập nội dung sẽ kiểm tra bản quyền và cố gắng cập nhật sớm nhất.",
+                    },
+                    {
+                      id: "faq-9",
+                      q: "Tôi có thể xem CineWrap các thiết bị di động không?",
+                      a: "Có, CineWrap hoàn toàn hỗ trợ xem phim trên các thiết bị di động như điện thoại thông minh và máy tính bảng. Bạn chỉ cần tải ứng dụng CineWrap về thiết bị của mình và đăng nhập để xem nội dung yêu thích.",
                     },
                   ].map((faq, idx) => (
                     <motion.div
@@ -3680,7 +3700,9 @@ const WelcomePage: React.FC = () => {
                   </p>
                   <h3 className="text-white font-bold text-xl leading-snug mb-2">
                     Điền form — nhận trả lời{" "}
-                    <span className="text-cine-primary">trong 2 giờ</span>
+                    <span className="text-cine-primary">
+                      tự động và nhanh chóng{" "}
+                    </span>
                   </h3>
                   <p className="text-cine-text-muted text-xs leading-relaxed">
                     Mô tả chi tiết vấn đề giúp đội ngũ hỗ trợ xử lý nhanh hơn và
