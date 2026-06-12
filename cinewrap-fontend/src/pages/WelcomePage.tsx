@@ -3186,19 +3186,6 @@ const WelcomePage: React.FC = () => {
                           >
                             {topic.label}
                           </span>
-                          <svg
-                            className="w-3 h-3 text-cine-text-muted ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex-shrink-0"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                          >
-                            <polyline
-                              points="9 18 15 12 9 6"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
                         </div>
                       ))}
                     </div>
