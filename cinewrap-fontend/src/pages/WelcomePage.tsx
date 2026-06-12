@@ -235,6 +235,12 @@ const WelcomePage: React.FC = () => {
   // Dữ liệu cho Section Privacy
   const [openPrivacy, setOpenPrivacy] = useState<string | null>(null);
 
+  // Dữ liệu cho Section Terms
+  const [openTerms, setOpenTerms] = useState<string | null>(null);
+  const [activeTermsTab, setActiveTermsTab] = useState<"user" | "platform">(
+    "user",
+  );
+
   return (
     <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* HEADER: Phân vùng thanh điều hướng chính đầu trang */}
@@ -1477,6 +1483,7 @@ const WelcomePage: React.FC = () => {
                       stroke="currentColor"
                       strokeWidth="2"
                     >
+                      cd
                       <polyline
                         points="6 9 12 15 18 9"
                         strokeLinecap="round"
@@ -1502,6 +1509,1023 @@ const WelcomePage: React.FC = () => {
                   </motion.div>
                 </motion.div>
               ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            SECTION 4: ĐIỀU KHOẢN SỬ DỤNG
+        ═══════════════════════════════════════════════════════════════════ */}
+
+        <section
+          id="terms"
+          className="relative z-20 w-full bg-cine-bg-primary py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
+        >
+          {/* Ambient glow — đối xứng ngược chiều với section Privacy */}
+          <div className="pointer-events-none absolute top-0 left-1/3 w-[500px] h-[500px] bg-cine-secondary/4 rounded-full blur-[130px]" />
+          <div className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] bg-cine-primary/4 rounded-full blur-[110px]" />
+
+          <div className="max-w-8xl mx-auto flex flex-col gap-20 relative">
+            {/* ── HERO TAGLINE ──────────────────────────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+            >
+              <div>
+                <p className="text-cine-secondary text-xs uppercase tracking-[0.3em] font-semibold mb-4">
+                  Minh bạch từ ngày đầu tiên
+                </p>
+                <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                  Điều Khoản <span className="text-cine-primary">Sử Dụng</span>
+                </h2>
+              </div>
+              <div className="flex flex-col items-start md:items-end gap-2">
+                <p className="text-cine-text-muted text-sm leading-relaxed max-w-md md:text-right">
+                  Bằng cách sử dụng CineWrap, bạn đồng ý với các điều khoản dưới
+                  đây. Vui lòng đọc kỹ trước khi tiếp tục.
+                </p>
+                <span className="inline-flex items-center gap-1.5 text-xs text-cine-text-muted border border-white/10 rounded-full px-3 py-1 bg-white/5">
+                  <svg
+                    className="w-3.5 h-3.5 text-cine-primary"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path
+                      d="M12 8v4l3 3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Cập nhật lần cuối:{" "}
+                  <span className="text-cine-text font-semibold">
+                    11/06/2026
+                  </span>
+                </span>
+              </div>
+            </motion.div>
+
+            {/* ── BANNER CAM KẾT ────────────────────────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1, delay: 0.05 }}
+              className="relative rounded-2xl overflow-hidden border border-cine-primary/20 bg-gradient-to-r from-cine-primary/10 via-cine-primary/5 to-transparent p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6"
+            >
+              {/* Đường kẻ vàng bên trái */}
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-cine-primary rounded-l-2xl" />
+
+              <div className="pl-4 flex-1">
+                <p className="text-cine-primary font-bold text-base mb-1">
+                  Tóm tắt trong 1 câu
+                </p>
+                <p className="text-cine-text-muted text-sm leading-relaxed">
+                  Bạn được quyền xem phim hợp pháp, tôn trọng bản quyền và không
+                  sử dụng nền tảng cho mục đích vi phạm pháp luật — đổi lại,
+                  chúng tôi cung cấp dịch vụ ổn định, không quảng cáo và bảo vệ
+                  dữ liệu của bạn.
+                </p>
+              </div>
+
+              {/* 3 chip nhanh */}
+              <div className="pl-4 md:pl-0 flex flex-wrap md:flex-col gap-2 flex-shrink-0">
+                {[
+                  { icon: "✅", text: "Miễn phí đọc điều khoản" },
+                  { icon: "📄", text: "Không legalese khó hiểu" },
+                  { icon: "🔔", text: "Thông báo khi có thay đổi" },
+                ].map((chip) => (
+                  <span
+                    key={chip.text}
+                    className="inline-flex items-center gap-2 text-xs text-cine-text-muted bg-white/5 border border-white/10 rounded-full px-3 py-1.5"
+                  >
+                    <span>{chip.icon}</span>
+                    {chip.text}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* ── TAB CHUYỂN NHÓM: Người dùng / Nền tảng ───────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 1, delay: 0.1 }}
+              className="flex flex-col gap-6"
+            >
+              {/* Tab bar — 2 nhánh */}
+              <div className="flex gap-1 p-1 bg-cine-bg-secondary rounded-xl border border-white/8 self-start">
+                {[
+                  {
+                    id: "user" as const,
+                    label: "Quyền & Nghĩa vụ người dùng",
+                    icon: (
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path
+                          d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                          strokeLinecap="round"
+                        />
+                        <circle cx="12" cy="7" r="4" strokeLinecap="round" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    id: "platform" as const,
+                    label: "Cam kết từ CineWrap",
+                    icon: (
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path
+                          d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ),
+                  },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTermsTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                      activeTermsTab === tab.id
+                        ? "bg-cine-primary text-cine-bg-primary shadow-lg shadow-cine-primary/20"
+                        : "text-cine-text-muted hover:text-cine-text"
+                    }`}
+                  >
+                    <span
+                      className={
+                        activeTermsTab === tab.id ? "text-cine-bg-primary" : ""
+                      }
+                    >
+                      {tab.icon}
+                    </span>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab content */}
+              <motion.div
+                key={activeTermsTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col gap-3"
+              >
+                {activeTermsTab === "user"
+                  ? /* ─── NHÓM 1: NGƯỜI DÙNG ─── */
+                    [
+                      {
+                        id: "dk-tai-khoan",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <path
+                              d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                              strokeLinecap="round"
+                            />
+                            <circle
+                              cx="12"
+                              cy="7"
+                              r="4"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        ),
+                        title: "1. Điều kiện tạo tài khoản",
+                        summary:
+                          "Độ tuổi tối thiểu, thông tin xác thực và trách nhiệm bảo mật.",
+                        content: (
+                          <ul className="space-y-3 text-cine-text-muted text-sm leading-relaxed">
+                            {[
+                              {
+                                label: "Độ tuổi tối thiểu",
+                                desc: "Bạn phải đủ 13 tuổi trở lên để đăng ký tài khoản. Người dùng dưới 18 tuổi cần có sự đồng ý của phụ huynh hoặc người giám hộ hợp pháp.",
+                              },
+                              {
+                                label: "Thông tin trung thực",
+                                desc: "Bạn cam kết cung cấp tên, email và thông tin thanh toán chính xác. Tài khoản được lập bằng thông tin giả mạo sẽ bị xoá mà không cần báo trước.",
+                              },
+                              {
+                                label: "Bảo mật tài khoản",
+                                desc: "Bạn chịu trách nhiệm bảo mật mật khẩu và mọi hoạt động phát sinh từ tài khoản của mình. Hãy thông báo ngay cho chúng tôi nếu phát hiện truy cập trái phép.",
+                              },
+                              {
+                                label: "Mỗi người — một tài khoản",
+                                desc: "Mỗi cá nhân chỉ được sở hữu một tài khoản. Việc tạo nhiều tài khoản để lách giới hạn dịch vụ là vi phạm điều khoản.",
+                              },
+                            ].map((item) => (
+                              <li key={item.label} className="flex gap-3">
+                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-cine-secondary flex-shrink-0" />
+                                <span>
+                                  <span className="text-cine-text font-semibold">
+                                    {item.label}:{" "}
+                                  </span>
+                                  {item.desc}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ),
+                      },
+                      {
+                        id: "dk-su-dung",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <polygon
+                              points="23 7 16 12 23 17 23 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <rect
+                              x="1"
+                              y="5"
+                              width="15"
+                              height="14"
+                              rx="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        ),
+                        title: "2. Quy tắc sử dụng nội dung",
+                        summary:
+                          "Những gì được phép và không được phép khi xem phim trên CineWrap.",
+                        content: (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-2">
+                              <p className="text-emerald-400 font-bold mb-3 flex items-center gap-2">
+                                <svg
+                                  className="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                                    strokeLinecap="round"
+                                  />
+                                  <polyline
+                                    points="22 4 12 14.01 9 11.01"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                Được phép
+                              </p>
+                              {[
+                                "Xem phim cho mục đích cá nhân, phi thương mại",
+                                "Chia sẻ đường link bài phim lên mạng xã hội",
+                                "Tải xuống (nếu tính năng được kích hoạt) để xem offline",
+                                "Viết đánh giá và bình luận mang tính xây dựng",
+                              ].map((item) => (
+                                <p
+                                  key={item}
+                                  className="text-cine-text-muted text-xs flex gap-2"
+                                >
+                                  <span className="text-emerald-400 flex-shrink-0">
+                                    ·
+                                  </span>
+                                  {item}
+                                </p>
+                              ))}
+                            </div>
+                            <div className="p-4 rounded-xl border border-cine-warn/20 bg-cine-warn/5 space-y-2">
+                              <p className="text-cine-warn font-bold mb-3 flex items-center gap-2">
+                                <svg
+                                  className="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <circle cx="12" cy="12" r="10" />
+                                  <line
+                                    x1="15"
+                                    y1="9"
+                                    x2="9"
+                                    y2="15"
+                                    strokeLinecap="round"
+                                  />
+                                  <line
+                                    x1="9"
+                                    y1="9"
+                                    x2="15"
+                                    y2="15"
+                                    strokeLinecap="round"
+                                  />
+                                </svg>
+                                Không được phép
+                              </p>
+                              {[
+                                "Ghi hình, chụp màn hình để phân phối lại",
+                                "Dùng VPN hoặc proxy để lách giới hạn vùng nội dung",
+                                "Bán lại hoặc cho thuê quyền truy cập tài khoản",
+                                "Sử dụng bot, script để tự động duyệt hoặc tải nội dung",
+                              ].map((item) => (
+                                <p
+                                  key={item}
+                                  className="text-cine-text-muted text-xs flex gap-2"
+                                >
+                                  <span className="text-cine-warn flex-shrink-0">
+                                    ·
+                                  </span>
+                                  {item}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "dk-thanh-toan",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <rect
+                              x="1"
+                              y="4"
+                              width="22"
+                              height="16"
+                              rx="2"
+                              strokeLinecap="round"
+                            />
+                            <line
+                              x1="1"
+                              y1="10"
+                              x2="23"
+                              y2="10"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        ),
+                        title: "3. Thanh toán & Hoàn tiền",
+                        summary:
+                          "Chính sách gói dịch vụ, gia hạn tự động và điều kiện hoàn tiền.",
+                        content: (
+                          <div className="space-y-4 text-sm text-cine-text-muted leading-relaxed">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              {[
+                                {
+                                  icon: "🔄",
+                                  label: "Gia hạn tự động",
+                                  desc: "Gói đăng ký sẽ tự động gia hạn vào ngày hết hạn. Bạn có thể huỷ bất cứ lúc nào trước 24 giờ chu kỳ tiếp theo.",
+                                  border: "border-cine-secondary/20",
+                                },
+                                {
+                                  icon: "💳",
+                                  label: "Phương thức thanh toán",
+                                  desc: "Hỗ trợ thẻ tín dụng/ghi nợ, ví điện tử MoMo, ZaloPay và chuyển khoản ngân hàng nội địa.",
+                                  border: "border-cine-primary/20",
+                                },
+                                {
+                                  icon: "↩️",
+                                  label: "Hoàn tiền",
+                                  desc: "Chấp nhận yêu cầu hoàn tiền trong vòng 7 ngày kể từ ngày thanh toán nếu dịch vụ gặp sự cố kỹ thuật nghiêm trọng từ phía CineWrap.",
+                                  border: "border-emerald-500/20",
+                                },
+                              ].map((item) => (
+                                <div
+                                  key={item.label}
+                                  className={`p-4 rounded-xl border ${item.border} bg-cine-bg-primary/40 flex flex-col gap-2`}
+                                >
+                                  <span className="text-xl">{item.icon}</span>
+                                  <p className="text-cine-text font-semibold text-xs">
+                                    {item.label}
+                                  </p>
+                                  <p className="text-xs leading-relaxed">
+                                    {item.desc}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="p-4 rounded-xl border border-white/8 bg-cine-bg-primary/30 flex gap-3">
+                              <svg
+                                className="w-5 h-5 text-cine-primary flex-shrink-0 mt-0.5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line
+                                  x1="12"
+                                  y1="8"
+                                  x2="12"
+                                  y2="12"
+                                  strokeLinecap="round"
+                                />
+                                <line
+                                  x1="12"
+                                  y1="16"
+                                  x2="12.01"
+                                  y2="16"
+                                  strokeLinecap="round"
+                                />
+                              </svg>
+                              <p className="text-xs leading-relaxed">
+                                Giá gói dịch vụ có thể thay đổi. CineWrap sẽ
+                                thông báo qua email ít nhất{" "}
+                                <span className="text-cine-text font-semibold">
+                                  30 ngày
+                                </span>{" "}
+                                trước khi mức giá mới có hiệu lực.
+                              </p>
+                            </div>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "dk-ban-quyen",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M14.83 14.83a4 4 0 1 1 0-5.66"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        ),
+                        title: "4. Bản quyền & Sở hữu trí tuệ",
+                        summary:
+                          "Toàn bộ nội dung được bảo hộ — vi phạm có thể bị xử lý pháp lý.",
+                        content: (
+                          <div className="space-y-4 text-sm text-cine-text-muted leading-relaxed">
+                            <p>
+                              Tất cả nội dung trên CineWrap — bao gồm phim,
+                              trailer, hình ảnh, logo, giao diện và mã nguồn —
+                              đều thuộc quyền sở hữu của CineWrap hoặc được cấp
+                              phép hợp lệ từ các đối tác phân phối.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {[
+                                {
+                                  type: "Nội dung phim",
+                                  rule: "Bảo hộ theo Luật Sở hữu trí tuệ Việt Nam và Công ước Berne. Mọi hành vi sao chép, phân phối trái phép đều có thể bị truy cứu trách nhiệm hình sự.",
+                                },
+                                {
+                                  type: "Giao diện & mã nguồn",
+                                  rule: "Thiết kế giao diện, logo và toàn bộ mã nguồn front-end là tài sản độc quyền của CineWrap, không được sao chép hay tái sử dụng.",
+                                },
+                                {
+                                  type: "Nội dung người dùng tạo",
+                                  rule: "Bình luận và đánh giá bạn đăng lên CineWrap vẫn thuộc quyền sở hữu của bạn, nhưng bạn cấp cho chúng tôi giấy phép hiển thị trên nền tảng.",
+                                },
+                                {
+                                  type: "Báo cáo vi phạm",
+                                  rule: "Nếu phát hiện nội dung vi phạm bản quyền, vui lòng liên hệ copyright@cinewrap.vn — chúng tôi xử lý trong vòng 48 giờ.",
+                                },
+                              ].map((item) => (
+                                <div
+                                  key={item.type}
+                                  className="p-4 rounded-xl border border-white/5 bg-cine-bg-primary/40 flex gap-3"
+                                >
+                                  <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-cine-primary flex-shrink-0 mt-1.5" />
+                                  <div>
+                                    <p className="text-cine-text font-semibold mb-1 text-xs">
+                                      {item.type}
+                                    </p>
+                                    <p className="text-xs leading-relaxed">
+                                      {item.rule}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ),
+                      },
+                    ].map((item, idx) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 14 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.15 }}
+                        transition={{ duration: 0.5, delay: idx * 0.06 }}
+                        className="bg-cine-bg-secondary/60 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md"
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenTerms(openTerms === item.id ? null : item.id)
+                          }
+                          className="w-full flex items-center gap-4 px-6 py-5 text-left group"
+                          aria-expanded={openTerms === item.id}
+                        >
+                          <div
+                            className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-200 ${
+                              openTerms === item.id
+                                ? "bg-cine-primary/20 text-cine-primary"
+                                : "bg-white/5 text-cine-text-muted group-hover:bg-cine-primary/10 group-hover:text-cine-primary"
+                            }`}
+                          >
+                            {item.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`font-bold text-sm md:text-base transition-colors duration-200 ${
+                                openTerms === item.id
+                                  ? "text-cine-primary"
+                                  : "text-cine-text group-hover:text-cine-primary/80"
+                              }`}
+                            >
+                              {item.title}
+                            </p>
+                            <p className="text-cine-text-muted text-xs mt-0.5 truncate">
+                              {item.summary}
+                            </p>
+                          </div>
+                          <svg
+                            className={`w-5 h-5 flex-shrink-0 text-cine-text-muted transition-transform duration-300 ${
+                              openTerms === item.id
+                                ? "rotate-180 text-cine-primary"
+                                : ""
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline
+                              points="6 9 12 15 18 9"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                        <motion.div
+                          initial={false}
+                          animate={
+                            openTerms === item.id
+                              ? { height: "auto", opacity: 1 }
+                              : { height: 0, opacity: 0 }
+                          }
+                          transition={{ duration: 0.35, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-6 pb-6 pt-2 border-t border-white/5">
+                            {item.content}
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    ))
+                  : /* ─── NHÓM 2: NỀN TẢNG ─── */
+                    [
+                      {
+                        id: "cam-ket-dich-vu",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <path
+                              d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                              strokeLinecap="round"
+                            />
+                            <polyline
+                              points="22 4 12 14.01 9 11.01"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        ),
+                        title: "5. Cam kết chất lượng dịch vụ",
+                        summary:
+                          "Uptime, tốc độ và tiêu chuẩn chất lượng CineWrap đảm bảo.",
+                        content: (
+                          <div className="space-y-4 text-sm text-cine-text-muted leading-relaxed">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              {[
+                                {
+                                  value: "99.5%",
+                                  label: "Uptime cam kết",
+                                  color: "text-emerald-400",
+                                  bg: "bg-emerald-500/10 border-emerald-500/20",
+                                },
+                                {
+                                  value: "< 2s",
+                                  label: "Thời gian tải trang",
+                                  color: "text-cine-secondary",
+                                  bg: "bg-cine-secondary/10 border-cine-secondary/20",
+                                },
+                                {
+                                  value: "4K",
+                                  label: "Độ phân giải tối đa",
+                                  color: "text-cine-primary",
+                                  bg: "bg-cine-primary/10 border-cine-primary/20",
+                                },
+                                {
+                                  value: "24/7",
+                                  label: "Giám sát hệ thống",
+                                  color: "text-cine-text",
+                                  bg: "bg-white/5 border-white/10",
+                                },
+                              ].map((stat) => (
+                                <div
+                                  key={stat.label}
+                                  className={`p-4 rounded-xl border ${stat.bg} flex flex-col gap-1`}
+                                >
+                                  <p
+                                    className={`text-xl font-extrabold ${stat.color}`}
+                                  >
+                                    {stat.value}
+                                  </p>
+                                  <p className="text-cine-text-muted text-xs">
+                                    {stat.label}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                            <p>
+                              Trong trường hợp downtime vượt quá mức cam kết,
+                              CineWrap sẽ tự động gia hạn gói dịch vụ của bạn
+                              tương ứng với thời gian gián đoạn, không cần yêu
+                              cầu.
+                            </p>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "gioi-han-trach-nhiem",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <path
+                              d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <line
+                              x1="12"
+                              y1="8"
+                              x2="12"
+                              y2="12"
+                              strokeLinecap="round"
+                            />
+                            <line
+                              x1="12"
+                              y1="16"
+                              x2="12.01"
+                              y2="16"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        ),
+                        title: "6. Giới hạn trách nhiệm",
+                        summary:
+                          "Những trường hợp CineWrap không chịu trách nhiệm pháp lý.",
+                        content: (
+                          <div className="space-y-3 text-sm text-cine-text-muted leading-relaxed">
+                            <p>
+                              CineWrap cung cấp dịch vụ theo dạng "nguyên trạng"
+                              và không chịu trách nhiệm trong các trường hợp
+                              sau:
+                            </p>
+                            <ul className="space-y-2.5">
+                              {[
+                                "Mất dữ liệu do lỗi thiết bị hoặc kết nối internet phía người dùng.",
+                                "Gián đoạn dịch vụ do sự cố bất khả kháng (thiên tai, chiến tranh mạng quy mô lớn, quyết định từ cơ quan nhà nước).",
+                                "Nội dung bình luận của người dùng khác gây ảnh hưởng đến bạn — chúng tôi sẽ xử lý khi nhận được báo cáo.",
+                                "Thiệt hại gián tiếp phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ, ngoài phạm vi phí dịch vụ đã thanh toán.",
+                              ].map((item) => (
+                                <li key={item} className="flex gap-3">
+                                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-cine-warn flex-shrink-0" />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "thay-doi-dk",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <path
+                              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        ),
+                        title: "7. Thay đổi điều khoản",
+                        summary:
+                          "CineWrap thông báo trước ít nhất 30 ngày mỗi khi cập nhật điều khoản.",
+                        content: (
+                          <div className="space-y-4 text-sm text-cine-text-muted leading-relaxed">
+                            <div className="flex flex-col md:flex-row gap-4">
+                              {[
+                                {
+                                  step: "01",
+                                  title: "Soạn thảo cập nhật",
+                                  desc: "Đội pháp lý soạn thảo và rà soát nội dung thay đổi.",
+                                  color: "text-cine-secondary",
+                                  border: "border-cine-secondary/30",
+                                },
+                                {
+                                  step: "02",
+                                  title: "Thông báo 30 ngày",
+                                  desc: "Gửi email tóm tắt thay đổi đến toàn bộ tài khoản đang hoạt động.",
+                                  color: "text-cine-primary",
+                                  border: "border-cine-primary/30",
+                                },
+                                {
+                                  step: "03",
+                                  title: "Hiệu lực",
+                                  desc: "Điều khoản mới có hiệu lực. Tiếp tục sử dụng đồng nghĩa với chấp thuận.",
+                                  color: "text-emerald-400",
+                                  border: "border-emerald-500/30",
+                                },
+                              ].map((step) => (
+                                <div
+                                  key={step.step}
+                                  className={`flex-1 p-4 rounded-xl border ${step.border} bg-cine-bg-primary/40`}
+                                >
+                                  <p
+                                    className={`text-2xl font-extrabold ${step.color} mb-2`}
+                                  >
+                                    {step.step}
+                                  </p>
+                                  <p className="text-cine-text font-semibold text-xs mb-1">
+                                    {step.title}
+                                  </p>
+                                  <p className="text-xs leading-relaxed">
+                                    {step.desc}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                            <p className="text-xs">
+                              Nếu bạn không đồng ý với điều khoản mới, bạn có
+                              quyền huỷ tài khoản trước ngày hiệu lực và được
+                              hoàn tiền phần dịch vụ chưa sử dụng theo tỷ lệ.
+                            </p>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "phap-luat",
+                        icon: (
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                          >
+                            <path
+                              d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M9 12l2 2 4-4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        ),
+                        title: "8. Pháp luật áp dụng & Giải quyết tranh chấp",
+                        summary:
+                          "Tuân theo pháp luật Việt Nam, ưu tiên hoà giải trước khi khởi kiện.",
+                        content: (
+                          <div className="space-y-4 text-sm text-cine-text-muted leading-relaxed">
+                            <p>
+                              Điều khoản này được điều chỉnh bởi pháp luật Cộng
+                              hoà Xã hội Chủ nghĩa Việt Nam. Mọi tranh chấp phát
+                              sinh sẽ được xử lý theo trình tự:
+                            </p>
+                            <ol className="space-y-3">
+                              {[
+                                {
+                                  num: "1.",
+                                  title: "Liên hệ trực tiếp",
+                                  desc: "Gửi yêu cầu tới legal@cinewrap.vn — chúng tôi cam kết phản hồi trong 5 ngày làm việc.",
+                                },
+                                {
+                                  num: "2.",
+                                  title: "Hoà giải",
+                                  desc: "Nếu không giải quyết được qua thư, hai bên đồng ý tiến hành hoà giải tại Trung tâm Hoà giải Thương mại Việt Nam (VMC).",
+                                },
+                                {
+                                  num: "3.",
+                                  title: "Toà án",
+                                  desc: "Trường hợp hoà giải thất bại, tranh chấp được đưa ra Toà án nhân dân có thẩm quyền tại TP. Hồ Chí Minh.",
+                                },
+                              ].map((step) => (
+                                <li key={step.num} className="flex gap-3">
+                                  <span className="text-cine-primary font-extrabold flex-shrink-0">
+                                    {step.num}
+                                  </span>
+                                  <span>
+                                    <span className="text-cine-text font-semibold">
+                                      {step.title}:{" "}
+                                    </span>
+                                    {step.desc}
+                                  </span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        ),
+                      },
+                    ].map((item, idx) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 14 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.15 }}
+                        transition={{ duration: 0.5, delay: idx * 0.06 }}
+                        className="bg-cine-bg-secondary/60 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md"
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenTerms(openTerms === item.id ? null : item.id)
+                          }
+                          className="w-full flex items-center gap-4 px-6 py-5 text-left group"
+                          aria-expanded={openTerms === item.id}
+                        >
+                          <div
+                            className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-200 ${
+                              openTerms === item.id
+                                ? "bg-cine-primary/20 text-cine-primary"
+                                : "bg-white/5 text-cine-text-muted group-hover:bg-cine-primary/10 group-hover:text-cine-primary"
+                            }`}
+                          >
+                            {item.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`font-bold text-sm md:text-base transition-colors duration-200 ${
+                                openTerms === item.id
+                                  ? "text-cine-primary"
+                                  : "text-cine-text group-hover:text-cine-primary/80"
+                              }`}
+                            >
+                              {item.title}
+                            </p>
+                            <p className="text-cine-text-muted text-xs mt-0.5 truncate">
+                              {item.summary}
+                            </p>
+                          </div>
+                          <svg
+                            className={`w-5 h-5 flex-shrink-0 text-cine-text-muted transition-transform duration-300 ${
+                              openTerms === item.id
+                                ? "rotate-180 text-cine-primary"
+                                : ""
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline
+                              points="6 9 12 15 18 9"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                        <motion.div
+                          initial={false}
+                          animate={
+                            openTerms === item.id
+                              ? { height: "auto", opacity: 1 }
+                              : { height: 0, opacity: 0 }
+                          }
+                          transition={{ duration: 0.35, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-6 pb-6 pt-2 border-t border-white/5">
+                            {item.content}
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    ))}
+              </motion.div>
+            </motion.div>
+
+            {/* ── CTA CUỐI SECTION ──────────────────────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 1, delay: 0.1 }}
+              className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 rounded-2xl border border-white/8 bg-cine-bg-secondary/40 backdrop-blur-md"
+            >
+              <div>
+                <p className="text-cine-text font-bold text-base mb-1">
+                  Có thắc mắc về điều khoản?
+                </p>
+                <p className="text-cine-text-muted text-sm">
+                  Đội ngũ hỗ trợ sẵn sàng giải đáp mọi câu hỏi pháp lý của bạn.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <a
+                  href="mailto:legal@cinewrap.vn"
+                  className="flex items-center gap-2 px-5 py-3 rounded-full bg-cine-secondary/10 border border-cine-secondary/30 text-cine-secondary text-sm font-semibold hover:bg-cine-secondary/20 transition-colors"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  legal@cinewrap.vn
+                </a>
+                <a
+                  href="#support"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document
+                      .getElementById("support")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="flex items-center gap-2 px-5 py-3 rounded-full bg-cine-primary/10 border border-cine-primary/30 text-cine-primary text-sm font-semibold hover:bg-cine-primary/20 transition-colors"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  Liên hệ hỗ trợ
+                </a>
+              </div>
             </motion.div>
           </div>
         </section>
