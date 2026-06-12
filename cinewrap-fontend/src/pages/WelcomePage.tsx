@@ -6,6 +6,7 @@ import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import Logo_CineWrap from "../assets/images/Logo_CineWrap.png";
 import Popcorn from "../assets/images/popcorn.jpg";
 import Cinemax_CineWrap from "../assets/images/CineWrap_Cinemax.png";
+import { Footer } from "../components/Footer";
 
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -2513,12 +2514,7 @@ const WelcomePage: React.FC = () => {
       </main>
 
       {/* FOOTER: Phân vùng chân trang chuẩn cấu trúc dự án doanh nghiệp */}
-      <footer className="bg-cine-bg py-12 px-6 border-t border-white/5 text-center text-sm text-cine-text-muted">
-        <p>
-          &copy; {new Date().getFullYear()} CineWrap. Toàn bộ bản quyền được bảo
-          lưu.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
