@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-// import Logo_CineWrap from "../assets/images/logo_CineWrap.png";
+import Logo_CineWrap from "../assets/images/logo_CineWrap.png";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 
 export const Footer: React.FC = () => {
@@ -18,14 +18,21 @@ export const Footer: React.FC = () => {
     }
   };
   return (
-    <footer className="w-full bg-cine-bg-primary border-t border-white/5 text-cine-text-muted font-sans text-sm">
+    <footer className="w-full bg-cine-bg-primary border-t border-white/5 text-cine-text-muted font-sans text-sm relative overflow-hidden">
+      {/* Mờ background logo */}
+      <img
+        src={Logo_CineWrap}
+        alt=""
+        aria-hidden="true"
+        className="absolute left-1/2 top-6 -translate-x-1/2 -translate-y-1/10  opacity-20 max-w-[520px] w-[60%] pointer-events-none z-0 transform scale-125 filter blur-sm brightness-90"
+      />
       {/* Khối nội dung chính phía trên */}
-      <div className="max-w-8xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="relative z-10 max-w-8xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
         {/* Cột 1: Thông tin thương hiệu (Chiếm 2 cột trên màn hình lớn) */}
         <div className="lg:col-span-2 flex flex-col items-start gap-5">
           <img
             src={Typo_CineWrap}
-            alt="CineWrap Logo"
+            alt="CineWrap Typo"
             className="w-44 cursor-pointer drop-shadow-[0_2px_8px_rgba(0,163,255,0.2)]"
             onClick={() => navigate("/")}
           />
