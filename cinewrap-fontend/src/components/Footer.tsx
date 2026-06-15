@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
 
         {/* Cột 2: Khám phá phim nhanh */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-cine-text font-bold uppercase tracking-wider text-xs border-l-2 border-cine-secondary pl-2.5">
+          <h4 className="text-cine-text font-bold uppercase tracking-wider text-lg border-l-2 border-cine-secondary pl-2.5">
             Khám phá
           </h4>
           <ul className="flex flex-col gap-2.5 text-xs font-medium">
@@ -79,7 +79,7 @@ export const Footer: React.FC = () => {
 
         {/* Cột 3: Phân vùng Landing điều hướng nhanh */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-cine-text font-bold uppercase tracking-wider text-xs border-l-2 border-cine-primary pl-2.5">
+          <h4 className="text-cine-text font-bold uppercase tracking-wider text-lg border-l-2 border-cine-primary pl-2.5">
             Thông tin
           </h4>
           <ul className="flex flex-col gap-2.5 text-xs font-medium">
@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
 
         {/* Cột 4: Liên hệ pháp lý */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-cine-text font-bold uppercase tracking-wider text-xs border-l-2 border-cine-warn pl-2.5">
+          <h4 className="text-cine-text font-bold uppercase tracking-wider text-lg border-l-2 border-cine-warn pl-2.5">
             Liên hệ pháp lý
           </h4>
           <ul className="flex flex-col gap-3 text-xs text-justify">
