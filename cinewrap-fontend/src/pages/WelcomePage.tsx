@@ -74,6 +74,7 @@ const WelcomePage: React.FC = () => {
         <GeneralSection />  
         <PrivacySection />    
         <TermsSection />  
+        <SupportSection />
       </main>
 
       {/* Chân trang */}
