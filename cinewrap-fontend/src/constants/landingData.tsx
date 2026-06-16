@@ -1249,3 +1249,86 @@ export const TERMS_PLATFORM_DATA = [
     ),
   },
 ];
+
+// ============================================================================
+// DỮ LIỆU CHO SECTION HỖ TRỢ & LIÊN HỆ (SUPPORT SECTION)
+// ============================================================================
+
+// 1. Chỉ số hỗ trợ
+export const SUPPORT_STATS = [
+  {
+    value: "Tự động",
+    label: "Hồi đáp biểu mẫu & Cấp lại mật khẩu",
+    icon: "🤖",
+  },
+  { value: "97%", label: "Tỷ lệ giải quyết lần đầu", icon: "✅" },
+  { value: "24/7", label: "Hỗ trợ qua email & FAQ", icon: "🌐" },
+];
+
+// 2. Danh sách câu hỏi thường gặp (FAQ)
+export const FAQS = [
+  {
+    id: "faq-1",
+    q: "Tại sao phim bị giật hoặc chất lượng thấp?",
+    a: "Thường do tốc độ mạng không ổn định. Thử giảm chất lượng phát xuống 1080p hoặc 720p trong menu Cài đặt phát > Chất lượng video. Nếu vẫn còn, hãy kiểm tra kết nối Wi-Fi hoặc chuyển sang mạng khác.",
+  },
+  {
+    id: "faq-2",
+    q: "Tôi có thể xem trên bao nhiêu thiết bị cùng lúc?",
+    a: "Gói Cơ bản: 1 thiết bị. Gói Premium: tối đa 4 thiết bị đồng thời. Bạn có thể quản lý và đăng xuất thiết bị khác trong Cài đặt > Thiết bị đang hoạt động.",
+  },
+  {
+    id: "faq-3",
+    q: "Làm thế nào để đổi gói dịch vụ hoặc huỷ đăng ký?",
+    a: "Vào Cài đặt > Gói dịch vụ > Thay đổi gói. Hủy đăng ký có hiệu lực vào cuối chu kỳ thanh toán hiện tại, bạn vẫn được xem phim đến hết ngày đó.",
+  },
+  {
+    id: "faq-4",
+    q: "Phim tôi đang xem biến mất khỏi thư viện?",
+    a: "Nội dung trên CineWrap phụ thuộc vào giấy phép phân phối theo từng khu vực. Một số phim có thể bị gỡ khi hết hợp đồng. Chúng tôi thông báo trước 7 ngày qua mục Thông báo nếu nội dung bạn đang theo dõi sắp bị gỡ.",
+  },
+  {
+    id: "faq-5",
+    q: "Tôi quên mật khẩu, phải làm gì?",
+    a: 'Bấm "Quên mật khẩu" tại màn hình đăng nhập, nhập email đã đăng ký. Bạn sẽ nhận link đặt lại mật khẩu trong vòng 5 phút. Kiểm tra cả thư mục Spam nếu không thấy email.',
+  },
+  {
+    id: "faq-6",
+    q: "Tại sao tôi đã thanh toán nhưng tài khoản vẫn chưa lên Premium?",
+    a: "Thường hệ thống mất từ 1 đến 3 phút để đồng bộ hóa với cổng ngân hàng. Hãy thử đăng xuất tài khoản ra và đăng nhập lại để hệ thống cập nhật. Nếu sau 15 phút tài khoản vẫn chưa được nâng cấp, bạn hãy gửi mã giao dịch (mã Ticket) qua Form hỗ trợ bên cạnh để được xử lý tự động.",
+  },
+  {
+    id: "faq-7",
+    q: "CineWrap có hỗ trợ xem phim độ phân giải 4K trên trình duyệt web không?",
+    a: "Có. Tuy nhiên, để xem được chất lượng 4K chuẩn HDR, trình duyệt và thiết bị của bạn phải hỗ trợ giải mã phần cứng tương thích (khuyến khích sử dụng Microsoft Edge trên Windows hoặc Safari trên macOS) và tốc độ đường truyền internet tối thiểu phải đạt 25 Mbps.",
+  },
+  {
+    id: "faq-8",
+    q: "Làm thế nào để tôi yêu cầu cập nhật bộ phim hoặc bộ tập tiếp theo mà mình yêu thích?",
+    a: "Chúng tôi luôn lắng nghe gu điện ảnh của bạn! Bạn có thể gửi tên bộ phim, tên đạo diễn hoặc tập phim còn thiếu thông qua Form hỗ trợ ở góc phải, chọn danh mục 'Nội dung & Bản quyền'. Đội ngũ biên tập nội dung sẽ kiểm tra bản quyền và cố gắng cập nhật sớm nhất.",
+  },
+  {
+    id: "faq-9",
+    q: "Tôi có thể xem CineWrap trên các thiết bị di động không?",
+    a: "Có, CineWrap hoàn toàn hỗ trợ xem phim trên các thiết bị di động như điện thoại thông minh và máy tính bảng. Bạn chỉ cần truy cập web hoặc tải ứng dụng CineWrap về thiết bị của mình và đăng nhập để xem nội dung yêu thích.",
+  },
+];
+
+// 3. Các chủ đề hỗ trợ (Bento Card nhỏ)
+export const SUPPORT_TOPICS = [
+  {
+    icon: "🎬",
+    label: "Sự cố phát phim & Chất lượng",
+    color: "text-cine-secondary",
+  },
+  { icon: "👤", label: "Tài khoản & Thành viên", color: "text-cine-primary" },
+  { icon: "💳", label: "Thanh toán & Hoàn tiền", color: "text-emerald-400" },
+  { icon: "🔒", label: "Bảo mật & Quyền riêng tư", color: "text-cine-warn" },
+];
+
+// 4. Khung giờ phục vụ (Bento Card nhỏ)
+export const WORKING_HOURS = [
+  { label: "Thứ 2 – Thứ 6", time: "08:00 – 22:00", color: "text-cine-text" },
+  { label: "Thứ 7 – Chủ nhật", time: "09:00 – 20:00", color: "text-cine-text" },
+  { label: "Email & FAQ", time: "24/7", color: "text-emerald-400" },
+];
