@@ -72,7 +72,8 @@ const WelcomePage: React.FC = () => {
       <main className="pt-20 relative w-full min-h-screen">
         <HeroSection />
         <GeneralSection />  
-        <PrivacySection />      
+        <PrivacySection />    
+        <TermsSection />  
       </main>
 
       {/* Chân trang */}
