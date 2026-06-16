@@ -71,7 +71,7 @@ const WelcomePage: React.FC = () => {
       {/* Vùng chứa các nội dung chính */}
       <main className="pt-20 relative w-full min-h-screen">
         <HeroSection />
-        
+        <GeneralSection />        
       </main>
 
       {/* Chân trang */}
