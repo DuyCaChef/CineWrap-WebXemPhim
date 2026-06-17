@@ -20,7 +20,9 @@ const WelcomePage: React.FC = () => {
 
     const updateActive = () => {
       const headerEl = document.querySelector("header");
-      const headerHeight = headerEl ? (headerEl as HTMLElement).offsetHeight : 0;
+      const headerHeight = headerEl
+        ? (headerEl as HTMLElement).offsetHeight
+        : 0;
 
       // Điểm kiểm tra nằm ngay dưới thanh header một chút
       const point = headerHeight + 20;
@@ -29,7 +31,7 @@ const WelcomePage: React.FC = () => {
         const el = document.getElementById(id);
         if (!el) continue;
         const rect = el.getBoundingClientRect();
-        
+
         // Nếu điểm kiểm tra nằm trong vùng của thẻ này
         if (rect.top <= point && rect.bottom >= point) {
           setActive(id);
@@ -71,9 +73,9 @@ const WelcomePage: React.FC = () => {
       {/* Vùng chứa các nội dung chính */}
       <main className="pt-20 relative w-full min-h-screen">
         <HeroSection />
-        <GeneralSection />  
-        <PrivacySection />    
-        <TermsSection />  
+        <GeneralSection />
+        <PrivacySection />
+        <TermsSection />
         <SupportSection />
       </main>
 
