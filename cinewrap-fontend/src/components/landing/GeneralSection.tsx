@@ -1,28 +1,28 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-// 1. Import hình ảnh (Lùi 2 bước để vào thư mục assets)
+// 1. Import hình ảnh
 import Popcorn from "../../assets/images/popcorn.jpg";
 import Cinemax_CineWrap from "../../assets/images/CineWrap_Cinemax.png";
 
-// 2. Import dữ liệu tĩnh từ file constants vừa tạo
+// 2. Import dữ liệu tĩnh
 import { FEATURE_CARDS, TABS, TAB_ITEMS } from "../../constants/landingData";
 
 export const GeneralSection: React.FC = () => {
-  // 3. Khai báo State để quản lý Tab đang được chọn (Mặc định lấy id của Tab đầu tiên)
   const [activeTab, setActiveTab] = useState(TABS[0].id);
 
   return (
     <section
       id="general"
-      className="relative z-20 w-full bg-cine-bg-primary py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
+      // TỐI ƯU 1: Giảm padding dọc trên Mobile (py-16), giữ nguyên py-24 cho Tablet/PC
+      className="relative z-20 w-full bg-cine-bg-primary py-16 md:py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
     >
-      {/* Ambient glow blobs — trang trí nền */}
       <div className="pointer-events-none absolute top-0 left-1/4 w-[500px] h-[500px] bg-cine-secondary/5 rounded-full blur-[120px]" />
       <div className="pointer-events-none absolute bottom-1/3 right-0 w-[400px] h-[400px] bg-cine-primary/5 rounded-full blur-[100px]" />
 
-      <div className="max-w-8xl mx-auto flex flex-col gap-28 relative">
-        {/* ── PHẦN 1: Hero tagline ─────────────────────────────────── */}
+      {/* TỐI ƯU 2: Giảm gap giữa các khối lớn trên Mobile (gap-16), Desktop giữ gap-28 */}
+      <div className="max-w-8xl mx-auto flex flex-col gap-16 lg:gap-28 relative">
+        {/* ── PHẦN 1: Hero tagline ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,7 +30,6 @@ export const GeneralSection: React.FC = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative w-full rounded-3xl overflow-hidden border border-white/10 p-8 md:p-16 lg:p-20 min-h-[400px] flex items-center shadow-2xl group cursor-pointer"
         >
-          {/* Hình ảnh nền */}
           <motion.img
             src={Popcorn}
             alt="Background Trải Nghiệm Rạp Phim"
@@ -43,7 +42,6 @@ export const GeneralSection: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-cine-bg-primary via-cine-bg-primary/80 to-transparent z-10 pointer-events-none" />
 
-          {/* Nội dung chữ */}
           <div className="relative z-20 w-full max-w-2xl text-left flex flex-col items-start pointer-events-none">
             <motion.p className="text-cine-secondary text-xs md:text-sm uppercase tracking-[0.3em] font-semibold mb-4 drop-shadow-md transition-transform duration-500 group-hover:-translate-y-1">
               Nghệ thuật điện ảnh
@@ -61,9 +59,8 @@ export const GeneralSection: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* ── PHẦN 2: Bento Grid ──────────────────────────────────── */}
+        {/* ── PHẦN 2: Bento Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card lớn: Tầm nhìn */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +83,8 @@ export const GeneralSection: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex gap-8 mt-8 border-t border-white/5 pt-6 relative z-10">
+            {/* TỐI ƯU 3: Đổi flex dàn ngang thành lưới (grid) 2 cột trên Mobile, 4 cột trên thiết bị lớn */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 mt-8 border-t border-white/5 pt-6 relative z-10">
               {[
                 { value: "4K+", label: "Độ phân giải" },
                 { value: "Dolby", label: "Âm thanh vòm" },
@@ -105,7 +103,6 @@ export const GeneralSection: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Card dọc: Góc phim yêu thích */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -133,7 +130,6 @@ export const GeneralSection: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* XỬ LÝ 4: Render danh sách Feature Cards tự động */}
           {FEATURE_CARDS.map((card, i) => (
             <motion.div
               key={card.title}
@@ -158,8 +154,9 @@ export const GeneralSection: React.FC = () => {
           ))}
         </div>
 
-        {/* ── PHẦN 3: Showcase (hình trái + checklist phải) ───────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* ── PHẦN 3: Showcase ── */}
+        {/* TỐI ƯU 4: Giảm gap xuống gap-8 trên Mobile/Tablet để nhường không gian cho cột chữ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -237,7 +234,7 @@ export const GeneralSection: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* ── PHẦN 4: Tabs thông tin chi tiết ────────────────────── */}
+        {/* ── PHẦN 4: Tabs thông tin chi tiết ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -254,7 +251,6 @@ export const GeneralSection: React.FC = () => {
             </p>
           </div>
 
-          {/* XỬ LÝ 5: Render Thanh Tab Buttons */}
           <div className="flex flex-wrap justify-center gap-2 md:gap-0 border-b border-white/10 pb-px mb-8 w-full max-w-2xl">
             {TABS.map((tab) => (
               <button
@@ -271,7 +267,6 @@ export const GeneralSection: React.FC = () => {
             ))}
           </div>
 
-          {/* XỬ LÝ 6: Render Nội dung Tab dựa vào State activeTab */}
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 12 }}
