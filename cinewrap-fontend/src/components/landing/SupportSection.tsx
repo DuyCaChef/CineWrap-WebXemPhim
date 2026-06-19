@@ -10,10 +10,8 @@ import {
 } from "../../constants/landingData";
 
 export const SupportSection: React.FC = () => {
-  // State quản lý Accordion FAQ
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
-  // State quản lý Form nhập liệu
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,7 +21,6 @@ export const SupportSection: React.FC = () => {
   const [formSent, setFormSent] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Hàm xử lý gửi form
   const handleSubmitForm = () => {
     if (
       !formData.name ||
@@ -34,7 +31,6 @@ export const SupportSection: React.FC = () => {
       return;
 
     setFormLoading(true);
-    // Giả lập gọi API gửi mail mất 1.5 giây
     setTimeout(() => {
       setFormLoading(false);
       setFormSent(true);
@@ -44,13 +40,15 @@ export const SupportSection: React.FC = () => {
   return (
     <section
       id="support"
-      className="relative z-20 w-full bg-cine-bg-secondary py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
+      // TỐI ƯU 1: Giảm padding dọc trên Mobile (py-16), giữ nguyên py-24 cho Tablet/PC
+      className="relative z-20 w-full bg-cine-bg-secondary py-16 md:py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
     >
       <div className="pointer-events-none absolute top-[-80px] right-1/4 w-[560px] h-[560px] bg-cine-secondary/6 rounded-full blur-[140px]" />
       <div className="pointer-events-none absolute bottom-0 left-0 w-[420px] h-[420px] bg-cine-primary/5 rounded-full blur-[120px]" />
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-cine-secondary/3 rounded-full blur-[100px]" />
 
-      <div className="max-w-8xl mx-auto flex flex-col gap-20 relative">
+      {/* TỐI ƯU 2: Giảm gap giữa các phân vùng trên Mobile (gap-16) */}
+      <div className="max-w-8xl mx-auto flex flex-col gap-16 md:gap-20 relative">
         {/* ── PHÂN VÙNG 1: HERO TAGLINE ──────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -98,13 +96,14 @@ export const SupportSection: React.FC = () => {
           </div>
           <div className="absolute inset-0 rounded-3xl border border-cine-secondary/20 z-10 pointer-events-none" />
 
-          <div className="relative z-20 w-full px-8 md:px-16 lg:px-20 py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          {/* TỐI ƯU 3: Padding nhỏ hơn trên Mobile (py-10) để cân đối */}
+          <div className="relative z-20 w-full px-6 py-10 md:px-16 lg:px-20 md:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-xl">
-              <p className="text-cine-secondary text-xs uppercase tracking-[0.35em] font-semibold mb-5 flex items-center gap-2">
+              <p className="text-cine-secondary text-xs uppercase tracking-[0.35em] font-semibold mb-4 md:mb-5 flex items-center gap-2">
                 <span className="inline-block w-6 h-px bg-cine-secondary" />
                 Trung tâm trợ giúp CineWrap
               </p>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-5">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] mb-4 md:mb-5">
                 Chúng Tôi Luôn{" "}
                 <span className="relative inline-block">
                   <span className="text-cine-primary">Bên Bạn</span>
@@ -118,12 +117,12 @@ export const SupportSection: React.FC = () => {
               </p>
             </div>
 
-            {/* Render 3 chỉ số */}
-            <div className="flex md:flex-col gap-4 md:gap-3 flex-shrink-0">
+            {/* TỐI ƯU 4: Chuyển hoàn toàn thành flex-col (xếp dọc) để chống vỡ khung trên Mobile */}
+            <div className="flex flex-col gap-3 flex-shrink-0 w-full md:w-auto">
               {SUPPORT_STATS.map((stat) => (
                 <div
                   key={stat.label}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm min-w-[220px]"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm w-full md:min-w-[220px]"
                 >
                   <span className="text-xl flex-shrink-0">{stat.icon}</span>
                   <div>
@@ -150,7 +149,7 @@ export const SupportSection: React.FC = () => {
             transition={{ duration: 1 }}
             className="md:col-span-2 bg-cine-bg-primary/60 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col"
           >
-            <div className="px-6 pt-6 pb-4 border-b border-white/5 flex items-center gap-3">
+            <div className="px-5 md:px-6 pt-5 md:pt-6 pb-4 border-b border-white/5 flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-cine-primary/15 flex items-center justify-center text-cine-primary flex-shrink-0">
                 <svg
                   className="w-4 h-4"
@@ -184,7 +183,7 @@ export const SupportSection: React.FC = () => {
             </div>
 
             {/* Minh họa SVG */}
-            <div className="px-6 pt-4 pb-2">
+            <div className="px-5 md:px-6 pt-4 pb-2">
               <div className="relative w-full h-24 rounded-xl overflow-hidden bg-gradient-to-r from-[#060e1e] to-[#0a1628] flex items-center justify-center border border-white/5">
                 <svg
                   viewBox="0 0 320 80"
@@ -275,7 +274,7 @@ export const SupportSection: React.FC = () => {
             </div>
 
             {/* Render danh sách FAQ */}
-            <div className="flex flex-col gap-1.5 px-6 pb-6 pt-2">
+            <div className="flex flex-col gap-1.5 px-5 md:px-6 pb-5 md:pb-6 pt-2">
               {FAQS.map((faq, idx) => (
                 <motion.div
                   key={faq.id}
@@ -545,7 +544,6 @@ export const SupportSection: React.FC = () => {
                   Chủ đề hỗ trợ
                 </p>
                 <div className="flex flex-col gap-1.5">
-                  {/* Render danh sách chủ đề */}
                   {SUPPORT_TOPICS.map((topic) => (
                     <div
                       key={topic.label}
@@ -677,7 +675,6 @@ export const SupportSection: React.FC = () => {
                   Giờ phục vụ
                 </p>
                 <div className="space-y-1.5 text-xs text-cine-text-muted">
-                  {/* Render thời gian làm việc */}
                   {WORKING_HOURS.map((hour) => (
                     <div key={hour.label} className="flex justify-between">
                       <span>{hour.label}</span>
@@ -701,7 +698,7 @@ export const SupportSection: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"
         >
           {/* CỘT TRÁI: Mockup hình ngữ cảnh */}
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#060e1e] to-[#0a1a30] min-h-[480px] flex flex-col justify-between p-6">
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#060e1e] to-[#0a1a30] min-h-[400px] md:min-h-[480px] flex flex-col justify-between p-6">
             <div className="absolute top-0 left-0 w-full h-full">
               <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-cine-secondary/10 rounded-full blur-[60px]" />
               <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-cine-primary/8 rounded-full blur-[50px]" />
@@ -997,7 +994,7 @@ export const SupportSection: React.FC = () => {
           </div>
 
           {/* CỘT PHẢI: Form glassmorphism */}
-          <div className="relative rounded-2xl border border-white/10 bg-cine-bg-primary/40 backdrop-blur-xl p-6 md:p-8 flex flex-col justify-between overflow-hidden">
+          <div className="relative rounded-2xl border border-white/10 bg-cine-bg-primary/40 backdrop-blur-xl p-5 md:p-8 flex flex-col justify-between overflow-hidden">
             <div className="pointer-events-none absolute top-0 right-0 w-48 h-48 bg-cine-secondary/8 rounded-full blur-[60px]" />
             <div className="pointer-events-none absolute bottom-0 left-0 w-40 h-40 bg-cine-primary/5 rounded-full blur-[50px]" />
 
@@ -1005,7 +1002,7 @@ export const SupportSection: React.FC = () => {
               <p className="text-cine-secondary text-xs uppercase tracking-[0.25em] font-semibold mb-1">
                 Gửi yêu cầu hỗ trợ
               </p>
-              <h3 className="text-white font-bold text-xl mb-6">
+              <h3 className="text-white font-bold text-xl mb-5 md:mb-6">
                 Mô tả thắc mắc của bạn
               </h3>
 
@@ -1192,7 +1189,7 @@ export const SupportSection: React.FC = () => {
                       !formData.category ||
                       !formData.message
                     }
-                    className={`relative w-full py-4 rounded-xl font-bold text-sm tracking-wider overflow-hidden transition-all duration-300 ${
+                    className={`relative w-full py-4 mt-2 rounded-xl font-bold text-sm tracking-wider overflow-hidden transition-all duration-300 ${
                       formData.name &&
                       formData.email &&
                       formData.category &&
@@ -1248,7 +1245,7 @@ export const SupportSection: React.FC = () => {
                     </span>
                   </motion.button>
 
-                  <p className="text-cine-text-muted text-xs text-center leading-relaxed">
+                  <p className="text-cine-text-muted text-xs text-center leading-relaxed mt-2">
                     Bằng cách gửi form, bạn đồng ý với{" "}
                     <a
                       href="#privacy"
