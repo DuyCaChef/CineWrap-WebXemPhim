@@ -17,23 +17,26 @@ export const Footer: React.FC = () => {
       navigate("/");
     }
   };
+
   return (
     <footer className="w-full bg-cine-bg-primary border-t border-white/5 text-cine-text-muted font-sans text-sm relative overflow-hidden">
-      {/* Mờ background logo */}
+      {/* TỐI ƯU 1: Logo Background - Phóng to w-[120%] và giảm opacity-10 trên Mobile để tạo hiệu ứng Watermark tràn viền. Giữ w-[60%] và opacity-20 cho Tablet/Desktop */}
       <img
         src={Logo_CineWrap}
         alt=""
         aria-hidden="true"
-        className="absolute left-1/2 top-6 -translate-x-1/2 -translate-y-1/10  opacity-20 max-w-[520px] w-[60%] pointer-events-none z-0 transform scale-125 filter blur-sm brightness-90"
+        className="absolute left-1/2 top-10 md:top-6 -translate-x-1/2 -translate-y-1/10 opacity-10 md:opacity-20 max-w-[520px] w-[120%] md:w-[60%] pointer-events-none z-0 transform scale-125 filter blur-sm brightness-90"
       />
+
       {/* Khối nội dung chính phía trên */}
-      <div className="relative z-10 max-w-8xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      {/* TỐI ƯU 2: Giảm Padding (py-10) và Gap (gap-10) trên Mobile. Mở rộng lại từ Tablet (md:) */}
+      <div className="relative z-10 max-w-8xl mx-auto px-6 py-10 md:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 md:gap-12">
         {/* Cột 1: Thông tin thương hiệu (Chiếm 2 cột trên màn hình lớn) */}
         <div className="lg:col-span-2 flex flex-col items-start gap-5">
           <img
             src={Typo_CineWrap}
             alt="CineWrap Typo"
-            className="w-44 cursor-pointer drop-shadow-[0_2px_8px_rgba(0,163,255,0.2)]"
+            className="w-40 md:w-44 cursor-pointer drop-shadow-[0_2px_8px_rgba(0,163,255,0.2)]"
             onClick={() => navigate("/")}
           />
           <p className="text-xs leading-relaxed max-w-sm text-justify">
@@ -73,7 +76,7 @@ export const Footer: React.FC = () => {
               },
               {
                 id: "gmail",
-                url: "mailto:support@cinewrap.vn", // Có thể đổi email tùy ý
+                url: "mailto:support@cinewrap.vn",
                 icon: (
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
@@ -86,7 +89,8 @@ export const Footer: React.FC = () => {
                 href={social.url}
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-cine-bg-secondary border border-white/10 flex items-center justify-center text-cine-text hover:text-cine-secondary hover:border-cine-secondary transition-all duration-300 transform hover:-translate-y-0.5"
+                // Nút mượt mà và thân thiện với ngón tay trên mobile
+                className="w-9 h-9 md:w-8 md:h-8 rounded-full bg-cine-bg-secondary border border-white/10 flex items-center justify-center text-cine-text hover:text-cine-secondary hover:border-cine-secondary transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 {social.icon}
               </a>
@@ -110,7 +114,7 @@ export const Footer: React.FC = () => {
               <li key={item}>
                 <span
                   onClick={() => navigate("/home")}
-                  className="hover:text-cine-primary cursor-pointer transition-colors duration-200"
+                  className="hover:text-cine-primary cursor-pointer transition-colors duration-200 block py-0.5"
                 >
                   {item}
                 </span>
@@ -134,7 +138,7 @@ export const Footer: React.FC = () => {
               <li key={item.id}>
                 <span
                   onClick={() => handleScrollToSection(item.id)}
-                  className="hover:text-cine-secondary cursor-pointer transition-colors duration-200"
+                  className="hover:text-cine-secondary cursor-pointer transition-colors duration-200 block py-0.5"
                 >
                   {item.label}
                 </span>
@@ -150,28 +154,28 @@ export const Footer: React.FC = () => {
           </h4>
           <ul className="flex flex-col gap-3 text-xs text-justify">
             <li>
-              <span className="text-cine-text font-medium block">
+              <span className="text-cine-text font-medium block mb-0.5">
                 Hỗ trợ dữ liệu:
               </span>
               <a
                 href="mailto:privacy@cinewrap.vn"
-                className="hover:text-cine-secondary transition-colors"
+                className="hover:text-cine-secondary transition-colors inline-block"
               >
                 privacy@cinewrap.vn
               </a>
             </li>
             <li>
-              <span className="text-cine-text font-medium block">
+              <span className="text-cine-text font-medium block mb-0.5">
                 Giải quyết khiếu nại:
               </span>
               <a
                 href="mailto:legal@cinewrap.vn"
-                className="hover:text-cine-primary transition-colors"
+                className="hover:text-cine-primary transition-colors inline-block"
               >
                 legal@cinewrap.vn
               </a>
             </li>
-            <li className="text-[11px] text-cine-text-muted/70 leading-snug">
+            <li className="text-[11px] text-cine-text-muted/70 leading-snug pt-1">
               Máy chủ vận hành tại Việt Nam. Tuân thủ tuyệt đối Luật An ninh
               mạng 2018.
             </li>
@@ -181,7 +185,8 @@ export const Footer: React.FC = () => {
 
       {/* Khối bản quyền dưới cùng (Bottom Bar) */}
       <div className="w-full bg-[#090d16] py-6 px-6 border-t border-white/5">
-        <div className="max-w-8xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        {/* TỐI ƯU 3: Canh giữa text (text-center) trên Mobile để không bị thò thụt */}
+        <div className="max-w-8xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-center sm:text-left">
           <p>
             &copy; {currentYear}{" "}
             <span className="text-cine-text font-semibold tracking-wider">
@@ -189,7 +194,7 @@ export const Footer: React.FC = () => {
             </span>
             . Toàn bộ bản quyền được bảo lưu.
           </p>
-          <div className="flex gap-6 text-cine-text-muted/60">
+          <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-cine-text-muted/60">
             <span className="hover:text-cine-text cursor-pointer transition-colors">
               Chính sách Cookie
             </span>
