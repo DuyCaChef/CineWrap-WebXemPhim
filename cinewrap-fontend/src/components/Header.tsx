@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// Đảm bảo đường dẫn này khớp với vị trí file Header của bạn
+import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 
+// ─── TYPES ───────────────────────────────────────────────────────────────────
 interface DropdownItem {
   label: string;
   href: string;
@@ -13,8 +17,7 @@ interface NavItem {
   dropdown?: DropdownItem[];
 }
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-
+// ─── DATA ────────────────────────────────────────────────────────────────────
 const genres: DropdownItem[] = [
   { label: "Hành Động", href: "/the-loai/hanh-dong" },
   { label: "Tình Cảm", href: "/the-loai/tinh-cam" },
@@ -58,13 +61,12 @@ const navItems: NavItem[] = [
   { label: "Diễn Viên", dropdown: actors },
 ];
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
-
+// ─── ICONS ───────────────────────────────────────────────────────────────────
 const SearchIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="18"
-    height="18"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -94,24 +96,6 @@ const ChevronDownIcon = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-const MenuIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="3" y1="12" x2="21" y2="12" />
-    <line x1="3" y1="6" x2="21" y2="6" />
-    <line x1="3" y1="18" x2="21" y2="18" />
-  </svg>
-);
-
 const CloseIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -132,12 +116,12 @@ const CloseIcon = () => (
 const UserIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
+    width="18"
+    height="18"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
@@ -146,62 +130,32 @@ const UserIcon = () => (
   </svg>
 );
 
-const FilmIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path d="M18 3v2h-2V3H8v2H6V3H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2v-2h2v2h8v-2h2v2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8 17H6v-2h2zm0-4H6v-2h2zm0-4H6V7h2zm10 8h-2v-2h2zm0-4h-2v-2h2zm0-4h-2V7h2z" />
-  </svg>
-);
-
-// ─── Dropdown Component ───────────────────────────────────────────────────────
-
+// ─── DESKTOP DROPDOWN ─────────────────────────────────────────────────────────
 interface DropdownProps {
   items: DropdownItem[];
   isOpen: boolean;
 }
 
-const Dropdown = ({ items, isOpen }: DropdownProps) => {
+const DesktopDropdown = ({ items, isOpen }: DropdownProps) => {
   return (
     <div
-      className={`absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-200 z-50 ${
+      className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-48 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-cine-bg-secondary/95 backdrop-blur-md transition-all duration-200 z-50 ${
         isOpen
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 -translate-y-2 pointer-events-none"
       }`}
-      style={{ background: "#1e293b" }}
     >
       {/* Arrow tip */}
-      <div
-        className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-t border-l border-white/10"
-        style={{ background: "#1e293b" }}
-      />
-      <ul className="py-1">
+      <div className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-t border-l border-white/10 bg-cine-bg-secondary" />
+
+      <ul className="py-2 relative z-10 max-h-[60vh] overflow-y-auto custom-scrollbar">
         {items.map((item) => (
           <li key={item.href}>
             <a
               href={item.href}
-              className="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-150"
-              style={{ color: "#9ca3af" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.color = "#ffc107";
-                (e.currentTarget as HTMLAnchorElement).style.background =
-                  "rgba(255,193,7,0.07)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.color = "#9ca3af";
-                (e.currentTarget as HTMLAnchorElement).style.background =
-                  "transparent";
-              }}
+              className="flex items-center px-4 py-2.5 text-[13px] font-medium text-cine-text-muted hover:text-cine-primary hover:bg-cine-primary/10 transition-colors duration-150 group"
             >
-              <span
-                className="mr-2 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ background: "#ffc107", opacity: 0.5 }}
-              />
+              <span className="mr-2 w-1.5 h-1.5 rounded-full bg-cine-primary opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
               {item.label}
             </a>
           </li>
@@ -211,8 +165,7 @@ const Dropdown = ({ items, isOpen }: DropdownProps) => {
   );
 };
 
-// ─── Search Bar ───────────────────────────────────────────────────────────────
-
+// ─── SEARCH OVERLAY ──────────────────────────────────────────────────────────
 interface SearchBarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -229,38 +182,26 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
 
   return (
     <div
-      className={`absolute inset-x-0 top-0 h-full flex items-center px-4 transition-all duration-300 z-20 ${
+      className={`absolute inset-0 w-full h-full flex items-center px-4 md:px-8 bg-cine-bg-primary/95 backdrop-blur-xl transition-all duration-300 z-[60] ${
         isOpen
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 -translate-y-full pointer-events-none"
       }`}
-      style={{ background: "#0f172a" }}
     >
-      <div className="flex items-center w-full max-w-2xl mx-auto gap-3">
-        <span style={{ color: "#ffc107" }}>
+      <div className="flex items-center w-full max-w-4xl mx-auto gap-3">
+        <span className="text-cine-primary">
           <SearchIcon />
         </span>
         <input
           ref={inputRef}
           type="text"
           placeholder="Tìm phim, diễn viên, đạo diễn..."
-          className="flex-1 bg-transparent text-base outline-none placeholder:font-normal"
-          style={{
-            color: "#ffffff",
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-          }}
+          className="flex-1 bg-transparent text-base text-white placeholder:text-cine-text-muted outline-none placeholder:font-normal"
           onKeyDown={(e) => e.key === "Escape" && onClose()}
         />
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg transition-colors duration-150"
-          style={{ color: "#9ca3af" }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLButtonElement).style.color = "#ffffff")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLButtonElement).style.color = "#9ca3af")
-          }
+          className="p-2 rounded-full text-cine-text-muted hover:text-white hover:bg-white/10 transition-colors duration-200"
         >
           <CloseIcon />
         </button>
@@ -269,182 +210,20 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
   );
 };
 
-// ─── Mobile Menu ─────────────────────────────────────────────────────────────
-
-interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const [openSection, setOpenSection] = useState<string | null>(null);
-
-  const toggleSection = (label: string) => {
-    setOpenSection((prev) => (prev === label ? null : label));
-  };
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-40 transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div
-        className={`fixed top-0 left-0 h-full w-72 z-50 flex flex-col transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        style={{
-          background: "#1e293b",
-          boxShadow: "4px 0 32px rgba(0,0,0,0.5)",
-        }}
-      >
-        {/* Header */}
-        <div
-          className="flex items-center justify-between px-5 py-4 border-b"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
-        >
-          <Logo />
-          <button
-            onClick={onClose}
-            className="p-1"
-            style={{ color: "#9ca3af" }}
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-3">
-          {navItems.map((item) => (
-            <div key={item.label}>
-              {item.dropdown ? (
-                <>
-                  <button
-                    onClick={() => toggleSection(item.label)}
-                    className="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold transition-colors duration-150"
-                    style={{
-                      color: openSection === item.label ? "#ffc107" : "#ffffff",
-                    }}
-                  >
-                    {item.label}
-                    <ChevronDownIcon
-                      className={`transition-transform duration-200 ${
-                        openSection === item.label ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ${
-                      openSection === item.label ? "max-h-96" : "max-h-0"
-                    }`}
-                    style={{
-                      background: "rgba(0,0,0,0.2)",
-                    }}
-                  >
-                    {item.dropdown.map((sub) => (
-                      <a
-                        key={sub.href}
-                        href={sub.href}
-                        onClick={onClose}
-                        className="flex items-center gap-2.5 pl-8 pr-5 py-2.5 text-sm transition-colors duration-150"
-                        style={{ color: "#9ca3af" }}
-                        onMouseEnter={(e) =>
-                          ((e.currentTarget as HTMLAnchorElement).style.color =
-                            "#ffc107")
-                        }
-                        onMouseLeave={(e) =>
-                          ((e.currentTarget as HTMLAnchorElement).style.color =
-                            "#9ca3af")
-                        }
-                      >
-                        <span
-                          className="w-1 h-1 rounded-full flex-shrink-0"
-                          style={{ background: "#ffc107", opacity: 0.5 }}
-                        />
-                        {sub.label}
-                      </a>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <a
-                  href={item.href}
-                  onClick={onClose}
-                  className="flex items-center px-5 py-3 text-sm font-semibold transition-colors duration-150"
-                  style={{ color: "#ffffff" }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.color =
-                      "#ffc107")
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.color =
-                      "#ffffff")
-                  }
-                >
-                  {item.label}
-                </a>
-              )}
-            </div>
-          ))}
-        </nav>
-
-        {/* Login */}
-        <div
-          className="p-5 border-t"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
-        >
-          <a
-            href="/dang-nhap"
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold transition-all duration-200"
-            style={{
-              background: "#ffc107",
-              color: "#0f172a",
-            }}
-          >
-            <UserIcon />
-            Đăng Nhập
-          </a>
-        </div>
-      </div>
-    </>
-  );
-};
-
-// ─── Logo ────────────────────────────────────────────────────────────────────
-
-const Logo = () => (
-  <a href="/" className="flex items-center gap-2 select-none">
-    <div
-      className="flex items-center justify-center w-9 h-9 rounded-lg"
-      style={{ background: "#ffc107" }}
-    >
-      <span style={{ color: "#0f172a" }}>
-        <FilmIcon />
-      </span>
-    </div>
-    <span
-      className="text-xl font-extrabold tracking-tight leading-none"
-      style={{ color: "#ffffff" }}
-    >
-      Cine
-      <span style={{ color: "#ffc107" }}>Hub</span>
-    </span>
-  </a>
-);
-
-// ─── Main Header ─────────────────────────────────────────────────────────────
+// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 export default function Header() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+
+  // Navigation State
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<
+    string | null
+  >(null);
+
   const dropdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Scroll detection
@@ -454,161 +233,233 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  // Close dropdown on outside click
+  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handler = () => setActiveDropdown(null);
-    if (activeDropdown) {
-      document.addEventListener("click", handler);
-    }
+    if (activeDropdown) document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, [activeDropdown]);
 
+  // Desktop Hover Logic
   const handleMouseEnter = (label: string) => {
     if (dropdownTimerRef.current) clearTimeout(dropdownTimerRef.current);
     setActiveDropdown(label);
   };
-
   const handleMouseLeave = () => {
     dropdownTimerRef.current = setTimeout(() => {
       setActiveDropdown(null);
     }, 150);
   };
 
+  // Mobile Accordion Logic
+  const toggleMobileSection = (label: string) => {
+    setMobileExpandedSection((prev) => (prev === label ? null : label));
+  };
+
   return (
-    <>
-      <header
-        className="fixed top-0 left-0 right-0 z-30 transition-all duration-300"
-        style={{
-          background: scrolled
-            ? "rgba(15,23,42,0.95)"
-            : "linear-gradient(to bottom, rgba(15,23,42,0.9) 0%, transparent 100%)",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.06)" : "none",
-        }}
-      >
-        <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          {/* Search overlay (covers full header) */}
-          <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    <header
+      className={`fixed top-0 left-0 w-full h-20 z-50 px-4 md:px-8 flex justify-between items-center transition-all duration-300 ${
+        scrolled || isMobileMenuOpen || searchOpen
+          ? "bg-cine-bg-primary/95 backdrop-blur-sm border-b border-white/10"
+          : "bg-gradient-to-b from-cine-bg-primary/90 to-transparent border-b border-transparent"
+      }`}
+    >
+      {/* ── SEARCH OVERLAY ── */}
+      <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-          {/* Logo */}
-          <Logo />
+      {/* ── CỘT TRÁI: LOGO ── */}
+      <div className="flex w-auto lg:w-1/4 items-center">
+        <img
+          src={Typo_CineWrap}
+          alt="CineWrap Typo"
+          className="w-28 md:w-36 lg:w-44 cursor-pointer transition-all duration-300"
+          onClick={() => navigate("/")}
+        />
+      </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+      {/* ── CỘT GIỮA: THANH ĐIỀU HƯỚNG (Desktop) ── */}
+      <nav className="hidden lg:flex flex-1 justify-center items-center gap-5 xl:gap-8 text-[13px] xl:text-sm font-medium">
+        {navItems.map((item) => (
+          <div
+            key={item.label}
+            className="relative"
+            onMouseEnter={() => item.dropdown && handleMouseEnter(item.label)}
+            onMouseLeave={item.dropdown ? handleMouseLeave : undefined}
+          >
+            {item.href ? (
+              <a
+                href={item.href}
+                className="text-cine-text hover:text-cine-primary transition-colors duration-200 whitespace-nowrap"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <button
+                className={`flex items-center gap-1.5 transition-colors duration-200 whitespace-nowrap ${
+                  activeDropdown === item.label
+                    ? "text-cine-primary"
+                    : "text-cine-text hover:text-cine-primary"
+                }`}
+              >
+                {item.label}
+                <ChevronDownIcon
+                  className={`transition-transform duration-200 ${
+                    activeDropdown === item.label ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+            )}
+
+            {/* Sub-menu Dropdown */}
+            {item.dropdown && (
+              <DesktopDropdown
+                items={item.dropdown}
+                isOpen={activeDropdown === item.label}
+              />
+            )}
+          </div>
+        ))}
+      </nav>
+
+      {/* ── CỘT PHẢI: BUTTONS ── */}
+      <div className="flex w-auto lg:w-1/4 items-center justify-end gap-3 md:gap-4">
+        {/* Nút Tìm kiếm */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="p-2 text-cine-text hover:text-cine-primary transition-colors duration-200"
+          aria-label="Tìm kiếm"
+        >
+          <SearchIcon />
+        </button>
+
+        {/* Nút Đăng nhập */}
+        <motion.button
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/dang-nhap")}
+          className="flex items-center justify-center gap-2 px-3 py-2 md:px-5 md:py-2.5 text-[13px] font-bold tracking-wide text-cine-bg-primary uppercase bg-cine-primary border border-cine-primary rounded-full shadow-lg shadow-cine-primary/20 transition-all duration-300 hover:bg-[#e0a800]"
+        >
+          <UserIcon />
+          <span className="hidden md:block whitespace-nowrap">Đăng nhập</span>
+        </motion.button>
+
+        {/* Nút Hamburger (Mobile) */}
+        <button
+          className="lg:hidden p-2 text-cine-text hover:text-white transition-colors"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            {isMobileMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* ── MOBILE MENU DRAWER (Accordion) ── */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-20 left-0 w-full max-h-[calc(100vh-80px)] overflow-y-auto bg-[#0a1628]/95 backdrop-blur-xl border-b border-white/10 flex flex-col lg:hidden shadow-2xl custom-scrollbar"
+          >
             {navItems.map((item) => (
               <div
                 key={item.label}
-                className="relative"
-                onMouseEnter={() =>
-                  item.dropdown && handleMouseEnter(item.label)
-                }
-                onMouseLeave={item.dropdown ? handleMouseLeave : undefined}
+                className="border-b border-white/5 last:border-none"
               >
                 {item.href ? (
                   <a
                     href={item.href}
-                    className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-150"
-                    style={{ color: "#9ca3af" }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "#ffffff")
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "#9ca3af")
-                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center px-6 py-4 text-sm font-semibold text-cine-text hover:bg-white/5 hover:text-white transition-colors"
                   >
                     {item.label}
                   </a>
                 ) : (
-                  <button
-                    className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-150"
-                    style={{
-                      color:
-                        activeDropdown === item.label ? "#ffffff" : "#9ca3af",
-                    }}
-                  >
-                    {item.label}
-                    <ChevronDownIcon
-                      className={`transition-transform duration-200 ${
-                        activeDropdown === item.label ? "rotate-180" : ""
+                  <>
+                    <button
+                      onClick={() => toggleMobileSection(item.label)}
+                      className={`w-full flex items-center justify-between px-6 py-4 text-sm font-semibold transition-colors duration-150 ${
+                        mobileExpandedSection === item.label
+                          ? "text-cine-primary bg-cine-primary/5"
+                          : "text-cine-text hover:bg-white/5"
                       }`}
-                    />
-                  </button>
-                )}
-
-                {item.dropdown && (
-                  <Dropdown
-                    items={item.dropdown}
-                    isOpen={activeDropdown === item.label}
-                  />
+                    >
+                      {item.label}
+                      <ChevronDownIcon
+                        className={`transition-transform duration-200 ${
+                          mobileExpandedSection === item.label
+                            ? "rotate-180 text-cine-primary"
+                            : "text-cine-text-muted"
+                        }`}
+                      />
+                    </button>
+                    {/* Danh sách con (Sub-menu) */}
+                    <AnimatePresence>
+                      {mobileExpandedSection === item.label &&
+                        item.dropdown && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden bg-black/20"
+                          >
+                            {item.dropdown.map((sub) => (
+                              <a
+                                key={sub.href}
+                                href={sub.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-3 pl-10 pr-6 py-3 text-sm text-cine-text-muted hover:text-cine-primary hover:bg-white/5 transition-colors"
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-cine-primary opacity-50" />
+                                {sub.label}
+                              </a>
+                            ))}
+                          </motion.div>
+                        )}
+                    </AnimatePresence>
+                  </>
                 )}
               </div>
             ))}
-          </nav>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-2">
-            {/* Search button */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="p-2.5 rounded-lg transition-colors duration-150"
-              style={{ color: "#9ca3af" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.color = "#ffffff")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.color = "#9ca3af")
-              }
-              aria-label="Tìm kiếm"
-            >
-              <SearchIcon />
-            </button>
-
-            {/* Login button — desktop */}
-            <a
-              href="/dang-nhap"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200"
-              style={{
-                color: "#ffc107",
-                border: "1.5px solid #ffc107",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement;
-                el.style.background = "#ffc107";
-                el.style.color = "#0f172a";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement;
-                el.style.background = "transparent";
-                el.style.color = "#ffc107";
-              }}
-            >
-              <UserIcon />
-              Đăng Nhập
-            </a>
-
-            {/* Hamburger — mobile */}
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2.5 rounded-lg transition-colors duration-150"
-              style={{ color: "#9ca3af" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.color = "#ffffff")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.color = "#9ca3af")
-              }
-              aria-label="Mở menu"
-            >
-              <MenuIcon />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Drawer */}
-      <MobileMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
-    </>
+            {/* Lặp lại nút đăng nhập cho Mobile ở cuối menu */}
+            <div className="p-6">
+              <button
+                onClick={() => navigate("/dang-nhap")}
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-cine-primary text-cine-bg-primary font-bold rounded-xl active:scale-95 transition-transform"
+              >
+                <UserIcon />
+                Đăng nhập ngay
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }

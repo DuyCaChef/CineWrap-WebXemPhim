@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 // Import các component đã được bóc tách
 import { HeaderLanding } from "../components/landing/HeaderLanding";
+import Header from "../components/Header";
 import { HeroSection } from "../components/landing/HeroSection";
 import { GeneralSection } from "../components/landing/GeneralSection";
 import { PrivacySection } from "../components/landing/PrivacySection";
@@ -69,6 +70,7 @@ const WelcomePage: React.FC = () => {
     <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* Thanh điều hướng nhận prop activeSection để tô sáng menu */}
       <HeaderLanding activeSection={active} />
+      <Header />
 
       {/* Vùng chứa các nội dung chính */}
       <main className="pt-20 relative w-full min-h-screen">
