@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Nhập toàn bộ dữ liệu đã được bóc tách từ file hằng số
+// Import dữ liệu tĩnh
 import {
   TERMS_CHIPS,
   TERMS_TABS,
@@ -22,12 +22,14 @@ export const TermsSection: React.FC = () => {
   return (
     <section
       id="terms"
-      className="relative z-20 w-full bg-cine-bg-primary py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
+      // TỐI ƯU 1: Giảm padding dọc trên Mobile (py-16), giữ nguyên py-24 cho Tablet/PC
+      className="relative z-20 w-full bg-cine-bg-primary py-16 md:py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
     >
       <div className="pointer-events-none absolute top-0 left-1/3 w-[500px] h-[500px] bg-cine-secondary/4 rounded-full blur-[130px]" />
       <div className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] bg-cine-primary/4 rounded-full blur-[110px]" />
 
-      <div className="max-w-8xl mx-auto flex flex-col gap-20 relative">
+      {/* TỐI ƯU 2: Giảm gap trên Mobile (gap-12), mở rộng trên Desktop (lg:gap-20) */}
+      <div className="max-w-8xl mx-auto flex flex-col gap-12 lg:gap-20 relative">
         {/* ── HERO TAGLINE ──────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -37,7 +39,7 @@ export const TermsSection: React.FC = () => {
           className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
           <div>
-            <p className="text-cine-secondary text-xs uppercase tracking-[0.3em] font-semibold mb-4">
+            <p className="text-cine-secondary text-xs uppercase tracking-[0.3em] font-semibold mb-3 md:mb-4">
               Minh bạch từ ngày đầu tiên
             </p>
             <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
@@ -52,22 +54,22 @@ export const TermsSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1, delay: 0.05 }}
-          className="relative rounded-2xl overflow-hidden border border-cine-primary/20 bg-gradient-to-r from-cine-primary/10 via-cine-primary/5 to-transparent p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6"
+          className="relative rounded-2xl overflow-hidden border border-cine-primary/20 bg-gradient-to-r from-cine-primary/10 via-cine-primary/5 to-transparent p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6"
         >
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-cine-primary rounded-l-2xl" />
-          <div className="pl-4 flex-1">
-            <p className="text-cine-primary font-bold text-base mb-1">
+          <div className="pl-3 md:pl-4 flex-1">
+            <p className="text-cine-primary font-bold text-sm md:text-base mb-1">
               Tuân thủ điều khoản sử dụng khi truy cập và sử dụng dịch vụ của
               CineWrap
             </p>
-            <p className="text-cine-text-muted text-sm leading-relaxed">
+            <p className="text-cine-text-muted text-xs md:text-sm leading-relaxed">
               Bạn được quyền xem phim hợp pháp, tôn trọng bản quyền và không sử
               dụng nền tảng cho mục đích vi phạm pháp luật — đổi lại, chúng tôi
               cung cấp dịch vụ ổn định, không quảng cáo và bảo vệ dữ liệu của
               bạn.
             </p>
           </div>
-          <div className="pl-4 md:pl-0 flex flex-wrap md:flex-col gap-2 flex-shrink-0">
+          <div className="pl-3 md:pl-0 flex flex-wrap md:flex-col gap-2 flex-shrink-0">
             {TERMS_CHIPS.map((chip) => (
               <span
                 key={chip.text}
@@ -89,7 +91,8 @@ export const TermsSection: React.FC = () => {
           className="flex flex-col gap-6"
         >
           {/* Menu Tab */}
-          <div className="flex gap-1 p-1 bg-cine-bg-secondary rounded-xl border border-white/8 self-start">
+          {/* TỐI ƯU 3: Đổi flex dàn ngang thành flex-col trên Mobile, sm:flex-row cho màn hình rộng hơn */}
+          <div className="flex flex-col sm:flex-row gap-1 p-1 bg-cine-bg-secondary rounded-xl border border-white/8 w-full sm:w-auto sm:self-start">
             {TERMS_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -98,7 +101,8 @@ export const TermsSection: React.FC = () => {
                   setActiveTermsTab(tab.id as "user" | "platform");
                   setOpenTerms(null); // Tự động đóng các accordion khi chuyển tab mới cho mượt
                 }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                // Bổ sung w-full justify-center cho Mobile để dễ bấm, sm:w-auto để trả lại bình thường
+                className={`w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 px-4 py-3 md:py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   activeTermsTab === tab.id
                     ? "bg-cine-primary text-cine-bg-primary shadow-lg shadow-cine-primary/20"
                     : "text-cine-text-muted hover:text-cine-text"
@@ -138,7 +142,8 @@ export const TermsSection: React.FC = () => {
                   onClick={() =>
                     setOpenTerms(openTerms === item.id ? null : item.id)
                   }
-                  className="w-full flex items-center gap-4 px-6 py-5 text-left group"
+                  // TỐI ƯU 4: Bóp padding nhỏ lại trên Mobile (px-4 py-4)
+                  className="w-full flex items-center gap-3 md:gap-4 px-4 py-4 md:px-6 md:py-5 text-left group"
                   aria-expanded={openTerms === item.id}
                 >
                   <div
@@ -182,8 +187,6 @@ export const TermsSection: React.FC = () => {
                     />
                   </svg>
                 </button>
-
-                {/* Ứng dụng AnimatePresence để hiệu ứng thu/mở mượt mà */}
                 <AnimatePresence>
                   {openTerms === item.id && (
                     <motion.div
@@ -193,7 +196,8 @@ export const TermsSection: React.FC = () => {
                       transition={{ duration: 0.35, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 pb-6 pt-2 border-t border-white/5">
+                      {/* Bóp padding nội dung tương ứng (px-4) */}
+                      <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2 border-t border-white/5">
                         {item.content}
                       </div>
                     </motion.div>
@@ -210,9 +214,9 @@ export const TermsSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1, delay: 0.1 }}
-          className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 md:p-8 rounded-2xl border border-white/8 bg-cine-bg-secondary/40 backdrop-blur-md"
+          className="flex flex-col md:flex-row items-center justify-between gap-6 p-5 md:p-8 rounded-2xl border border-white/8 bg-cine-bg-secondary/40 backdrop-blur-md"
         >
-          <div>
+          <div className="text-center md:text-left">
             <p className="text-cine-text font-bold text-base mb-1">
               Có thắc mắc về điều khoản?
             </p>
@@ -220,10 +224,10 @@ export const TermsSection: React.FC = () => {
               Đội ngũ hỗ trợ sẵn sàng giải đáp mọi câu hỏi pháp lý của bạn.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3 flex-shrink-0">
             <a
               href="mailto:legal@cinewrap.vn"
-              className="flex items-center gap-2 px-5 py-3 rounded-full bg-cine-secondary/10 border border-cine-secondary/30 text-cine-secondary text-sm font-semibold hover:bg-cine-secondary/20 transition-colors"
+              className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-3 rounded-full bg-cine-secondary/10 border border-cine-secondary/30 text-cine-secondary text-sm font-semibold hover:bg-cine-secondary/20 transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -245,7 +249,7 @@ export const TermsSection: React.FC = () => {
                   .getElementById("support")
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="flex items-center gap-2 px-5 py-3 rounded-full bg-cine-primary/10 border border-cine-primary/30 text-cine-primary text-sm font-semibold hover:bg-cine-primary/20 transition-colors"
+              className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-3 rounded-full bg-cine-primary/10 border border-cine-primary/30 text-cine-primary text-sm font-semibold hover:bg-cine-primary/20 transition-colors"
             >
               <svg
                 className="w-4 h-4"
