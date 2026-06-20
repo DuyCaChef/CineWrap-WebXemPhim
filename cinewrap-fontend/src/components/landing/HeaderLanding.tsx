@@ -38,7 +38,7 @@ export const HeaderLanding: React.FC<HeaderLandingProps> = ({
           src={Typo_CineWrap}
           alt="CineWrap Typo"
           className="w-28 md:w-36 lg:w-44 cursor-pointer transition-all duration-300"
-          onClick={() => navigate("/")}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />
       </div>
 
