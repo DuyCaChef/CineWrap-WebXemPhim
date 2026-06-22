@@ -157,21 +157,23 @@ const HeroBanner: React.FC = () => {
             </button>
           </div>
 
-          {/* Chỉ báo slide */}
-          <div className="mt-6 flex gap-2 sm:mt-8">
-            {HERO_MOVIES.map((m, idx) => (
-              <button
-                key={m.id}
-                type="button"
-                aria-label={`Chuyển đến phim ${idx + 1}`}
-                onClick={() => setActive(idx)}
-                className={`h-1.5 rounded-full transition-all ${
-                  idx === active
-                    ? "w-8 bg-cine-primary"
-                    : "w-3 bg-white/30 hover:bg-white/50"
-                }`}
-              />
-            ))}
+          {/* ── CHỈ BÁO SLIDE (Bản nâng cấp Glassmorphism) ── */}
+          <div className="mt-6 sm:mt-8 flex">
+            <div className="inline-flex items-center gap-2.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 px-3.5 py-2.5 shadow-lg">
+              {HERO_MOVIES.map((m, idx) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  aria-label={`Chuyển đến phim ${idx + 1}`}
+                  onClick={() => setActive(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    idx === active
+                      ? "w-8 bg-cine-text shadow-[0_0_8px_rgba(255,255,255,0.8)]" // Thanh active màu trắng, phát sáng nhẹ
+                      : "w-3 bg-white/30 hover:bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
