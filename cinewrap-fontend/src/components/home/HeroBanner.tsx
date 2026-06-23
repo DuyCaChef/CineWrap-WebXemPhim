@@ -72,17 +72,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-5",
-    title: "Thành Phố Khói Bụi",
+    title: "Đất rừng Phương Nam",
     backdrop:
-      "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/b5/8c/32/b58c32a352af3e2681c9c3bf1958a774.jpg",
     poster:
-      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=400&auto=format&fit=crop",
-    rating: "8.2",
-    genre: "Tội phạm",
+      "https://i.pinimg.com/1200x/ee/7a/0b/ee7a0b36bffdccb84c43d841ebf49a76.jpg",
+    rating: "10.0",
+    genre: "Chiến tranh",
     quality: "Full HD",
     ageRating: "16+",
     synopsis:
-      "Cảnh sát chìm xâm nhập vào băng đảng nguy hiểm nhất thành phố, ranh giới giữa cái thiện và cái ác dần lu mờ.",
+      "Theo chân cậu bé An trong cuộc phiêu lưu ly tán để tìm lại người cha của mình. Trên hành trình gian nan đó, An được chở che bởi tình yêu thương của những người dân Nam Bộ chất phác, kiên cường, và chứng kiến dòng chảy lịch sử hào hùng của một thế hệ đứng lên bảo vệ quê hương.",
   },
   {
     id: "hm-6",
