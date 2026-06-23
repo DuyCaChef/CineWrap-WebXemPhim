@@ -142,17 +142,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-10",
-    title: "Đế Chế Suy Tàn",
+    title: "Mr.Been's Holiday",
     backdrop:
-      "https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/6d/86/2e/6d862ec2e80df62de77136b6e0411714.jpg",
     poster:
-      "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/736x/5e/0b/13/5e0b1385fc91e5ec8ade4a1ae72757c6.jpg",
     rating: "9.3",
-    genre: "Cổ trang",
+    genre: "Hài hước",
     quality: "HD 4K",
-    ageRating: "18+",
+    ageRating: "13+",
     synopsis:
-      "Cuộc chiến tranh giành quyền lực tàn khốc đánh dấu sự lụi tàn của một vương triều huy hoàng.",
+      "Câu chuyện bắt đầu khi Mr. Bean giành được giải nhất trong một cuộc quay số trúng thưởng, bao gồm một chuyến đi nghỉ mát đến vùng biển phía Nam nước Pháp, một chiếc máy quay cầm tay và 200 Euro. Tuy nhiên, kỳ nghỉ mơ ước nhanh chóng biến thành thảm họa theo cách hài hước nhất có thể",
   },
   {
     id: "hm-11",
