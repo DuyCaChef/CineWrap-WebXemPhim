@@ -114,17 +114,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-8",
-    title: "Chiến Binh Mùa Đông",
+    title: "Twenty Five Twenty One",
     backdrop:
-      "https://images.unsplash.com/photo-1516466723877-e4ec1d736c8a?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/4a/9a/ba/4a9aba1cd624482fe69aeff2c05c3e85.jpg",
     poster:
-      "https://images.unsplash.com/photo-1542451313056-b7c8e626645f?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/d8/b6/c5/d8b6c5e2433d402c1c96927b5ad269b4.jpg",
     rating: "8.4",
-    genre: "Phiêu lưu",
+    genre: "Tình cảm",
     quality: "Full HD",
     ageRating: "16+",
     synopsis:
-      "Hành trình sinh tồn khắc nghiệt của một cựu chiến binh trên vùng núi tuyết hoang dã.",
+      "Bộ phim xoay quanh câu chuyện trưởng thành của Na Hee-do, một vận động viên đấu kiếm trung học đầy nhiệt huyết, và Baek Yi-jin, chàng trai trẻ phải nỗ lực vực dậy cuộc sống sau khi gia đình phá sản vì khủng hoảng kinh tế.",
   },
   {
     id: "hm-9",
