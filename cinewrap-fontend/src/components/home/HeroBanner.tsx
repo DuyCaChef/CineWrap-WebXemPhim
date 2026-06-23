@@ -86,17 +86,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-6",
-    title: "Kỷ Nguyên Máy Móc",
+    title: "Bố Già",
     backdrop:
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/c3/60/59/c3605982d92fcc02198218a20561bee0.jpg",
     poster:
-      "https://images.unsplash.com/photo-1535378620166-273708d44e4c?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/bf/59/43/bf5943093d7a281cc12e331a62241afa.jpg",
     rating: "9.0",
-    genre: "Hành động",
+    genre: "Gia đình",
     quality: "HD 4K",
     ageRating: "13+",
     synopsis:
-      "Cuộc chiến sinh tồn của loài người trước cuộc nổi dậy của trí tuệ nhân tạo toàn cầu.",
+      "Xoay quanh cuộc đời của ông Ba Sang – một người cha nghèo khó, bao đồng, luôn hết lòng hy sinh vì người thân nhưng lại không biết cách thể hiện tình cảm khiến những mâu thuẫn thế hệ nảy sinh. Một lát cắt chân thực, chạm đến trái tim về sự hy sinh, nỗi đau và sợi dây gắn kết gia đình khó xóa nhòa.",
   },
   {
     id: "hm-7",
