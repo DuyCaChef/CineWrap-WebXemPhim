@@ -219,7 +219,7 @@ const HeroBanner: React.FC = () => {
         type="button"
         aria-label="Phim trước"
         onClick={() => goTo("prev")}
-        className="group absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-white/15 bg-black/30 p-3 backdrop-blur-md transition hover:bg-black/50 lg:flex"
+        className="group absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-white/15 bg-black/30 p-3 backdrop-blur-md transition hover:bg-black/50 md:flex"
       >
         <svg
           className="h-6 w-6 text-cine-text transition group-hover:-translate-x-0.5"
@@ -239,7 +239,7 @@ const HeroBanner: React.FC = () => {
         type="button"
         aria-label="Phim tiếp theo"
         onClick={() => goTo("next")}
-        className="group absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-white/15 bg-black/30 p-3 backdrop-blur-md transition hover:bg-black/50 lg:flex"
+        className="group absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 rounded-full border border-white/15 bg-black/30 p-3 backdrop-blur-md transition hover:bg-black/50 md:flex"
       >
         <svg
           className="h-6 w-6 text-cine-text transition group-hover:translate-x-0.5"
@@ -310,7 +310,7 @@ const HeroBanner: React.FC = () => {
       </div>
 
       {/* ─── DẢI POSTER NẰM NGANG PHÍA DƯỚI CÙNG ─── */}
-      <div className="relative z-20 w-full pb-6 lg:pb-10 pt-4">
+      <div className="relative z-20 w-full pb-6 lg:pb-10">
         {/* Container lướt ngang (Horizontal Scroll):
           - overflow-x-auto: cho phép cuộn ngang
           - snap-x: cuộn khựng mượt
