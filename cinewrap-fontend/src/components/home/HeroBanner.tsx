@@ -128,17 +128,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-9",
-    title: "Bí Ẩn Hành Tinh Đỏ",
+    title: "Rely 1988",
     backdrop:
-      "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/19/ef/fe/19effed5b68c877608d720d205c6f37d.jpg",
     poster:
-      "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/08/9c/45/089c456d0063a27e5683b57f67a8c9ad.jpg",
     rating: "8.7",
-    genre: "Khoa học",
+    genre: "Gia đình",
     quality: "HD 4K",
     ageRating: "13+",
     synopsis:
-      "Chuyến thám hiểm sao Hỏa đầu tiên của nhân loại đối mặt với những bí mật vượt ngoài tầm hiểu biết.",
+      "Lấy bối cảnh khu phố Ssangmun-dong (Seoul) vào năm 1988, bộ phim xoay quanh cuộc sống của 5 gia đình và nhóm bạn thân 5 người lớn lên cùng nhau: Duk-sun, Jung-hwan, Sun-woo, Taek và Dong-ryong.",
   },
   {
     id: "hm-10",
