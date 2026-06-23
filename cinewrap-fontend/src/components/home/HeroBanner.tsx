@@ -32,9 +32,9 @@ const HERO_MOVIES: HeroMovie[] = [
     id: "hm-2",
     title: "Ánh Sáng Cuối Đường Hầm",
     backdrop:
-      "https://images.unsplash.com/photo-1574267432553-4b4628081c31?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/d7/50/71/d7507190bf4f9811d42cdad85f8f7a52.jpg",
     poster:
-      "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/originals/fd/72/86/fd7286c435a370ac00dee8410ed15a7c.jpg",
     rating: "9.1",
     genre: "Tâm lý",
     quality: "HD 4K",
@@ -46,7 +46,7 @@ const HERO_MOVIES: HeroMovie[] = [
     id: "hm-3",
     title: "Thiên Hà Tan Vỡ",
     backdrop:
-      "https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/d7/50/71/d7507190bf4f9811d42cdad85f8f7a52.jpg",
     poster:
       "https://images.unsplash.com/photo-1616530940355-351fabd9524b?q=80&w=400&auto=format&fit=crop",
     rating: "8.8",
