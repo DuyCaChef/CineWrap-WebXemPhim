@@ -58,17 +58,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-4",
-    title: "Lời Nguyền Biển Sâu",
+    title: "Mắt biếc",
     backdrop:
-      "https://images.unsplash.com/photo-1518182170546-076616fdfaaf?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/00/12/ae/0012aead8778ab2fb3446d1b38d84ba1.jpg",
     poster:
-      "https://images.unsplash.com/photo-1551524164-687a55dd1126?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/69/8f/ed/698fed9182e1a389a005be886aff68fe.jpg",
     rating: "7.9",
-    genre: "Kinh dị",
+    genre: "Tình cảm",
     quality: "HD 4K",
     ageRating: "18+",
     synopsis:
-      "Một nhóm thám hiểm tìm thấy tàn tích cổ đại dưới đáy biển, đánh thức một thế lực đen tối ngủ yên hàng ngàn năm.",
+      "Câu chuyện tình đơn phương kéo dài cả đời người của Ngạn dành cho Hà Lan – cô gái có đôi mắt đẹp như bầu trời. Một bản tình ca buồn về sự lỡ làng, những nuối tiếc thanh xuân và ký ức về một thời đã xa chẳng thể nào quay lại.",
   },
   {
     id: "hm-5",
