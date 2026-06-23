@@ -16,17 +16,17 @@ interface HeroMovie {
 const HERO_MOVIES: HeroMovie[] = [
   {
     id: "hm-1",
-    title: "Vực Thẳm Vô Tận",
+    title: "Peaky Blinders: Trỗi Dậy Của Băng Đảng",
     backdrop:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/7e/0d/f0/7e0df08da300bc6e9b6ddb101b6349d5.jpg",
     poster:
-      "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/736x/76/07/ee/7607ee8bd1916c561ea0cd55ea95dff0.jpg",
     rating: "8.5",
     genre: "Hành động",
     quality: "HD 4K",
     ageRating: "18+",
     synopsis:
-      "Một đặc vụ phải đối mặt với quá khứ của chính mình khi một âm mưu toàn cầu đe dọa lật đổ trật tự thế giới.",
+      "Hành trình bành trướng nghẹt thở của băng đảng nhà Shelby dưới sự dẫn dắt của thủ lĩnh thiên tài, đầy tham vọng Tommy Shelby — biến một gia tộc tội phạm đường phố thành một đế chế thống trị cả thế giới ngầm lẫn chính trường.",
   },
   {
     id: "hm-2",
