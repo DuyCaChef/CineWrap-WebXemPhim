@@ -156,17 +156,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-11",
-    title: "Hung Thần Rừng Sâu",
+    title: "Shaun the Sheep Movie",
     backdrop:
-      "https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/78/fa/10/78fa100695711d6238691e4a104a4fc9.jpg",
     poster:
-      "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/ac/ce/1c/acce1c0531c7e8486c2d63ee880aca0a.jpg",
     rating: "9.3",
-    genre: "Cổ trang",
+    genre: "Hoạt hình",
     quality: "HD 4K",
-    ageRating: "18+",
+    ageRating: "6+",
     synopsis:
-      "Cuộc chiến tranh giành quyền lực tàn khốc đánh dấu sự lụi tàn của một vương triều huy hoàng.",
+      "Câu chuyện bắt đầu tại nông trại Mossy Bottom khi chú cừu thông minh Shaun cảm thấy cuộc sống hằng ngày quá nhàm chán và muốn có một ngày nghỉ ngơi thực thụ. Tuy nhiên, kế hoạch của Shaun vô tình khiến chiếc xe caravan (có chứa ông chủ nông dân bên trong) lăn bánh xuống đồi và tiến thẳng về thành phố lớn.",
   },
 ];
 
