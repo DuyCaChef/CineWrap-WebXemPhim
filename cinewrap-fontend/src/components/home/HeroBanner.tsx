@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface HeroMovie {
   id: string;
@@ -187,6 +187,18 @@ const HeroBanner: React.FC = () => {
     });
   };
 
+  // Khi `active` thay đổi, cuộn poster tương ứng vào giữa vùng nhìn thấy của container
+  useEffect(() => {
+    const activePoster = document.getElementById(`poster-${active}`);
+    if (activePoster) {
+      activePoster.scrollIntoView({
+        behavior: "smooth", // Cuộn mượt mà
+        inline: "center", // Đưa poster ra giữa vùng nhìn thấy
+        block: "nearest", // QUAN TRỌNG: Tránh làm giật/cuộn dọc cả trang web
+      });
+    }
+  }, [active]);
+
   return (
     <section className="relative flex flex-col justify-end min-h-[85vh] lg:min-h-[100vh] w-full overflow-hidden bg-cine-bg-primary">
       {/* Background image (giả lập trailer auto-play) */}
@@ -308,6 +320,7 @@ const HeroBanner: React.FC = () => {
           {HERO_MOVIES.map((m, idx) => (
             <div
               key={m.id}
+              id={`poster-${idx}`} // ID để scrollIntoView
               onClick={() => setActive(idx)}
               className={`relative snap-center shrink-0 overflow-hidden rounded-xl cursor-pointer transition-all duration-500 ease-out origin-bottom ${
                 active === idx
