@@ -30,31 +30,31 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-2",
-    title: "Ánh Sáng Cuối Đường Hầm",
+    title: "One Piece Movie",
     backdrop:
       "https://i.pinimg.com/1200x/d7/50/71/d7507190bf4f9811d42cdad85f8f7a52.jpg",
     poster:
       "https://i.pinimg.com/originals/fd/72/86/fd7286c435a370ac00dee8410ed15a7c.jpg",
     rating: "9.1",
-    genre: "Tâm lý",
+    genre: "Phiêu lưu",
     quality: "HD 4K",
     ageRating: "16+",
     synopsis:
-      "Câu chuyện cảm động về hành trình tìm lại chính mình sau biến cố lớn nhất cuộc đời.",
+      "Câu chuyện cảm động về hành trình tìm lại chính mình sau biến cố lớn nhất cuộc đời.Bước vào một hòn đảo kỳ bí hoàn toàn mới trên Đại Hải Trình, băng Mũ Rơm phải đối đầu với những kẻ thù nguy hiểm trong quá khứ lẫn thế hệ mới. Những thế lực mạnh nhất hội tụ, đẩy Luffy và đồng đội vào thử thách sống còn để bảo vệ đồng đội và kho báu lớn nhất.",
   },
   {
     id: "hm-3",
-    title: "Thiên Hà Tan Vỡ",
+    title: "Interstellar",
     backdrop:
-      "https://i.pinimg.com/1200x/d7/50/71/d7507190bf4f9811d42cdad85f8f7a52.jpg",
+      "https://i.pinimg.com/originals/23/af/5f/23af5fadb6399c522676d2e87236a2ba.jpg",
     poster:
-      "https://images.unsplash.com/photo-1616530940355-351fabd9524b?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/a3/19/69/a319697386c13cc6d64dff5797de9f5d.jpg",
     rating: "8.8",
     genre: "Viễn tưởng",
     quality: "HD 4K",
-    ageRating: "13+",
+    ageRating: "18+",
     synopsis:
-      "Phi hành đoàn cuối cùng của Trái Đất phải tìm ra ngôi nhà mới trước khi quá muộn.",
+      "Một nhóm các nhà thám hiểm không gian vũ trụ phải thực hiện chuyến hành trình nguy hiểm nhất lịch sử nhân loại: bước qua một hố đen vũ trụ để tìm kiếm một hành tinh mới, cứu lấy tương lai của loài người. Đó không chỉ là cuộc chiến với sự bao la của vũ trụ, mà còn là cuộc chiến với thời gian để trở về với gia đình.",
   },
   {
     id: "hm-4",
