@@ -100,17 +100,17 @@ const HERO_MOVIES: HeroMovie[] = [
   },
   {
     id: "hm-7",
-    title: "Giai Điệu Mùa Thu",
+    title: "BatMan",
     backdrop:
-      "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1920&auto=format&fit=crop",
+      "https://i.pinimg.com/1200x/33/c4/94/33c494a1a55a2d8e03e34dc7fc5cac1f.jpg",
     poster:
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop",
+      "https://i.pinimg.com/736x/ab/3d/63/ab3d6358c7ee93923de8caec086aa259.jpg",
     rating: "8.6",
-    genre: "Lãng mạn",
+    genre: "Siêu anh hùng",
     quality: "HD 4K",
-    ageRating: "13+",
+    ageRating: "16+",
     synopsis:
-      "Hai tâm hồn cô đơn tìm thấy nhau qua niềm đam mê âm nhạc tại một thành phố thơ mộng nước Pháp.",
+      "Trong đêm tối Gotham, một người đàn ông mặc áo choàng và mặt nạ dơi chiến đấu chống lại tội ác, bảo vệ thành phố khỏi những kẻ xấu xa. Batman không chỉ là biểu tượng của công lý mà còn là hiện thân của sự hy sinh và quyết tâm không ngừng nghỉ để bảo vệ những người vô tội.",
   },
   {
     id: "hm-8",
