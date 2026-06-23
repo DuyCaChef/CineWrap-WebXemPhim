@@ -1,5 +1,5 @@
 import React from "react";
-// import Header from "../components/Header";
+import Header from "../components/Header";
 import HeroBanner from "../components/home/HeroBanner";
 import ContinueWatching from "../components/home/ContinueWatching";
 import NewReleases from "../components/home/NewReleases";
@@ -11,6 +11,11 @@ import TopSeries from "../components/home/TopSeries";
 const HomePage: React.FC = () => {
   return (
     <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
+      {/* Header */}
+      <Header />
+
+      <div className="pt-20"></div>
+
       {/* 1. Hero Banner */}
       <HeroBanner />
 
