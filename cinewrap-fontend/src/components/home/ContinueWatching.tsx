@@ -53,13 +53,17 @@ const ContinueWatching: React.FC = () => {
 
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
-      <div className="mb-4 flex items-center justify-between sm:mb-5">
-        <h2 className="text-lg font-bold text-cine-text sm:text-xl lg:text-2xl">
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="block h-6 w-[3px] rounded-full bg-[#ffe600] sm:h-7"
+        />
+        <h2 className="text-xl font-bold text-white sm:text-2xl">
           Tiếp tục xem
         </h2>
       </div>
 
-      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:gap-4 sm:px-8 lg:-mx-16 lg:px-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="-mx-4 pt-8 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:gap-4 sm:px-8 lg:-mx-16 lg:px-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {CONTINUE_ITEMS.map((item) => (
           <button
             key={item.id}
