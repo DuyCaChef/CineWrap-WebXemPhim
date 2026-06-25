@@ -14,7 +14,7 @@ const CONTINUE_ITEMS: ContinueItem[] = [
     title: "Vực Thẳm Vô Tận",
     thumbnail:
       "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=800&auto=format&fit=crop",
-    progress: 68,
+    progress: 70,
   },
   {
     id: "cw-2",
@@ -22,14 +22,14 @@ const CONTINUE_ITEMS: ContinueItem[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=800&auto=format&fit=crop",
     progress: 32,
-    episode: "Tập 4",
+    episode: "Tập 5",
   },
   {
     id: "cw-3",
     title: "Thiên Hà Tan Vỡ",
     thumbnail:
       "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=800&auto=format&fit=crop",
-    progress: 85,
+    progress: 80,
   },
   {
     id: "cw-4",
