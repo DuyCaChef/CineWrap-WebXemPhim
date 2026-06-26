@@ -102,6 +102,16 @@ const MOVIES: Movie[] = [
     year: 2024,
     isHot: false,
   },
+  {
+    id: "nr-9",
+    title: "Vòng Xoáy Định Mệnh",
+    poster:
+      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop&auto=format",
+    rating: "8.9",
+    genre: "Hình sự",
+    year: 2024,
+    isHot: false,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -224,7 +234,7 @@ const NewReleases: React.FC = () => {
 
       {/*
         ── Scroll container ──
-        pt-4 pb-6 px-1 : không gian buffer để glow + scale không bị clip
+        pt-8 pb-6 px-1 : không gian buffer để glow + scale không bị clip
         snap-x snap-mandatory scroll-smooth : khựng đúng tâm mỗi thẻ khi vuốt
         [&::-webkit-scrollbar]:hidden ... : ẩn scrollbar mọi trình duyệt
       */}
@@ -232,7 +242,7 @@ const NewReleases: React.FC = () => {
         className={[
           "flex gap-4 overflow-x-auto sm:gap-5",
           "scroll-smooth snap-x snap-mandatory",
-          "pt-4 pb-6 px-1",
+          "pt-8 pl-8 pr-8 pb-6 px-1",
           "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
         ].join(" ")}
       >
