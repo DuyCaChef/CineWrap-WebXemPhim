@@ -82,6 +82,26 @@ const GENRES: Genre[] = [
   },
   {
     id: "g-6",
+    name: "Gia Đình",
+    icon: "🏡",
+    image:
+      "https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?w=400&h=400&fit=crop&auto=format",
+    count: 112,
+    size: "small",
+    accentColor: "rgba(16,185,129,0.5)", // Màu xanh lục ấm áp
+  },
+  {
+    id: "g-7",
+    name: "Anime",
+    icon: "🌸",
+    image:
+      "https://images.unsplash.com/photo-1578356983759-450f3de0a4ab?w=400&h=400&fit=crop&auto=format",
+    count: 245,
+    size: "small",
+    accentColor: "rgba(244,114,182,0.5)", // Màu hồng hoa anh đào
+  },
+  {
+    id: "g-8",
     name: "Phiêu Lưu",
     icon: "🌍",
     image:
@@ -91,7 +111,7 @@ const GENRES: Genre[] = [
     accentColor: "rgba(16,185,129,0.5)",
   },
   {
-    id: "g-7",
+    id: "g-9",
     name: "Hình Sự",
     icon: "🔍",
     image:
@@ -101,7 +121,7 @@ const GENRES: Genre[] = [
     accentColor: "rgba(245,158,11,0.5)",
   },
   {
-    id: "g-8",
+    id: "g-10",
     name: "Hoạt Hình",
     icon: "🎨",
     image:
@@ -313,7 +333,7 @@ const CategoriesGrid: React.FC = () => {
       */}
 
       {/* Desktop grid */}
-      <div className="hidden lg:grid lg:grid-cols-4 lg:grid-rows-[140px_140px_140px] lg:gap-4">
+      <div className="hidden lg:grid lg:grid-cols-4 lg:auto-rows-[140px] lg:gap-4">
         {GENRES.map((genre) => (
           <GenreCell key={genre.id} genre={genre} />
         ))}
