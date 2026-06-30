@@ -202,7 +202,7 @@ const GenreCell: React.FC<GenreCellProps> = ({ genre }) => {
       <div
         className={[
           "absolute inset-0",
-          "bg-gradient-to-t from-black/75 via-black/40 to-black/20",
+          "bg-linear-to-t from-black/75 via-black/40 to-black/20",
           "transition-opacity duration-300",
           "group-hover:opacity-60",
         ].join(" ")}
@@ -308,7 +308,7 @@ const CategoriesGrid: React.FC = () => {
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="block h-6 w-[3px] rounded-full bg-[#00a3ff] sm:h-7"
+            className="block h-6 w-0.75 rounded-full bg-[#00a3ff] sm:h-7"
           />
           <h2 className="text-xl font-bold text-white sm:text-2xl">
             Khám Phá Thể Loại
@@ -316,9 +316,24 @@ const CategoriesGrid: React.FC = () => {
         </div>
         <button
           type="button"
-          className="rounded text-xs font-semibold text-[#00a3ff] transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a3ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:text-sm"
+          className="group inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 text-xs font-semibold text-[#00a3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.02)_inset] backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a3ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:text-sm"
         >
-          Tất cả thể loại →
+          Tất cả thể loại
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5.5 3.5L10 8l-4.5 4.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
       </div>
 
@@ -341,7 +356,6 @@ const CategoriesGrid: React.FC = () => {
 
       {/* Mobile / Tablet grid — 2 cột, auto height, không dùng row-span */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
-      
         {GENRES.map((genre) => (
           <button
             key={genre.id}
@@ -367,7 +381,7 @@ const CategoriesGrid: React.FC = () => {
             />
 
             {/* Darken overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/20 transition-opacity duration-300 group-hover:opacity-60" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/40 to-black/20 transition-opacity duration-300 group-hover:opacity-60" />
 
             {/* Accent tint */}
             <div
