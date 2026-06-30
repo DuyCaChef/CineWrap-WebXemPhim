@@ -341,6 +341,7 @@ const CategoriesGrid: React.FC = () => {
 
       {/* Mobile / Tablet grid — 2 cột, auto height, không dùng row-span */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
+      
         {GENRES.map((genre) => (
           <button
             key={genre.id}
