@@ -339,7 +339,7 @@ const SeriesCard: React.FC<SeriesCardProps> = ({ series }) => {
 // Main component: TopSeries
 // ---------------------------------------------------------------------------
 
-const TopSeries: React.FC = () => {
+export const TopSeries: React.FC = () => {
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-10 lg:px-16">
       {/* ── Section header ── */}
@@ -398,5 +398,3 @@ const TopSeries: React.FC = () => {
     </section>
   );
 };
-
-export default TopSeries;
