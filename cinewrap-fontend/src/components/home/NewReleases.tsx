@@ -202,7 +202,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
 // Main component: NewReleases
 // ---------------------------------------------------------------------------
 
-const NewReleases: React.FC = () => {
+export const NewReleases: React.FC = () => {
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
       {/* ── Section header ── */}
@@ -270,5 +270,3 @@ const NewReleases: React.FC = () => {
     </section>
   );
 };
-
-export default NewReleases;
