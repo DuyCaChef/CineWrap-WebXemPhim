@@ -212,7 +212,7 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
-export default function Header() {
+export const Header: React.FC = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
@@ -462,4 +462,4 @@ export default function Header() {
       </AnimatePresence>
     </header>
   );
-}
+};
