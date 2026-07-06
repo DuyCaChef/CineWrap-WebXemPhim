@@ -48,7 +48,7 @@ const CONTINUE_ITEMS: ContinueItem[] = [
   },
 ];
 
-const ContinueWatching: React.FC = () => {
+export const ContinueWatching: React.FC = () => {
   if (CONTINUE_ITEMS.length === 0) return null;
 
   return (
@@ -115,5 +115,3 @@ const ContinueWatching: React.FC = () => {
     </section>
   );
 };
-
-export default ContinueWatching;

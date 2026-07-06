@@ -1,7 +1,7 @@
 import React from "react";
 import { Header } from "../components/Header";
 import { HeroBanner } from "../components/home/HeroBanner";
-import ContinueWatching from "../components/home/ContinueWatching";
+import { ContinueWatching } from "../components/home/ContinueWatching";
 import NewReleases from "../components/home/NewReleases";
 import { TopMovies } from "../components/home/TopMovies";
 import { CategoriesGrid } from "../components/home/CategoriesGrid";
