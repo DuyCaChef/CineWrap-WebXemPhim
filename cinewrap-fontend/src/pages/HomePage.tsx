@@ -4,7 +4,7 @@ import HeroBanner from "../components/home/HeroBanner";
 import ContinueWatching from "../components/home/ContinueWatching";
 import NewReleases from "../components/home/NewReleases";
 import TopMovies from "../components/home/TopMovies";
-import CategoriesGrid from "../components/home/CategoriesGrid";
+import { CategoriesGrid } from "../components/home/CategoriesGrid";
 import Recommended from "../components/home/Recommended";
 import TopSeries from "../components/home/TopSeries";
 import { Footer } from "../components/Footer";

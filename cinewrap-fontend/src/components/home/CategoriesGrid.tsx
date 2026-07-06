@@ -300,7 +300,7 @@ const GenreCell: React.FC<GenreCellProps> = ({ genre }) => {
 // Main component: CategoriesGrid
 // ---------------------------------------------------------------------------
 
-const CategoriesGrid: React.FC = () => {
+export const CategoriesGrid: React.FC = () => {
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-10 lg:px-16">
       {/* ── Section header ── */}
@@ -409,5 +409,3 @@ const CategoriesGrid: React.FC = () => {
     </section>
   );
 };
-
-export default CategoriesGrid;
