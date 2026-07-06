@@ -328,7 +328,7 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
 // Main component: TopMovies
 // ---------------------------------------------------------------------------
 
-const TopMovies: React.FC = () => {
+export const TopMovies: React.FC = () => {
   // Chia 10 phim thành 2 cột trên desktop (5 phim / cột)
   const leftCol = TOP_MOVIES.slice(0, 5);
   const rightCol = TOP_MOVIES.slice(5, 10);
@@ -405,5 +405,3 @@ const TopMovies: React.FC = () => {
     </section>
   );
 };
-
-export default TopMovies;
