@@ -12,9 +12,15 @@
   --color-cine-bg-primary: #0f172a;
   --color-cine-bg-secondary: #1e293b;
   --color-cine-surface: #334155;
+  --color-cine-bg: #0f172a;
   --color-cine-neutral: #7e7668;
   --color-cine-primary: #ffc107;
   --color-cine-secondary: #00a3ff;
+  --color-cine-success: #22c55e;
+  --color-cine-warning: #f59e0b;
+  --color-cine-danger: #e50914;
+  --color-cine-error: #e50914;
+  --color-cine-info: #38bdf8;
   --color-cine-warn: #e50914;
   --color-cine-text: #ffffff;
   --color-cine-text-muted: #9ca3af;
