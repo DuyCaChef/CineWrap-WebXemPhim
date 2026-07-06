@@ -176,7 +176,7 @@ const Badge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </span>
 );
 
-const HeroBanner: React.FC = () => {
+export const HeroBanner: React.FC = () => {
   const [active, setActive] = useState(0);
   const movie = HERO_MOVIES[active];
 
@@ -354,5 +354,3 @@ const HeroBanner: React.FC = () => {
     </section>
   );
 };
-
-export default HeroBanner;
