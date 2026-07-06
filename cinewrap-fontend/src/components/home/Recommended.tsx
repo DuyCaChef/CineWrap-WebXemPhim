@@ -188,7 +188,7 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
 // Main component: Recommended
 // ---------------------------------------------------------------------------
 
-const Recommended: React.FC = () => {
+export const Recommended: React.FC = () => {
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
       {/* ── Section header ── */}
@@ -253,5 +253,3 @@ const Recommended: React.FC = () => {
     </section>
   );
 };
-
-export default Recommended;
