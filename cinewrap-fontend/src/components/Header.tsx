@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Đảm bảo đường dẫn này khớp với vị trí file Header của bạn
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
