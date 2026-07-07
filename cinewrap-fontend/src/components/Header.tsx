@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
+import { AuthModal } from "@/components/auth";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface DropdownItem {
@@ -214,6 +215,10 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
+  // Auth Modal State
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+
   // Navigation State
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -337,7 +342,10 @@ export const Header: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("/dang-nhap")}
+          onClick={() => {
+            setAuthOpen(true);
+            setAuthMode("login");
+          }}
           className="flex items-center justify-center gap-2 px-3 py-2 md:px-5 md:py-2.5 text-[13px] font-bold tracking-wide text-cine-bg-primary uppercase bg-cine-primary border border-cine-primary rounded-full shadow-lg shadow-cine-primary/20 transition-all duration-300 hover:bg-[#e0a800]"
         >
           <UserIcon />
@@ -448,7 +456,10 @@ export const Header: React.FC = () => {
             {/* Lặp lại nút đăng nhập cho Mobile ở cuối menu */}
             <div className="p-6">
               <button
-                onClick={() => navigate("/dang-nhap")}
+                onClick={() => {
+                  setAuthOpen(true);
+                  setAuthMode("login");
+                }}
                 className="w-full flex items-center justify-center gap-2 py-3.5 bg-cine-primary text-cine-bg-primary font-bold rounded-xl active:scale-95 transition-transform"
               >
                 <UserIcon />
@@ -458,6 +469,12 @@ export const Header: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <AuthModal
+        isOpen={authOpen}
+        initialMode={authMode}
+        onClose={() => setAuthOpen(false)}
+        key={authOpen ? authMode : "closed"}
+      />
     </header>
   );
 };

@@ -38,16 +38,13 @@ interface AuthModalProps {
  * Thao tác đóng (Close behavior): nhấp vào vùng nền, nút X hoặc phím Escape
  * tất cả đều đóng cửa sổ modal. Việc cuộn trang bị khóa khi cửa sổ đang mở.
  */
+
 export default function AuthModal({
   isOpen,
   initialMode = "login",
   onClose,
 }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
-
-  useEffect(() => {
-    if (isOpen) setMode(initialMode);
-  }, [isOpen, initialMode]);
 
   useEffect(() => {
     if (!isOpen) return;

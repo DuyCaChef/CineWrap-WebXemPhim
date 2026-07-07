@@ -9,20 +9,20 @@ interface AuthVisualPanelProps {
 /**
  * AuthVisualPanel: Panel ảnh trang trí (LeftSide for Login, RightSide for Register)
  * ------------------------------------------------------------------
- * Purely decorative half of the popup. Reuses the same poster-collage
- * + gradient-overlay language as NewReleases/Recommended cards so the
- * modal still feels like part of CineWrap rather than a generic
- * "auth page" bolted on.
+ * Phần này của cửa sổ bật lên (popup) chỉ mang tính chất trang trí. Nó sử dụng lại cùng kiểu thiết kế ghép ảnh (poster-collage)
+ * và lớp phủ chuyển màu (gradient-overlay) như các thẻ "NewReleases" (Mới phát hành) hay "Recommended" (Đề xuất), giúp
+ * cửa sổ này vẫn mang đậm phong cách CineWrap thay vì trông như một
+ * "trang đăng nhập" chung chung được chắp vá vào.
  *
- * Content (tagline + CTA copy) swaps based on `mode` so the same panel
- * component can serve both flows without duplicating markup — this is
- * what lets AuthModal simply flip flex-direction to move it from left
- * to right instead of maintaining two near-identical components.
+ * Nội dung (khẩu hiệu và lời kêu gọi hành động - CTA) sẽ thay đổi tùy theo `mode` (chế độ), cho phép cùng một
+ * thành phần giao diện (component) phục vụ cả hai luồng chức năng mà không cần lặp lại mã nguồn — đây là
+ * cơ chế giúp AuthModal chỉ cần thay đổi thuộc tính `flex-direction` để chuyển vị trí từ trái
+ * sang phải, thay vì phải duy trì hai thành phần gần như giống hệt nhau.
  *
- * Hidden below `md` breakpoint: on mobile the form must be the very
- * first thing the user sees (mobile-first, one-handed use per
- * DESIGN.md section 7), so the decorative panel collapses away rather
- * than pushing the form below the fold.
+ * Ẩn đi khi màn hình nhỏ hơn điểm ngắt `md`: trên thiết bị di động, biểu mẫu phải là thứ
+ * đầu tiên người dùng nhìn thấy (ưu tiên thiết bị di động - mobile-first, thao tác bằng một tay theo
+ * tài liệu DESIGN.md, mục 7), do đó bảng trang trí sẽ được ẩn đi thay vì
+ * đẩy biểu mẫu xuống dưới phần hiển thị ban đầu của màn hình (below the fold).
  */
 export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
   const copy =
@@ -40,8 +40,8 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
 
   return (
     <div className="relative hidden h-full w-full overflow-hidden md:block">
-      {/* Poster collage background — a soft mosaic feel via repeating gradient blocks;
-          keeps this file self-contained without depending on external poster assets. */}
+      {/* Nền poster dạng ghép hình — tạo cảm giác khảm nhẹ nhàng nhờ các khối chuyển màu lặp lại;
+          giúp tệp tin này hoạt động độc lập mà không cần phụ thuộc vào các tài nguyên poster bên ngoài.*/}
       <div
         className="absolute inset-0 bg-[#1e293b]"
         style={{
@@ -50,7 +50,7 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
         }}
       />
 
-      {/* Darken + brand tint overlay so text stays readable, matching CategoriesGrid's layered-overlay pattern */}
+      {/* Làm tối và phủ lớp màu thương hiệu để đảm bảo văn bản vẫn dễ đọc, đồng bộ với kiểu phủ lớp (layered-overlay) của CategoriesGrid.*/}
       <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-[#0f172a]/20" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/40 to-transparent" />
 
@@ -62,7 +62,7 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="relative z-10 flex h-full flex-col justify-end p-10"
       >
-        {/* Vertical accent bar, consistent with section-header convention used across the homepage */}
+        {/* Thanh nhấn dọc, đồng bộ với quy tắc thiết kế tiêu đề phần được áp dụng trên toàn bộ trang chủ. */}
         <div className="mb-4 flex items-center gap-3">
           <span className="h-5 w-1 rounded-full bg-[#ffc107]" />
           <span className="text-xs font-semibold uppercase tracking-wide text-[#00a3ff]">
@@ -78,7 +78,7 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
           {copy.desc}
         </p>
 
-        {/* Logo watermark, echoes footer's subtle-watermark rule */}
+        {/* Logo dạng hình mờ, tuân theo quy tắc về hình mờ tinh tế ở phần chân trang. */}
         <div className="mt-10 text-lg font-extrabold tracking-tight text-white/20">
           CineWrap
         </div>
