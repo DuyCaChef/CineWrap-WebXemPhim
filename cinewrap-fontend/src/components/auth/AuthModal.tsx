@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import AuthBackdrop from "./AuthBackdrop";
@@ -64,7 +65,7 @@ export default function AuthModal({
     };
   }, [isOpen, onClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -128,6 +129,7 @@ export default function AuthModal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body, // Dịch chuyển toàn bộ Modal ra ngoài thẻ <body>
   );
 }
