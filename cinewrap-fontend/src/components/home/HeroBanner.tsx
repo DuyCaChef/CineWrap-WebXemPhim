@@ -200,7 +200,7 @@ export const HeroBanner: React.FC = () => {
   }, [active]);
 
   return (
-    <section className="relative flex flex-col justify-end min-h-[85vh] lg:min-h-[100vh] w-full overflow-hidden bg-cine-bg-primary">
+    <section className="relative flex flex-col min-h-[calc(100vh-80px)] w-full overflow-hidden bg-cine-bg-primary pt-20">
       {/* Background image (giả lập trailer auto-play) */}
       <div className="absolute inset-0">
         <img
@@ -253,7 +253,7 @@ export const HeroBanner: React.FC = () => {
       </button>
 
       {/* ─── PHẦN THÔNG TIN PHIM (Nằm trên dải Poster) ─── */}
-      <div className="relative z-20 w-full px-4 sm:px-8 lg:px-20 pb-6 lg:pb-8 flex flex-col items-start mt-24">
+      <div className="relative z-20 w-full px-4 sm:px-8 lg:px-20 flex-1 flex flex-col justify-center items-start pt-8 pb-4">
         <div className="max-w-3xl">
           {/* Badge Thông Tin */}
           <div className="mb-3 flex flex-wrap items-center gap-2 sm:mb-4">
@@ -310,7 +310,7 @@ export const HeroBanner: React.FC = () => {
       </div>
 
       {/* ─── DẢI POSTER NẰM NGANG PHÍA DƯỚI CÙNG ─── */}
-      <div className="relative z-20 w-full pb-6 lg:pb-10">
+      <div className="relative z-20 w-full mt-auto pb-6 lg:pb-10">
         {/* Container lướt ngang (Horizontal Scroll):
           - overflow-x-auto: cho phép cuộn ngang
           - snap-x: cuộn khựng mượt

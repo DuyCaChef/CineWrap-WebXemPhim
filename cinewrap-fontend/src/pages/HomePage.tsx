@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Header } from "../components/Header";
 import { HeroBanner } from "../components/home/HeroBanner";
 import { ContinueWatching } from "../components/home/ContinueWatching";
@@ -10,6 +10,15 @@ import { TopSeries } from "../components/home/TopSeries";
 import { Footer } from "../components/Footer";
 
 const HomePage: React.FC = () => {
+  // Ép cuộn lên đỉnh khi vừa vào trang
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Dùng "instant" để trang nhảy lên đỉnh ngay lập tức khi load, người dùng không bị thấy màn hình bị giật cuộn
+    });
+  }, []); // Mảng rỗng [] đảm bảo code này chỉ chạy DUY NHẤT 1 LẦN khi trang mở lên
+
   return (
     <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
       {/* Header */}
