@@ -9,10 +9,8 @@ interface LoginFormProps {
 /**
  * LoginForm
  * ------------------------------------------------------------------
- * Nội dung phần bên phải (RightSide) dành cho chế độ "login". Được tách thành một component riêng biệt
- * (thay vì dùng một form lớn với cấu trúc JSX phân nhánh phức tạp), nhờ đó mỗi luồng chức năng có thể mở rộng
- * các trường dữ liệu riêng của mình (ví dụ: trường xác nhận mật khẩu và ô tích chọn điều khoản ở luồng Đăng ký)
- * mà không tạo ra mớ mã lệnh rắc rối, chồng chéo (spaghetti code) bên trong AuthModal.
+ * Phiên bản nâng cấp giao diện "Kính Trắng Sữa" (Frosted Glass)
+ * Giúp tăng độ sáng, độ rõ nét của chữ và các ô nhập liệu trên nền tối.
  */
 export default function LoginForm({
   onSwitchToRegister,
@@ -32,8 +30,6 @@ export default function LoginForm({
       return;
     }
 
-    // Disable button immediately on submit + show inline spinner,
-    // per DESIGN.md "Interaction optimization" rule to prevent double-submits.
     setIsSubmitting(true);
     try {
       await onSubmit?.({ email, password });
@@ -49,9 +45,9 @@ export default function LoginForm({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -16 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="flex h-full w-full flex-col justify-center p-8 md:p-12"
+      className="flex h-full w-full flex-col justify-center bg-white/[0.03] backdrop-blur-xl p-8 md:p-12"
     >
-      <h1 className="text-[28px] font-bold leading-tight text-white">
+      <h1 className="text-[28px] font-bold leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
         Đăng nhập
       </h1>
       <p className="mt-2 text-sm text-[#9ca3af]">
@@ -66,6 +62,7 @@ export default function LoginForm({
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        {/* Email Field */}
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="login-email"
@@ -79,10 +76,12 @@ export default function LoginForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ban@email.com"
-            className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+            // ✅ ĐÃ SỬA: Chuyển sang màu xám kính mờ nhẹ bg-white/[0.05] để ô nhập nổi bật và dễ nhìn hơn
+            className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] px-4 text-sm text-white placeholder:text-white/30 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
         </div>
 
+        {/* Password Field */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <label
@@ -104,7 +103,8 @@ export default function LoginForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+            // ✅ ĐÃ SỬA: Đồng bộ hóa ô input password thành dạng kính mờ sáng sủa bg-white/[0.05]
+            className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] px-4 text-sm text-white placeholder:text-white/30 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
         </div>
 
@@ -114,12 +114,13 @@ export default function LoginForm({
           </p>
         )}
 
+        {/* Submit Button */}
         <motion.button
           type="submit"
           disabled={isSubmitting}
           whileHover={{ scale: isSubmitting ? 1 : 1.015 }}
           whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-          className="mt-2 flex h-12 items-center justify-center rounded-lg bg-[#ffc107] text-sm font-bold text-[#0f172a] transition-colors hover:bg-[#ffce33] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 flex h-12 items-center justify-center rounded-lg bg-[#ffc107] text-sm font-bold text-[#0f172a] transition-colors hover:bg-[#ffce33] disabled:cursor-not-allowed disabled:opacity-60 shadow-[0_4px_20px_rgba(255,193,7,0.25)]"
         >
           {isSubmitting ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0f172a]/30 border-t-[#0f172a]" />
@@ -129,15 +130,18 @@ export default function LoginForm({
         </motion.button>
       </form>
 
+      {/* Divider */}
       <div className="mt-6 flex items-center gap-3">
         <span className="h-px flex-1 bg-white/10" />
         <span className="text-xs text-[#9ca3af]">hoặc</span>
         <span className="h-px flex-1 bg-white/10" />
       </div>
 
+      {/* Google Button */}
       <button
         type="button"
-        className="mt-6 flex h-12 items-center justify-center rounded-lg border border-white/10 bg-transparent text-sm font-semibold text-white transition-colors hover:border-[#00a3ff]"
+        // ✅ ĐÃ SỬA: Chuyển sang nút kính mờ đồng điệu bg-white/[0.04]
+        className="mt-6 flex h-12 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] backdrop-blur-sm text-sm font-semibold text-white transition-colors hover:bg-white/[0.08] hover:border-[#00a3ff]"
       >
         Tiếp tục với Google
       </button>

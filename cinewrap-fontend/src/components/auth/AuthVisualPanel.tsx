@@ -6,24 +6,6 @@ interface AuthVisualPanelProps {
   mode: AuthMode;
 }
 
-/**
- * AuthVisualPanel: Panel ảnh trang trí (LeftSide for Login, RightSide for Register)
- * ------------------------------------------------------------------
- * Phần này của cửa sổ bật lên (popup) chỉ mang tính chất trang trí. Nó sử dụng lại cùng kiểu thiết kế ghép ảnh (poster-collage)
- * và lớp phủ chuyển màu (gradient-overlay) như các thẻ "NewReleases" (Mới phát hành) hay "Recommended" (Đề xuất), giúp
- * cửa sổ này vẫn mang đậm phong cách CineWrap thay vì trông như một
- * "trang đăng nhập" chung chung được chắp vá vào.
- *
- * Nội dung (khẩu hiệu và lời kêu gọi hành động - CTA) sẽ thay đổi tùy theo `mode` (chế độ), cho phép cùng một
- * thành phần giao diện (component) phục vụ cả hai luồng chức năng mà không cần lặp lại mã nguồn — đây là
- * cơ chế giúp AuthModal chỉ cần thay đổi thuộc tính `flex-direction` để chuyển vị trí từ trái
- * sang phải, thay vì phải duy trì hai thành phần gần như giống hệt nhau.
- *
- * Ẩn đi khi màn hình nhỏ hơn điểm ngắt `md`: trên thiết bị di động, biểu mẫu phải là thứ
- * đầu tiên người dùng nhìn thấy (ưu tiên thiết bị di động - mobile-first, thao tác bằng một tay theo
- * tài liệu DESIGN.md, mục 7), do đó bảng trang trí sẽ được ẩn đi thay vì
- * đẩy biểu mẫu xuống dưới phần hiển thị ban đầu của màn hình (below the fold).
- */
 export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
   const copy =
     mode === "login"
@@ -39,20 +21,25 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
         };
 
   return (
-    <div className="relative hidden h-full w-full overflow-hidden md:block">
-      {/* Nền poster dạng ghép hình — tạo cảm giác khảm nhẹ nhàng nhờ các khối chuyển màu lặp lại;
-          giúp tệp tin này hoạt động độc lập mà không cần phụ thuộc vào các tài nguyên poster bên ngoài.*/}
+    <div className="relative hidden h-full w-full overflow-hidden md:block bg-transparent">
+      {/* 1. Lớp nền lưới khảm nhẹ nhàng, đổi từ màu tối sang độ trong suốt siêu mỏng */}
       <div
-        className="absolute inset-0 bg-[#1e293b]"
+        className="absolute inset-0 bg-white/[0.01]"
         style={{
           backgroundImage:
-            "linear-gradient(135deg, rgba(0,163,255,0.18) 0%, transparent 40%), linear-gradient(315deg, rgba(255,193,7,0.14) 0%, transparent 45%)",
+            "linear-gradient(135deg, rgba(0,245,255,0.08) 0%, transparent 50%), linear-gradient(315deg, rgba(255,163,0,0.06) 0%, transparent 50%)",
         }}
       />
 
-      {/* Làm tối và phủ lớp màu thương hiệu để đảm bảo văn bản vẫn dễ đọc, đồng bộ với kiểu phủ lớp (layered-overlay) của CategoriesGrid.*/}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-[#0f172a]/20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/40 to-transparent" />
+      {/* 2. ✅ ĐÃ SỬA: Lớp phủ đen từ đáy lên được làm mỏng đi rất nhiều (from 90% -> 60%, và via 50% -> 20%) 
+          giúp ánh sáng vàng/xanh từ backdrop rò rỉ lên cực kỳ rõ ràng */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#05070f]/70 via-[#05070f]/20 to-transparent" />
+
+      {/* 3. ✅ ĐÃ SỬA: Lớp phủ đen từ trái sang phải được hạ xuống mức tối thiểu (20% -> 10%) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#05070f]/10 to-transparent" />
+
+      {/* 4. Lớp phủ màu điện ảnh mỏng (Ambient Tint) giúp panel bên trái cộng hưởng nhẹ với dải sáng Teal phía sau */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,245,255,0.05)_0%,transparent_60%)] mix-blend-screen" />
 
       {/* Content */}
       <motion.div
@@ -62,24 +49,26 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="relative z-10 flex h-full flex-col justify-end p-10"
       >
-        {/* Thanh nhấn dọc, đồng bộ với quy tắc thiết kế tiêu đề phần được áp dụng trên toàn bộ trang chủ. */}
+        {/* Thanh nhấn dọc */}
         <div className="mb-4 flex items-center gap-3">
-          <span className="h-5 w-1 rounded-full bg-[#ffc107]" />
+          <span className="h-5 w-1 rounded-full bg-[#ffc107] shadow-[0_0_15px_rgba(255,193,7,0.6)]" />
           <span className="text-xs font-semibold uppercase tracking-wide text-[#00a3ff]">
             {copy.eyebrow}
           </span>
         </div>
 
-        <h2 className="whitespace-pre-line text-[26px] font-bold leading-[1.2] text-white">
+        {/* Tiêu đề - Thêm drop-shadow rõ hơn để luôn nổi bật trên nền sáng */}
+        <h2 className="whitespace-pre-line text-[26px] font-bold leading-[1.2] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
           {copy.title}
         </h2>
 
-        <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-[#9ca3af]">
+        {/* Mô tả */}
+        <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-[#9ca3af] drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
           {copy.desc}
         </p>
 
-        {/* Logo dạng hình mờ, tuân theo quy tắc về hình mờ tinh tế ở phần chân trang. */}
-        <div className="mt-10 text-lg font-extrabold tracking-tight text-white/20">
+        {/* Logo CineWrap */}
+        <div className="mt-10 text-lg font-extrabold tracking-tight text-white/25">
           CineWrap
         </div>
       </motion.div>

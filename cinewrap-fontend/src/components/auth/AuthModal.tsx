@@ -68,30 +68,31 @@ export default function AuthModal({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop: click-to-close + darken + ambient motion */}
+        // Khung bọc fixed ngoài cùng trùm toàn màn hình
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* 1. LỚP NỀN ĐỘNG CINEMATIC (NẰM DƯỚI CÙNG) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="absolute inset-0"
-            onClick={onClose}
+            className="absolute inset-0 z-0 pointer-events-none"
           >
             <AuthBackdrop />
-            {/* Một lớp phủ tối tĩnh được đặt phía trên nền động, 
-            giúp nội dung thẻ luôn dễ đọc bất kể vị trí hiện tại của dải màu chuyển sắc. */}
-            <div className="absolute inset-0 bg-black/50" />
           </motion.div>
 
-          {/* Card */}
+          {/* 2. LỚP PHỦ ĐEN MỜ NHẸ (TẠO ĐỘ TƯƠNG PHẢN CHO FORM) */}
+          <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
+
+          {/* 3. TẤM KÍNH CƯỜNG LỰC TRONG SUỐT (NẰM TRÊN CÙNG) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 flex h-[600px] w-full max-w-[860px] overflow-hidden rounded-2xl border border-white/10 bg-[#1e293b] shadow-2xl ${
+            // Thay thế hoàn toàn bằng chuỗi class kính thấu này:
+            className={`relative z-20 flex h-[600px] w-full max-w-[860px] overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.6)] ${
               mode === "register" ? "flex-row-reverse" : "flex-row"
             }`}
           >
@@ -99,19 +100,18 @@ export default function AuthModal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Đóng"
-              className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white/80 backdrop-blur-md transition-colors hover:bg-black/50 hover:text-white"
+              className="absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white/80 backdrop-blur-md transition-colors hover:bg-black/50 hover:text-white"
             >
               <X size={18} />
             </button>
 
-            {/* Decorative side — LeftSide for login, RightSide for register via row-reverse above */}
-            <div className="hidden w-[42%] md:block">
+            {/* Khung bên trái (Đảm bảo trong suốt) */}
+            <div className="hidden w-[42%] md:block bg-transparent">
               <AuthVisualPanel mode={mode} />
             </div>
 
-            {/* Form side */}
-            <div className="w-full overflow-y-auto md:w-[58%]">
+            {/* Khung chứa Form con bên phải (Đảm bảo trong suốt) */}
+            <div className="w-full overflow-y-auto md:w-[58%] bg-transparent">
               <AnimatePresence mode="wait">
                 {mode === "login" ? (
                   <LoginForm
@@ -130,6 +130,6 @@ export default function AuthModal({
         </div>
       )}
     </AnimatePresence>,
-    document.body, // Dịch chuyển toàn bộ Modal ra ngoài thẻ <body>
+    document.body,
   );
 }

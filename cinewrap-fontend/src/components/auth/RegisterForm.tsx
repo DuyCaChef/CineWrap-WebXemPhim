@@ -9,9 +9,7 @@ interface RegisterFormProps {
 /**
  * RegisterForm
  * ------------------------------------------------------------------
- * Nội dung cho chế độ `mode="register"`. Bổ sung trường xác nhận mật khẩu và các ô checkbox
- * về điều khoản sử dụng – những thành phần mà chức năng Đăng nhập không cần đến;
- * chúng được tách riêng tại đây để giữ cho `LoginForm` gọn nhẹ.
+ * Giao diện đăng ký kính mờ đồng bộ hóa hoàn toàn với phong cách thiết kế rạp phim.
  */
 export default function RegisterForm({
   onSwitchToLogin,
@@ -57,7 +55,7 @@ export default function RegisterForm({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 16 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="flex h-full w-full flex-col justify-center p-8 md:p-12"
+      className="flex h-full w-full flex-col justify-center bg-white/[0.03] backdrop-blur-xl p-8 md:p-12"
     >
       <h1 className="text-[28px] font-bold leading-tight text-white">
         Tạo tài khoản
@@ -74,6 +72,7 @@ export default function RegisterForm({
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3.5">
+        {/* Họ và tên */}
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="reg-name"
@@ -87,10 +86,11 @@ export default function RegisterForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Nguyễn Văn A"
-            className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+            className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] backdrop-blur-md px-4 text-sm text-white placeholder:text-[#9ca3af]/40 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
         </div>
 
+        {/* Email */}
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="reg-email"
@@ -104,10 +104,11 @@ export default function RegisterForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ban@email.com"
-            className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+            className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] backdrop-blur-md px-4 text-sm text-white placeholder:text-[#9ca3af]/40 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
         </div>
 
+        {/* Mật khẩu & Nhập lại */}
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
             <label
@@ -122,7 +123,7 @@ export default function RegisterForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+              className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] backdrop-blur-md px-4 text-sm text-white placeholder:text-[#9ca3af]/40 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -138,23 +139,27 @@ export default function RegisterForm({
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="h-11 rounded-lg border border-white/10 bg-[#0f172a] px-4 text-sm text-white placeholder:text-[#9ca3af]/60 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
+              className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] backdrop-blur-md px-4 text-sm text-white placeholder:text-[#9ca3af]/40 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
             />
           </div>
         </div>
 
+        {/* Checkbox Điều khoản */}
         <label className="mt-1 flex cursor-pointer items-start gap-2 text-xs text-[#9ca3af]">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-[#0f172a] accent-[#ffc107]"
+            // ✅ ĐÃ SỬA: Thay bg-[#0f172a] đục bằng bg-black/40 nhẹ nhàng
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-black/40 accent-[#ffc107]"
           />
-          Tôi đồng ý với{" "}
-          <span className="text-[#00a3ff] underline-offset-2 hover:underline">
-            Điều khoản sử dụng
-          </span>{" "}
-          và Chính sách bảo mật của CineWrap.
+          <span>
+            Tôi đồng ý với{" "}
+            <span className="text-[#00a3ff] underline-offset-2 hover:underline">
+              Điều khoản sử dụng
+            </span>{" "}
+            và Chính sách bảo mật của CineWrap.
+          </span>
         </label>
 
         {error && (
@@ -163,12 +168,13 @@ export default function RegisterForm({
           </p>
         )}
 
+        {/* Nút Tạo tài khoản */}
         <motion.button
           type="submit"
           disabled={isSubmitting}
           whileHover={{ scale: isSubmitting ? 1 : 1.015 }}
           whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-          className="mt-1 flex h-12 items-center justify-center rounded-lg bg-[#ffc107] text-sm font-bold text-[#0f172a] transition-colors hover:bg-[#ffce33] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex h-12 items-center justify-center rounded-lg bg-[#ffc107] text-sm font-bold text-[#0f172a] transition-colors hover:bg-[#ffce33] disabled:cursor-not-allowed disabled:opacity-60 shadow-[0_4px_20px_rgba(255,193,7,0.2)]"
         >
           {isSubmitting ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0f172a]/30 border-t-[#0f172a]" />
