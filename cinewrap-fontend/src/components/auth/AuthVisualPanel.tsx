@@ -4,9 +4,13 @@ type AuthMode = "login" | "register";
 
 interface AuthVisualPanelProps {
   mode: AuthMode;
+  imageUrl?: string; // URL của hình ảnh nền
 }
 
-export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
+export default function AuthVisualPanel({
+  mode,
+  imageUrl,
+}: AuthVisualPanelProps) {
   const copy =
     mode === "login"
       ? {
@@ -24,10 +28,12 @@ export default function AuthVisualPanel({ mode }: AuthVisualPanelProps) {
     <div className="relative hidden h-full w-full overflow-hidden md:block bg-transparent">
       {/* 1. Lớp nền lưới khảm nhẹ nhàng, đổi từ màu tối sang độ trong suốt siêu mỏng */}
       <div
-        className="absolute inset-0 bg-white/[0.01]"
+        className="absolute inset-0 bg-no-repeat bg-white/[0.01]"
         style={{
-          backgroundImage:
-            "linear-gradient(135deg, rgba(0,245,255,0.08) 0%, transparent 50%), linear-gradient(315deg, rgba(255,163,0,0.06) 0%, transparent 50%)",
+          backgroundImage: `url(${imageUrl})`,
+          backgroundSize: "cover", // "contain" là chìa khóa: Hiển thị trọn vẹn ảnh, không bị cắt
+          backgroundPosition: "left 10% center", // Dịch điểm neo về phía bên trái 10%
+          backgroundColor: "#05070f",
         }}
       />
 

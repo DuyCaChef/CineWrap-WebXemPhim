@@ -6,6 +6,8 @@ import AuthBackdrop from "./AuthBackdrop";
 import AuthVisualPanel from "./AuthVisualPanel";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import LoginBg from "../../assets/images/Bg_panel_login.png";
+import RegisterBg from "../../assets/images/Bg_panel_register.png";
 
 export type AuthMode = "login" | "register";
 
@@ -107,7 +109,10 @@ export default function AuthModal({
 
             {/* Khung bên trái (Đảm bảo trong suốt) */}
             <div className="hidden w-[42%] md:block bg-transparent">
-              <AuthVisualPanel mode={mode} />
+              <AuthVisualPanel
+                mode={mode}
+                imageUrl={mode === "login" ? LoginBg : RegisterBg}
+              />
             </div>
 
             {/* Khung chứa Form con bên phải (Đảm bảo trong suốt) */}
