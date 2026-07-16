@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
-// ✅ ĐÃ TĂNG CƯỜNG: Tăng lên 40 hạt bụi với độ bắt sáng và kích thước đa dạng hơn để tạo chiều sâu rõ rệt
-const CINEMATIC_PARTICLES = Array.from({ length: 40 }, (_, i) => {
+// ✅ ĐÃ TĂNG CƯỜNG: Tăng lên 100 hạt bụi với độ bắt sáng và kích thước đa dạng hơn để tạo chiều sâu rõ rệt
+const CINEMATIC_PARTICLES = Array.from({ length: 100 }, (_, i) => {
   const size = Math.random() * 3.5 + 1.5; // Kích thước hạt từ 1.5px đến 5px
   return {
     id: i,
