@@ -75,7 +75,7 @@ export default function LoginForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ban@email.com"
+            placeholder="username@gmail.com"
             // ✅ ĐÃ SỬA: Chuyển sang màu xám kính mờ nhẹ bg-white/[0.05] để ô nhập nổi bật và dễ nhìn hơn
             className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] px-4 text-sm text-white placeholder:text-white/30 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
@@ -92,7 +92,7 @@ export default function LoginForm({
             </label>
             <button
               type="button"
-              className="text-xs font-medium text-[#9ca3af] transition-colors hover:text-[#00a3ff]"
+              className="text-xs font-medium text-[#9ca3af] transition-colors hover:text-[#00a3ff] hover:underline"
             >
               Quên mật khẩu?
             </button>

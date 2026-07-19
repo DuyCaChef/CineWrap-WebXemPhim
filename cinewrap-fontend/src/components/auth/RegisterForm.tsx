@@ -103,7 +103,7 @@ export default function RegisterForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ban@email.com"
+            placeholder="username@gmail.com"
             className="h-11 rounded-lg border border-white/10 bg-white/[0.05] focus:bg-white/[0.08] backdrop-blur-md px-4 text-sm text-white placeholder:text-[#9ca3af]/40 outline-none transition-all focus:border-[#00a3ff] focus:shadow-[0_0_0_3px_rgba(0,163,255,0.15)]"
           />
         </div>
@@ -131,7 +131,7 @@ export default function RegisterForm({
               htmlFor="reg-confirm"
               className="text-xs font-medium text-[#9ca3af]"
             >
-              Nhập lại
+              Xác nhận mật khẩu
             </label>
             <input
               id="reg-confirm"
@@ -150,15 +150,24 @@ export default function RegisterForm({
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            // ✅ ĐÃ SỬA: Thay bg-[#0f172a] đục bằng bg-black/40 nhẹ nhàng
             className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-black/40 accent-[#ffc107]"
           />
           <span>
             Tôi đồng ý với{" "}
-            <span className="text-[#00a3ff] underline-offset-2 hover:underline">
+            <a
+              href="/terms"
+              className="text-[#00a3ff] underline-offset-2 hover:underline"
+            >
               Điều khoản sử dụng
-            </span>{" "}
-            và Chính sách bảo mật của CineWrap.
+            </a>{" "}
+            và{" "}
+            <a
+              href="/privacy"
+              className="text-[#00a3ff] underline-offset-2 hover:underline"
+            >
+              Chính sách bảo mật
+            </a>{" "}
+            của CineWrap.
           </span>
         </label>
 
