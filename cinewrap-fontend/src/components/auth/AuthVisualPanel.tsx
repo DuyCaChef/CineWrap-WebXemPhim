@@ -53,28 +53,39 @@ export default function AuthVisualPanel({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="relative z-10 flex h-full flex-col justify-end p-10"
+        className="relative z-10 flex h-full flex-col justify-start mt-8 p-10"
       >
         {/* Thanh nhấn dọc */}
+        {/* Phần Header: Giữ nguyên bố cục nhưng thêm glow nhẹ */}
         <div className="mb-4 flex items-center gap-3">
           <span className="h-5 w-1 rounded-full bg-[#ffc107] shadow-[0_0_15px_rgba(255,193,7,0.6)]" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-[#00a3ff]">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[#00a3ff] drop-shadow-md">
             {copy.eyebrow}
           </span>
         </div>
 
-        {/* Tiêu đề - Thêm drop-shadow rõ hơn để luôn nổi bật trên nền sáng */}
-        <h2 className="whitespace-pre-line text-[26px] font-bold leading-[1.2] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+        {/* Tiêu đề: Sử dụng text-shadow để tạo hiệu ứng glow điện ảnh */}
+        <h2
+          className="whitespace-pre-line text-[26px] font-bold leading-[1.2] text-white"
+          style={{
+            textShadow: "0 4px 20px rgba(0,0,1,0.8), 0 0 10px rgba(0,0,1,1.4)",
+          }}
+        >
           {copy.title}
         </h2>
 
-        {/* Mô tả */}
-        <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-[#9ca3af] drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+        {/* Mô tả: Thêm drop shadow nhẹ để tách lớp khỏi ảnh nền */}
+        <p
+          className="mt-3 max-w-[280px] text-sm leading-relaxed text-white/90"
+          style={{
+            textShadow: "0 2px 4px rgba(0,0,1,0.8), 0 0 10px rgba(0,0,1,1.4)",
+          }}
+        >
           {copy.desc}
         </p>
 
-        {/* Logo CineWrap */}
-        <div className="mt-10 text-lg font-extrabold tracking-tight text-white/25">
+        {/* Logo */}
+        <div className="mt-10 text-lg font-extrabold tracking-tight text-white/20">
           CineWrap
         </div>
       </motion.div>
