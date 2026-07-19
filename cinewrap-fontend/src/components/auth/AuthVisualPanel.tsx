@@ -69,7 +69,13 @@ export default function AuthVisualPanel({
         {/* Phần Header: Giữ nguyên bố cục nhưng thêm glow nhẹ */}
         <div className="mb-4 flex items-center gap-3">
           <span className="h-5 w-1 rounded-full bg-[#ffc107] shadow-[0_0_15px_rgba(255,193,7,0.6)]" />
-          <span className="text-lg font-extrabold uppercase tracking-wide text-[#00a3ff] drop-shadow-md">
+          <span
+            className="text-lg font-extrabold uppercase tracking-wide text-[#00a3ff] drop-shadow-md"
+            style={{
+              textShadow:
+                "0 2px 4px rgba(0,0,0,0.5), 0 0 15px rgba(0, 163, 255, 0.6)",
+            }}
+          >
             {copy.eyebrow}
           </span>
         </div>
