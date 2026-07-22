@@ -25,8 +25,8 @@ export const HeaderLanding: React.FC<HeaderLandingProps> = ({
   const navLinks = [
     { id: "welcome", label: "Chào mừng" },
     { id: "general", label: "Thông tin chung" },
-    { id: "privacy", label: "Chính sách bảo mật" },
-    { id: "terms", label: "Điều khoản sử dụng" },
+    { id: "privacy-section", label: "Chính sách bảo mật" },
+    { id: "terms-section", label: "Điều khoản sử dụng" },
     { id: "support", label: "Hỗ trợ" },
   ];
 

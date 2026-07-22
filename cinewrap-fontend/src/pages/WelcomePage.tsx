@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 // Import các component đã được bóc tách
 import { HeaderLanding } from "../components/landing/HeaderLanding";
@@ -12,10 +13,18 @@ import { Footer } from "../components/Footer";
 const WelcomePage: React.FC = () => {
   // State lưu trữ id của Section đang hiển thị trên màn hình
   const [active, setActive] = useState<string>("welcome");
+  // Lấy thông tin location từ react-router để xử lý Smooth Scroll khi có hash
+  const location = useLocation();
 
   // Logic Scrollspy: Xác định người dùng đang cuộn tới phần nào
   useEffect(() => {
-    const ids = ["welcome", "general", "privacy", "terms", "support"];
+    const ids = [
+      "welcome",
+      "general",
+      "privacy-section",
+      "terms-section",
+      "support",
+    ];
     let rafId: number | null = null;
 
     const updateActive = () => {
