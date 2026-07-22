@@ -9,7 +9,13 @@ import {
   TERMS_PLATFORM_DATA,
 } from "../../constants/landingData";
 
-export const TermsSection: React.FC = () => {
+interface TermsSectionProps {
+  id?: string; // Thêm prop id để có thể nhận từ WelcomePage
+}
+
+export const TermsSection: React.FC<TermsSectionProps> = ({
+  id = "terms-section",
+}) => {
   const [openTerms, setOpenTerms] = useState<string | null>(null);
   const [activeTermsTab, setActiveTermsTab] = useState<"user" | "platform">(
     "user",
@@ -21,7 +27,7 @@ export const TermsSection: React.FC = () => {
 
   return (
     <section
-      id="terms"
+      id={id}
       // TỐI ƯU 1: Giảm padding dọc trên Mobile (py-16), giữ nguyên py-24 cho Tablet/PC
       className="relative z-20 w-full bg-cine-bg-primary py-16 md:py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
     >

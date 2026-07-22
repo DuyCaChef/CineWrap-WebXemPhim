@@ -65,6 +65,20 @@ const WelcomePage: React.FC = () => {
     };
   }, []);
 
+  // Logic Smooth Scroll khi click vào link có hash
+  useEffect(() => {
+    // Khi trang vừa load hoặc URL thay đổi có chứa #hash
+    if (location.hash) {
+      // Dùng setTimeout nhỏ để đảm bảo các component con đã render xong hoàn toàn
+      setTimeout(() => {
+        const element = document.getElementById(location.hash.replace("#", ""));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [location]);
+
   return (
     <div className="w-full text-cine-text font-sans bg-cine-bg-primary selection:bg-cine-primary selection:text-cine-bg">
       {/* Thanh điều hướng nhận prop activeSection để tô sáng menu */}
@@ -74,8 +88,8 @@ const WelcomePage: React.FC = () => {
       <main className="pt-20 relative w-full min-h-screen">
         <HeroSection />
         <GeneralSection />
-        <PrivacySection />
-        <TermsSection />
+        <PrivacySection id="privacy-section" />
+        <TermsSection id="terms-section" />
         <SupportSection />
       </main>
 

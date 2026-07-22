@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
   onSubmit?: (data: { name: string; email: string; password: string }) => void;
+  onClose?: () => void; // Thêm prop này để nhận hàm đóng modal từ cha xuống
 }
 
 /**
@@ -14,6 +16,7 @@ interface RegisterFormProps {
 export default function RegisterForm({
   onSwitchToLogin,
   onSubmit,
+  onClose,
 }: RegisterFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,6 +28,8 @@ export default function RegisterForm({
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +54,19 @@ export default function RegisterForm({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Hàm điều hướng đến trang Điều khoản sử dụng
+  const handleNavigateToTerms = (e: React.MouseEvent) => {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ <a>
+    onClose?.(); // Đóng Modal lại trước
+    navigate("/#terms-section"); // Điều hướng đến trang Điều khoản sử dụng
+  };
+  // Hàm điều hướng đến trang Chính sách bảo mật
+  const handleNavigateToPrivacy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClose?.(); // Đóng Modal lại trước
+    navigate("/#privacy-section");
   };
 
   return (
@@ -238,14 +256,16 @@ export default function RegisterForm({
           <span>
             Tôi đồng ý với{" "}
             <a
-              href="/terms"
+              href="#terms-section"
+              onClick={handleNavigateToTerms} // Gắn sự kiện điều hướng
               className="text-[#00a3ff] underline-offset-2 hover:underline"
             >
               Điều khoản sử dụng
             </a>{" "}
             và{" "}
             <a
-              href="/privacy"
+              href="#privacy-section"
+              onClick={handleNavigateToPrivacy} // Gắn sự kiện điều hướng
               className="text-[#00a3ff] underline-offset-2 hover:underline"
             >
               Chính sách bảo mật

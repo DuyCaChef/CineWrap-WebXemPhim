@@ -127,6 +127,7 @@ export default function AuthModal({
                   <RegisterForm
                     key="register"
                     onSwitchToLogin={() => setMode("login")}
+                    onClose={() => onClose()} //  Truyền hàm đóng modal vào đây
                   />
                 )}
               </AnimatePresence>

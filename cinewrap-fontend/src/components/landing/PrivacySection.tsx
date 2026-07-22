@@ -5,13 +5,19 @@ import {
   PRIVACY_ACCORDION_DATA,
 } from "../../constants/landingData";
 
-export const PrivacySection: React.FC = () => {
+interface PrivacySectionProps {
+  id?: string; // Thêm prop id để có thể nhận từ WelcomePage
+}
+
+export const PrivacySection: React.FC<PrivacySectionProps> = ({
+  id = "privacy-section", // Giá trị mặc định nếu không truyền prop id
+}) => {
   // Quản lý trạng thái mở/đóng của các mục chính sách
   const [openPrivacy, setOpenPrivacy] = useState<string | null>(null);
 
   return (
     <section
-      id="privacy"
+      id={id}
       // TỐI ƯU 1: Giảm padding dọc trên Mobile (py-16), giữ nguyên py-24 cho Tablet/PC
       className="relative z-20 w-full bg-cine-bg-secondary py-16 md:py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden"
     >
