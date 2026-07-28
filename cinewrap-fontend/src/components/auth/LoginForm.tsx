@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import { api } from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -17,7 +18,7 @@ interface LoginFormProps {
  */
 export default function LoginForm({
   onSwitchToRegister,
-  onSubmit,
+
   onSuccess,
 }: LoginFormProps) {
   const [email, setEmail] = useState("");
@@ -52,17 +53,19 @@ export default function LoginForm({
 
       // Gọi callback onSuccess để báo thành công đóng Popup
       onSuccess?.();
-    } catch (err: any) {
-      // Bắt thông báo lỗi chi tiết từ NestJS DTO / Exception
-      const serverMessage = err.response?.data?.message;
-      if (Array.isArray(serverMessage)) {
-        setError(serverMessage[0]); // Lỗi validation dạng mảng
-      } else if (serverMessage) {
-        setError(serverMessage); // Lỗi dạng chuỗi
-      } else {
-        setError(
-          "Đăng nhập thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
-        ); // Lỗi chung
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const serverMessage = err.response?.data?.message; // Lấy thông báo lỗi từ server trả về
+
+        if (Array.isArray(serverMessage)) {
+          setError(serverMessage[0]); // Lỗi validation dạng mảng từ NestJS DTO
+        } else if (typeof serverMessage === "string") {
+          setError(serverMessage); // Lỗi dạng chuỗi
+        } else {
+          setError(
+            "Đăng nhập thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
+          ); // Lỗi chung
+        }
       }
     } finally {
       setIsSubmitting(false);
