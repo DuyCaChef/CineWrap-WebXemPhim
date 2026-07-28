@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { api } from "@/services/api";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -15,7 +17,6 @@ interface RegisterFormProps {
  */
 export default function RegisterForm({
   onSwitchToLogin,
-  onSubmit,
   onClose,
 }: RegisterFormProps) {
   const [name, setName] = useState("");
@@ -25,6 +26,7 @@ export default function RegisterForm({
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Thêm state để hiển thị thông báo thành công
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -50,7 +52,33 @@ export default function RegisterForm({
 
     setIsSubmitting(true);
     try {
-      await onSubmit?.({ name, email, password });
+      // 1.Gọi API đăng ký tới Nest.js be (Map 'name' thành 'full_name' để gửi lên BE)
+      await api.post("/auth/register", {
+        full_name: name,
+        email,
+        password,
+      });
+
+      // 2.Hiển thị thông báo thành công và chuyển sang tag Login
+      setSuccessMessage(
+        "Đăng ký thành công! Đang chuyển sang trang đăng nhập...",
+      );
+      setTimeout(() => {
+        onSwitchToLogin(); // Chuyển sang tab đăng nhập
+      }, 2000); // Chờ 2 giây trước khi chuyển sang tab đăng nhập
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const serverMessage = err.response?.data?.message; // Lấy thông báo lỗi từ server trả về
+        if (Array.isArray(serverMessage)) {
+          setError(serverMessage[0]); // Lỗi validation dạng mảng từ NestJS DTO
+        } else if (typeof serverMessage === "string") {
+          setError(serverMessage); // Lỗi dạng chuỗi
+        } else {
+          setError(
+            "Đăng ký thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
+          ); // Lỗi chung
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -273,6 +301,13 @@ export default function RegisterForm({
             của CineWrap.
           </span>
         </label>
+
+        {/* ✅ B Hiển thị thông báo thành công màu xanh lá */}
+        {successMessage && (
+          <p className="rounded-md bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 text-xs text-emerald-400">
+            {successMessage}
+          </p>
+        )}
 
         {error && (
           <p className="rounded-md bg-[#e50914]/10 px-3 py-2 text-xs text-[#e50914]">
