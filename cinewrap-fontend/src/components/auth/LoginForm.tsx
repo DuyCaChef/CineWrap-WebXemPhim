@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { api } from "@/services/api";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
   onSubmit?: (data: { email: string; password: string }) => void;
+  onSuccess?: () => void; // Callback khi đăng nhập thành công, prop này để báo thành công cho AuthModal đóng lại
 }
 
 /**
@@ -15,6 +18,7 @@ interface LoginFormProps {
 export default function LoginForm({
   onSwitchToRegister,
   onSubmit,
+  onSuccess,
 }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +26,9 @@ export default function LoginForm({
   const [error, setError] = useState<string | null>(null);
 
   const [showPassword, setShowPassword] = useState(false);
+
+  // Sử dụng hook useAuth để lấy hàm login từ AuthContext
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +41,29 @@ export default function LoginForm({
 
     setIsSubmitting(true);
     try {
-      await onSubmit?.({ email, password });
+      // 1.Gọi API login tới Nest.js be
+      const respone = await api.post("/auth/login", { email, password });
+
+      // 2.Bóc tách dữ liệu trả về từ API
+      const { accessToken, user } = respone.data;
+
+      // 3.Lưu vào state toàn cục và LocalStorage thông qua hàm login từ AuthContext
+      login(accessToken, user);
+
+      // Gọi callback onSuccess để báo thành công đóng Popup
+      onSuccess?.();
+    } catch (err: any) {
+      // Bắt thông báo lỗi chi tiết từ NestJS DTO / Exception
+      const serverMessage = err.response?.data?.message;
+      if (Array.isArray(serverMessage)) {
+        setError(serverMessage[0]); // Lỗi validation dạng mảng
+      } else if (serverMessage) {
+        setError(serverMessage); // Lỗi dạng chuỗi
+      } else {
+        setError(
+          "Đăng nhập thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
+        ); // Lỗi chung
+      }
     } finally {
       setIsSubmitting(false);
     }
