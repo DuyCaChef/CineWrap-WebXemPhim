@@ -68,16 +68,40 @@ export default function RegisterForm({
       }, 2000); // Chờ 2 giây trước khi chuyển sang tab đăng nhập
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        const serverMessage = err.response?.data?.message; // Lấy thông báo lỗi từ server trả về
-        if (Array.isArray(serverMessage)) {
-          setError(serverMessage[0]); // Lỗi validation dạng mảng từ NestJS DTO
-        } else if (typeof serverMessage === "string") {
-          setError(serverMessage); // Lỗi dạng chuỗi
-        } else {
-          setError(
-            "Đăng ký thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
-          ); // Lỗi chung
+        // 1. TRƯỜNG HỢP SERVER CÓ TRẢ VỀ BÁO LỖI (Mã 400, 409, 422...)
+        if (err.response) {
+          const serverData = err.response.data;
+          const serverMessage = serverData?.message;
+
+          if (Array.isArray(serverMessage)) {
+            // Lỗi Validation từ DTO (ví dụ mảng các câu báo lỗi)
+            setError(serverMessage[0]);
+          } else if (typeof serverMessage === "string") {
+            // Lỗi do NestJS némException (ví dụ: "Email này đã được sử dụng")
+            setError(serverMessage);
+          } else if (err.response.status === 500) {
+            // Lỗi sập Server
+            setError(
+              "Hệ thống máy chủ đang gặp sự cố. Vui lòng thử lại sau ít phút!",
+            );
+          } else {
+            setError(
+              `Đã xảy ra lỗi (${err.response.status}). Vui lòng thử lại!`,
+            );
+          }
         }
+        // 2. TRƯỜNG HỢP REQUEST GỬI ĐI NHƯNG KHÔNG NHẬN ĐƯỢC PHẢN HỒI (Lỗi Mạng/CORS/Mất kết nối)
+        else if (err.request) {
+          setError(
+            "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối Internet hoặc Proxy!",
+          );
+        }
+        // 3. TRƯỜNG HỢP LỖI CẤU HÌNH CODE FE
+        else {
+          setError(`Lỗi ứng dụng: ${err.message}`);
+        }
+      } else {
+        setError("Đã xảy ra lỗi không xác định!");
       }
     } finally {
       setIsSubmitting(false);
