@@ -33,6 +33,13 @@ async function bootstrap() {
   // 4. Kích hoạt Validation toàn cầu để tự động validate dữ liệu đầu vào dựa trên các DTO đã định nghĩa (CreateUserDto, UpdateUserDto, v.v...)
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
+  // 🚀 Bật CORS cho phép kết nối từ Vite
+  app.enableCors({
+    origin: true, // Cho phép tất cả nguồn kết nối local
+    credentials: true,
+  });
+
   await app.listen(3001); // BE và FE chạy trên 2 cổng khác nhau để dễ dàng cấu hình CORS (3000 cho FE, 3001 cho BE)
+  console.log(`Server is running on: http://localhost:3001`);
 }
 bootstrap();
