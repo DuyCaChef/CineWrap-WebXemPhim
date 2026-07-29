@@ -64,7 +64,7 @@ export default function LoginForm({
         } else {
           setError(
             "Đăng nhập thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.",
-          ); // Lỗi chung
+          ); // Lỗi chung, dù thành công hay thất bại, cuối cùng vẫn phải trả nút bấm về trạng thái bình thường
         }
       }
     } finally {

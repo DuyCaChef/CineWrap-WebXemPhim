@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 1. Tạo instance của Axios
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000", // URL cơ sở của API
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json", // Đặt header Content-Type là application/json
   },
