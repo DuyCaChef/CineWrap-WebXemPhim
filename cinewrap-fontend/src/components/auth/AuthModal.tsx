@@ -122,6 +122,7 @@ export default function AuthModal({
                   <LoginForm
                     key="login"
                     onSwitchToRegister={() => setMode("register")}
+                    onSuccess={onClose} //  Truyền hàm đóng modal vào đây khi đăng nhập thành công
                   />
                 ) : (
                   <RegisterForm
