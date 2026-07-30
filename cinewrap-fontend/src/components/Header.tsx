@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Typo_CineWrap from "../assets/images/Typo_CineWrap.png";
 import { AuthModal } from "@/components/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface DropdownItem {
@@ -213,6 +214,7 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   // Auth Modal State
@@ -235,6 +237,10 @@ export const Header: React.FC = () => {
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const displayName = user?.full_name || user?.email || "User";
+  const avatarInitial = displayName.charAt(0).toUpperCase();
+  const isSignedIn = !isLoading && isAuthenticated;
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -335,22 +341,45 @@ export const Header: React.FC = () => {
           <SearchIcon />
         </button>
 
-        {/* Nút Đăng nhập */}
-        <motion.button
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            setAuthOpen(true);
-            setAuthMode("login");
-          }}
-          className="flex items-center justify-center gap-2 px-3 py-2 md:px-5 md:py-2.5 text-[13px] font-bold tracking-wide text-cine-bg-primary uppercase bg-cine-primary border border-cine-primary rounded-full shadow-lg shadow-cine-primary/20 transition-all duration-300 hover:bg-[#e0a800]"
-        >
-          <UserIcon />
-          <span className="hidden md:block whitespace-nowrap">Đăng nhập</span>
-        </motion.button>
+        {/* Nút Đăng nhập / Avatar người dùng */}
+        {isSignedIn ? (
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-cine-primary/15 text-sm font-semibold text-cine-primary shadow-lg shadow-cine-primary/10 transition-all duration-300 hover:border-cine-primary/60"
+            aria-label="Tài khoản"
+          >
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={displayName}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span>{avatarInitial}</span>
+            )}
+          </motion.button>
+        ) : (
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setAuthOpen(true);
+              setAuthMode("login");
+            }}
+            className="flex items-center justify-center gap-2 px-3 py-2 md:px-5 md:py-2.5 text-[13px] font-bold tracking-wide text-cine-bg-primary uppercase bg-cine-primary border border-cine-primary rounded-full shadow-lg shadow-cine-primary/20 transition-all duration-300 hover:bg-[#e0a800]"
+          >
+            <UserIcon />
+            <span className="hidden md:block whitespace-nowrap">Đăng nhập</span>
+          </motion.button>
+        )}
 
         {/* Nút Hamburger (Mobile) */}
         <button
@@ -455,16 +484,36 @@ export const Header: React.FC = () => {
             ))}
             {/* Lặp lại nút đăng nhập cho Mobile ở cuối menu */}
             <div className="p-6">
-              <button
-                onClick={() => {
-                  setAuthOpen(true);
-                  setAuthMode("login");
-                }}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-cine-primary text-cine-bg-primary font-bold rounded-xl active:scale-95 transition-transform"
-              >
-                <UserIcon />
-                Đăng nhập ngay
-              </button>
+              {isSignedIn ? (
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border border-white/10 bg-white/5 text-cine-text font-semibold active:scale-95 transition-transform"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-cine-primary/15 text-sm font-semibold text-cine-primary">
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span>{avatarInitial}</span>
+                    )}
+                  </div>
+                  <span>{displayName}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAuthOpen(true);
+                    setAuthMode("login");
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-cine-primary text-cine-bg-primary font-bold rounded-xl active:scale-95 transition-transform"
+                >
+                  <UserIcon />
+                  Đăng nhập ngay
+                </button>
+              )}
             </div>
           </motion.div>
         )}
