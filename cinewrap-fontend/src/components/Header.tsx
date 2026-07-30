@@ -214,7 +214,7 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   // Auth Modal State
@@ -228,8 +228,10 @@ export const Header: React.FC = () => {
   const [mobileExpandedSection, setMobileExpandedSection] = useState<
     string | null
   >(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const dropdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Scroll detection
   useEffect(() => {
@@ -240,7 +242,7 @@ export const Header: React.FC = () => {
 
   const displayName = user?.full_name || user?.email || "User";
   const avatarInitial = displayName.charAt(0).toUpperCase();
-  const isSignedIn = !isLoading && isAuthenticated;
+  const isSignedIn = !isLoading && isAuthenticated && !!user;
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -248,6 +250,23 @@ export const Header: React.FC = () => {
     if (activeDropdown) document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, [activeDropdown]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [userMenuOpen]);
 
   // Desktop Hover Logic
   const handleMouseEnter = (label: string) => {
@@ -263,6 +282,16 @@ export const Header: React.FC = () => {
   // Mobile Accordion Logic
   const toggleMobileSection = (label: string) => {
     setMobileExpandedSection((prev) => (prev === label ? null : label));
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUserMenuOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -331,7 +360,7 @@ export const Header: React.FC = () => {
       </nav>
 
       {/* ── CỘT PHẢI: BUTTONS ── */}
-      <div className="flex w-auto lg:w-1/4 items-center justify-end gap-3 md:gap-4">
+      <div className="flex w-auto lg:w-1/4 items-center justify-end gap-6 md:gap-8">
         {/* Nút Tìm kiếm */}
         <button
           onClick={() => setSearchOpen(true)}
@@ -343,26 +372,79 @@ export const Header: React.FC = () => {
 
         {/* Nút Đăng nhập / Avatar người dùng */}
         {isSignedIn ? (
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-cine-primary/15 text-sm font-semibold text-cine-primary shadow-lg shadow-cine-primary/10 transition-all duration-300 hover:border-cine-primary/60"
-            aria-label="Tài khoản"
-          >
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={displayName}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span>{avatarInitial}</span>
-            )}
-          </motion.button>
+          <div ref={userMenuRef} className="relative">
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-cine-primary/15 text-sm font-semibold text-cine-primary shadow-lg shadow-cine-primary/10 transition-all duration-300 hover:border-cine-primary/60"
+              aria-label="Tài khoản"
+            >
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span>{avatarInitial}</span>
+              )}
+            </motion.button>
+
+            <AnimatePresence>
+              {userMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute right-0 top-full mt-3 w-52 sm:w-56 overflow-hidden rounded-xl border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-xl"
+                >
+                  <div className="border-b border-white/10 px-4 py-3">
+                    <p className="text-sm font-semibold text-white">
+                      {displayName}
+                    </p>
+                    <p className="mt-1 text-xs text-cine-text-muted">
+                      {user?.email}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate("/profile");
+                    }}
+                    className="flex w-full items-center px-4 py-3 text-left text-sm text-cine-text transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    Thông tin cá nhân
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate("/saved-movies");
+                    }}
+                    className="flex w-full items-center px-4 py-3 text-left text-sm text-cine-text transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    Danh sách phim đã lưu
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center px-4 py-3 text-left text-sm text-red-400 transition-colors hover:bg-red-500/10"
+                  >
+                    Đăng xuất
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         ) : (
           <motion.button
             initial={{ opacity: 0, x: 20 }}
