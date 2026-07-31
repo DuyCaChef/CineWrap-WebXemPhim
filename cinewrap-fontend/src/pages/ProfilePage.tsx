@@ -323,7 +323,12 @@ export const ProfilePage: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,193,7,0.08),transparent_32%),radial-gradient(circle_at_20%_30%,rgba(0,163,255,0.08),transparent_24%),radial-gradient(circle_at_80%_70%,rgba(255,193,7,0.05),transparent_22%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-[18%] h-40 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.25),transparent)] blur-2xl" />
       <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-linear-to-b from-transparent via-white/10 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,rgba(10,22,40,0.72)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(10,22,40,0.84)_100%)]" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-linear-to-r from-[#08111f]/95 via-[#0f172a]/85 to-transparent md:w-48" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-linear-to-l from-[#08111f]/95 via-[#0f172a]/85 to-transparent md:w-48" />
+      <div className="pointer-events-none absolute inset-x-[8%] top-[10%] h-192 rounded-[56px] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.18)_0%,rgba(255,193,7,0.16)_14%,rgba(0,163,255,0.08)_30%,rgba(15,23,42,0.02)_54%,transparent_78%)] blur-3xl opacity-95" />
+      <div className="pointer-events-none absolute inset-x-[18%] top-[15%] h-144 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12)_0%,rgba(255,193,7,0.07)_22%,transparent_68%)] blur-3xl opacity-70" />
+      <div className="pointer-events-none absolute inset-x-[34%] top-[22%] h-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.08)_20%,transparent_65%)] blur-2xl opacity-80" />
 
       <motion.div
         aria-hidden="true"
