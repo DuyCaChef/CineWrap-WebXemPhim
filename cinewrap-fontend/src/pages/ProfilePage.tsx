@@ -121,7 +121,21 @@ const HeartIcon = () => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <path d="M20.8 4.6c-1.5-1.5-3.9-1.5-5.4 0L12 8l-3.4-3.4c-1.5-1.5-3.9-1.5-5.4 0-1.5 1.5-1.5 3.9 0 5.4L12 22l8.8-8.8c1.5-1.5 1.5-3.9 0-5.4z" />
+    <path d="M20.8 4.6c-1.5-1.5-3.9-1.5-5.4 0L12 8.2 8.6 4.6c-1.5-1.5-3.9-1.5-5.4 0s-1.5 3.9 0 5.4L12 22l8.8-12c1.5-1.5 1.5-3.9 0-5.4z" />
+  </svg>
+);
+
+const ChevronArrowIcon = () => (
+  <svg
+    className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 6l6 6-6 6" />
   </svg>
 );
 
@@ -482,8 +496,8 @@ export const ProfilePage: React.FC = () => {
                     </span>
                     Lịch sử xem phim
                   </span>
-                  <span className="text-xs text-cine-text-muted group-hover:text-white">
-                    →
+                  <span className="text-cine-text-muted group-hover:text-white">
+                    <ChevronArrowIcon />
                   </span>
                 </button>
 
@@ -497,8 +511,8 @@ export const ProfilePage: React.FC = () => {
                     </span>
                     Phim đã yêu thích
                   </span>
-                  <span className="text-xs text-cine-text-muted group-hover:text-white">
-                    →
+                  <span className="text-cine-text-muted group-hover:text-white">
+                    <ChevronArrowIcon />
                   </span>
                 </button>
               </div>
