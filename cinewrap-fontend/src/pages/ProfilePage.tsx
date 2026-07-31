@@ -320,6 +320,14 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-cine-bg-primary px-4 pb-12 pt-24 md:px-8">
+      <button
+        onClick={() => navigate("/")}
+        className="group fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/3 text-white backdrop-blur-2xl shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:border-cine-primary/40 hover:bg-white/5 md:left-6 md:top-6"
+        aria-label="Về trang chủ"
+      >
+        <ArrowLeftIcon />
+      </button>
+
       <div className="pointer-events-none absolute -left-32 -top-24 h-96 w-96 rounded-full bg-[#ffc107]/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-32 top-20 h-96 w-96 rounded-full bg-[#00a3ff]/10 blur-3xl" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
