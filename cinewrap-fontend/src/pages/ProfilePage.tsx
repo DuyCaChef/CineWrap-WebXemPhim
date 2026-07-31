@@ -183,7 +183,7 @@ export const ProfilePage: React.FC = () => {
         <div className="pointer-events-none absolute -right-24 top-28 h-96 w-96 rounded-full bg-[#00a3ff]/10 blur-3xl" />
 
         <div className="relative mx-auto flex min-h-[calc(100vh-8rem)] max-w-2xl flex-col items-center justify-center text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl shadow-cine-primary/10">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-cine-primary/10">
             <ShieldIcon />
           </div>
           <h1 className="text-3xl font-bold text-white md:text-4xl">
@@ -202,7 +202,7 @@ export const ProfilePage: React.FC = () => {
             </button>
             <button
               onClick={() => navigate("/")}
-              className="rounded-full border border-white/10 bg-white/[0.04] px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/10"
+              className="rounded-full border border-white/10 bg-white/4 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/10"
             >
               Về Trang Chủ
             </button>
@@ -319,13 +319,17 @@ export const ProfilePage: React.FC = () => {
       {/* Glow Effects */}
       <div className="pointer-events-none absolute -left-32 -top-24 h-96 w-96 rounded-full bg-[#ffc107]/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-32 top-20 h-96 w-96 rounded-full bg-[#00a3ff]/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-size-[120px_120px] opacity-25" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,193,7,0.08),transparent_32%),radial-gradient(circle_at_20%_30%,rgba(0,163,255,0.08),transparent_24%),radial-gradient(circle_at_80%_70%,rgba(255,193,7,0.05),transparent_22%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-[18%] h-40 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.25),transparent)] blur-2xl" />
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-linear-to-b from-transparent via-white/10 to-transparent" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
         {/* ── 1. HEADER NAV NẰM TRONG CONTAINER ── */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate("/")}
-            className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-cine-text-muted backdrop-blur-xl transition-all hover:border-cine-primary/40 hover:bg-white/5 hover:text-white"
+            className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-2 text-xs font-semibold text-cine-text-muted backdrop-blur-xl transition-all hover:border-cine-primary/40 hover:bg-white/5 hover:text-white"
           >
             <ArrowLeftIcon />
             <span>Trang Chủ</span>
@@ -345,10 +349,10 @@ export const ProfilePage: React.FC = () => {
             className="space-y-6"
           >
             {/* Thẻ Profile Card */}
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl shadow-black/40">
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-black/40">
               {/* Cover Banner Mờ Phía Trên */}
-              <div className="h-20 bg-gradient-to-r from-[#ffc107]/20 via-[#00a3ff]/20 to-transparent relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a1628]/80" />
+              <div className="relative h-20 bg-linear-to-r from-[#ffc107]/20 via-[#00a3ff]/20 to-transparent">
+                <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#0a1628]/80" />
               </div>
 
               <div className="relative px-6 pb-6 -mt-12 text-center">
@@ -400,7 +404,7 @@ export const ProfilePage: React.FC = () => {
               </div>
 
               {/* Thống kê nhanh */}
-              <div className="grid grid-cols-3 border-t border-white/10 bg-white/[0.01]">
+              <div className="grid grid-cols-3 border-t border-white/10 bg-white/1">
                 <div className="px-2 py-3.5 text-center">
                   <p className="text-base font-bold text-[#00a3ff]">
                     {savedMoviesCount}
@@ -427,7 +431,7 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Thẻ Thao tác nhanh */}
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl shadow-black/40">
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-black/40">
               <div className="border-b border-white/10 px-6 py-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">
                   Thao tác nhanh
@@ -437,7 +441,7 @@ export const ProfilePage: React.FC = () => {
               <div className="grid gap-2.5 p-4">
                 <button
                   onClick={() => navigate("/history")}
-                  className="group flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.02] p-3 text-left transition-all hover:border-cine-primary/30 hover:bg-white/[0.06]"
+                  className="group flex items-center justify-between rounded-2xl border border-white/5 bg-white/2 p-3 text-left transition-all hover:border-cine-primary/30 hover:bg-white/6"
                 >
                   <span className="flex items-center gap-3 text-xs font-semibold text-white">
                     <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-cine-primary/10 text-cine-primary group-hover:bg-cine-primary group-hover:text-cine-bg-primary transition-colors">
@@ -452,7 +456,7 @@ export const ProfilePage: React.FC = () => {
 
                 <button
                   onClick={() => navigate("/watchlist")}
-                  className="group flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.02] p-3 text-left transition-all hover:border-[#00a3ff]/30 hover:bg-white/[0.06]"
+                  className="group flex items-center justify-between rounded-2xl border border-white/5 bg-white/2 p-3 text-left transition-all hover:border-[#00a3ff]/30 hover:bg-white/6"
                 >
                   <span className="flex items-center gap-3 text-xs font-semibold text-white">
                     <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#00a3ff]/10 text-[#00a3ff] group-hover:bg-[#00a3ff] group-hover:text-[#0f172a] transition-colors">
@@ -483,10 +487,10 @@ export const ProfilePage: React.FC = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl shadow-black/40"
+            className="overflow-hidden rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-black/40"
           >
             {/* Header Tabs */}
-            <div className="flex border-b border-white/10 bg-white/[0.01] p-2 gap-2">
+            <div className="flex gap-2 border-b border-white/10 bg-white/1 p-2">
               <button
                 onClick={() => setActiveTab("profile")}
                 className={`flex-1 rounded-2xl py-3 text-xs font-bold transition-all ${
@@ -616,7 +620,7 @@ export const ProfilePage: React.FC = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+                        <div className="rounded-2xl border border-white/5 bg-white/2 p-4">
                           <p className="text-sm font-semibold text-white">
                             {fullName || "Chưa cập nhật tên hiển thị"}
                           </p>
