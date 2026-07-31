@@ -323,6 +323,34 @@ export const ProfilePage: React.FC = () => {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,193,7,0.08),transparent_32%),radial-gradient(circle_at_20%_30%,rgba(0,163,255,0.08),transparent_24%),radial-gradient(circle_at_80%_70%,rgba(255,193,7,0.05),transparent_22%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-[18%] h-40 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.25),transparent)] blur-2xl" />
       <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-linear-to-b from-transparent via-white/10 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,rgba(10,22,40,0.72)_100%)]" />
+
+      <motion.div
+        aria-hidden="true"
+        animate={{
+          x: [0, -36, 0],
+          y: [0, 18, 0],
+          opacity: [0.35, 0.62, 0.35],
+          scale: [1, 1.06, 1],
+        }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -right-40 top-10 h-136 w-136 rounded-full bg-[radial-gradient(circle,rgba(255,193,7,0.16)_0%,rgba(255,193,7,0.07)_18%,transparent_68%)] blur-3xl"
+      />
+
+      <motion.div
+        aria-hidden="true"
+        animate={{
+          x: [0, 28, 0],
+          y: [0, -24, 0],
+          opacity: [0.28, 0.5, 0.28],
+          scale: [1, 1.04, 1],
+        }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -left-40 -bottom-24 h-120 w-120 rounded-full bg-[radial-gradient(circle,rgba(0,163,255,0.15)_0%,rgba(0,163,255,0.06)_20%,transparent_70%)] blur-3xl"
+      />
+
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.018)_50%,transparent_100%)] opacity-35" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.045),transparent_18%),radial-gradient(circle_at_50%_80%,rgba(255,255,255,0.03),transparent_18%)] opacity-40" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
         {/* ── 1. HEADER NAV NẰM TRONG CONTAINER ── */}
