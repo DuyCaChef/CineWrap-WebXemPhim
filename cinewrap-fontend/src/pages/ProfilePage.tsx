@@ -195,9 +195,12 @@ export const ProfilePage: React.FC = () => {
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-cine-primary/10 text-cine-primary">
             <ShieldIcon />
           </div>
-          <h1 className="text-3xl font-bold text-white md:text-4xl">Đăng nhập để xem hồ sơ của bạn</h1>
+          <h1 className="text-3xl font-bold text-white md:text-4xl">
+            Đăng nhập để xem hồ sơ của bạn
+          </h1>
           <p className="mt-4 max-w-xl text-sm leading-6 text-cine-text-muted md:text-base">
-            Profile của bạn sẽ lưu thông tin cá nhân, mật khẩu, lịch sử xem và danh sách yêu thích.
+            Profile của bạn sẽ lưu thông tin cá nhân, mật khẩu, lịch sử xem và
+            danh sách yêu thích.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <button
@@ -249,7 +252,8 @@ export const ProfilePage: React.FC = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const updatedUser = response.data?.data ?? response.data?.user ?? response.data;
+      const updatedUser =
+        response.data?.data ?? response.data?.user ?? response.data;
       if (updatedUser) {
         login(localStorage.getItem("accessToken") || "", updatedUser);
         setSuccess("Cập nhật thông tin thành công!");
@@ -259,7 +263,8 @@ export const ProfilePage: React.FC = () => {
     } catch (err: unknown) {
       const message =
         typeof err === "object" && err !== null && "response" in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
           : undefined;
       setError(message || "Lỗi cập nhật thông tin người dùng");
     } finally {
@@ -295,7 +300,8 @@ export const ProfilePage: React.FC = () => {
     } catch (err: unknown) {
       const message =
         typeof err === "object" && err !== null && "response" in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
           : undefined;
       setPasswordError(message || "Lỗi đổi mật khẩu");
     } finally {
@@ -331,7 +337,11 @@ export const ProfilePage: React.FC = () => {
                 <div className="relative shrink-0">
                   <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-cine-primary/10 text-5xl font-bold text-cine-primary shadow-lg shadow-cine-primary/10 md:h-32 md:w-32">
                     {avatar ? (
-                      <img src={avatar} alt={fullName} className="h-full w-full object-cover" />
+                      <img
+                        src={avatar}
+                        alt={fullName}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <span>{fullName.charAt(0).toUpperCase()}</span>
                     )}
@@ -354,8 +364,12 @@ export const ProfilePage: React.FC = () => {
                   />
                 </div>
 
-                <h2 className="mt-5 text-2xl font-bold text-white">{fullName || "Chưa cập nhật"}</h2>
-                <p className="mt-1 text-sm text-cine-text-muted">{user.email}</p>
+                <h2 className="mt-5 text-2xl font-bold text-white">
+                  {fullName || "Chưa cập nhật"}
+                </h2>
+                <p className="mt-1 text-sm text-cine-text-muted">
+                  {user.email}
+                </p>
                 <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cine-primary/20 bg-cine-primary/10 px-3 py-1.5 text-xs font-semibold text-cine-primary">
                   <SparkIcon />
                   {accountTier}
@@ -365,24 +379,38 @@ export const ProfilePage: React.FC = () => {
 
             <div className="grid grid-cols-3 border-t border-white/10">
               <div className="px-4 py-4 text-center">
-                <p className="text-lg font-bold text-white">{savedMoviesCount}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">Đã lưu</p>
+                <p className="text-lg font-bold text-white">
+                  {savedMoviesCount}
+                </p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">
+                  Đã lưu
+                </p>
               </div>
               <div className="border-x border-white/10 px-4 py-4 text-center">
-                <p className="text-lg font-bold text-white">{watchedEpisodesCount}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">Đã xem</p>
+                <p className="text-lg font-bold text-white">
+                  {watchedEpisodesCount}
+                </p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">
+                  Đã xem
+                </p>
               </div>
               <div className="px-4 py-4 text-center">
                 <p className="text-lg font-bold text-white">{accountTier}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">Tài khoản</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-cine-text-muted">
+                  Tài khoản
+                </p>
               </div>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3 backdrop-blur-2xl shadow-2xl shadow-black/30">
             <div className="border-b border-white/10 px-6 py-5">
-              <h3 className="text-lg font-semibold text-white">Thao tác nhanh</h3>
-              <p className="mt-1 text-sm text-cine-text-muted">Đi tới những khu vực cá nhân thường dùng.</p>
+              <h3 className="text-lg font-semibold text-white">
+                Thao tác nhanh
+              </h3>
+              <p className="mt-1 text-sm text-cine-text-muted">
+                Đi tới những khu vực cá nhân thường dùng.
+              </p>
             </div>
 
             <div className="grid gap-3 p-6">
@@ -462,11 +490,15 @@ export const ProfilePage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="rounded-2xl border border-white/10 bg-[#0f172a]/40 p-4">
-                    <p className="mb-2 text-sm font-medium text-cine-text-muted">Email</p>
+                    <p className="mb-2 text-sm font-medium text-cine-text-muted">
+                      Email
+                    </p>
                     <p className="break-all text-white">{user.email}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-[#0f172a]/40 p-4">
-                    <p className="mb-2 text-sm font-medium text-cine-text-muted">Loại tài khoản</p>
+                    <p className="mb-2 text-sm font-medium text-cine-text-muted">
+                      Loại tài khoản
+                    </p>
                     <p className="text-white">{accountTier}</p>
                   </div>
                 </div>
@@ -474,8 +506,12 @@ export const ProfilePage: React.FC = () => {
                 <div className="rounded-3xl border border-white/10 bg-[#0f172a]/40 p-5 md:p-6">
                   <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Thông tin cá nhân</h3>
-                      <p className="mt-1 text-sm text-cine-text-muted">Cập nhật tên hiển thị và avatar.</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        Thông tin cá nhân
+                      </h3>
+                      <p className="mt-1 text-sm text-cine-text-muted">
+                        Cập nhật tên hiển thị và avatar.
+                      </p>
                     </div>
                     <button
                       onClick={() => setIsEditMode((prev) => !prev)}
@@ -492,7 +528,9 @@ export const ProfilePage: React.FC = () => {
                   {isEditMode ? (
                     <div className="space-y-4">
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">Full Name</label>
+                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">
+                          Full Name
+                        </label>
                         <input
                           type="text"
                           value={fullName}
@@ -528,12 +566,18 @@ export const ProfilePage: React.FC = () => {
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-                        <p className="text-sm text-cine-text-muted">Tên hiển thị</p>
-                        <p className="mt-2 text-white">{fullName || "Chưa cập nhật"}</p>
+                        <p className="text-sm text-cine-text-muted">
+                          Tên hiển thị
+                        </p>
+                        <p className="mt-2 text-white">
+                          {fullName || "Chưa cập nhật"}
+                        </p>
                       </div>
                       <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
                         <p className="text-sm text-cine-text-muted">Avatar</p>
-                        <p className="mt-2 text-white">{avatar ? "Đã cập nhật" : "Chưa có avatar"}</p>
+                        <p className="mt-2 text-white">
+                          {avatar ? "Đã cập nhật" : "Chưa có avatar"}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -544,14 +588,20 @@ export const ProfilePage: React.FC = () => {
                 <div className="rounded-3xl border border-white/10 bg-[#0f172a]/40 p-5 md:p-6">
                   <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Đổi mật khẩu</h3>
-                      <p className="mt-1 text-sm text-cine-text-muted">Bảo mật tài khoản bằng mật khẩu mới.</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        Đổi mật khẩu
+                      </h3>
+                      <p className="mt-1 text-sm text-cine-text-muted">
+                        Bảo mật tài khoản bằng mật khẩu mới.
+                      </p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-cine-text-muted">Mật khẩu hiện tại</label>
+                      <label className="mb-2 block text-sm font-medium text-cine-text-muted">
+                        Mật khẩu hiện tại
+                      </label>
                       <div className="relative">
                         <input
                           type={showOldPassword ? "text" : "password"}
@@ -564,16 +614,26 @@ export const ProfilePage: React.FC = () => {
                           type="button"
                           onClick={() => setShowOldPassword((prev) => !prev)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] transition-colors hover:text-white"
-                          aria-label={showOldPassword ? "Ẩn mật khẩu hiện tại" : "Hiện mật khẩu hiện tại"}
+                          aria-label={
+                            showOldPassword
+                              ? "Ẩn mật khẩu hiện tại"
+                              : "Hiện mật khẩu hiện tại"
+                          }
                         >
-                          {showOldPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                          {showOldPassword ? (
+                            <EyeOpenIcon />
+                          ) : (
+                            <EyeClosedIcon />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">Mật khẩu mới</label>
+                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">
+                          Mật khẩu mới
+                        </label>
                         <div className="relative">
                           <input
                             type={showNewPassword ? "text" : "password"}
@@ -586,15 +646,25 @@ export const ProfilePage: React.FC = () => {
                             type="button"
                             onClick={() => setShowNewPassword((prev) => !prev)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] transition-colors hover:text-white"
-                            aria-label={showNewPassword ? "Ẩn mật khẩu mới" : "Hiện mật khẩu mới"}
+                            aria-label={
+                              showNewPassword
+                                ? "Ẩn mật khẩu mới"
+                                : "Hiện mật khẩu mới"
+                            }
                           >
-                            {showNewPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                            {showNewPassword ? (
+                              <EyeOpenIcon />
+                            ) : (
+                              <EyeClosedIcon />
+                            )}
                           </button>
                         </div>
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">Xác nhận mật khẩu</label>
+                        <label className="mb-2 block text-sm font-medium text-cine-text-muted">
+                          Xác nhận mật khẩu
+                        </label>
                         <div className="relative">
                           <input
                             type={showConfirmPassword ? "text" : "password"}
@@ -605,11 +675,21 @@ export const ProfilePage: React.FC = () => {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowConfirmPassword((prev) => !prev)}
+                            onClick={() =>
+                              setShowConfirmPassword((prev) => !prev)
+                            }
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] transition-colors hover:text-white"
-                            aria-label={showConfirmPassword ? "Ẩn xác nhận mật khẩu" : "Hiện xác nhận mật khẩu"}
+                            aria-label={
+                              showConfirmPassword
+                                ? "Ẩn xác nhận mật khẩu"
+                                : "Hiện xác nhận mật khẩu"
+                            }
                           >
-                            {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                            {showConfirmPassword ? (
+                              <EyeOpenIcon />
+                            ) : (
+                              <EyeClosedIcon />
+                            )}
                           </button>
                         </div>
                       </div>
