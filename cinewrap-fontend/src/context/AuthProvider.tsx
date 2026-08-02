@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, useCallback } from "react";
 import { api } from "@/services/api";
 import { AuthContext, type User } from "./AuthContext";
 
@@ -39,18 +39,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Hàm gọi khi đăng xuất
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
+      // 1. Gọi API /auth/logout lên NestJS Back-end
       await api.post("/auth/logout");
     } catch (error) {
-      console.error("Lỗi đăng xuất", error);
+      // Dù API có lỗi (ví dụ token hết hạn) thì vẫn tiếp tục xóa state ở client
+      console.warn("Lỗi khi gọi API logout từ Server:", error);
     } finally {
+      // 2. Xóa Token và User thông tin ở Client State & LocalStorage
       setAccessToken(null);
       setUser(null);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
