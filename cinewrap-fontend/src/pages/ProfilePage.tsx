@@ -319,12 +319,13 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
+  // Logout logic
   const handleLogout = async () => {
     try {
       await logout();
       navigate("/");
-    } catch (logoutError) {
-      console.error("Logout failed", logoutError);
+    } catch (error) {
+      console.error("Đăng xuất thất bại", error);
     }
   };
 

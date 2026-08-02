@@ -213,8 +213,8 @@ const SearchBar = ({ isOpen, onClose }: SearchBarProps) => {
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 export const Header: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const navigate = useNavigate(); // Sử dụng hook useNavigate để điều hướng trang
+  const { user, isAuthenticated, isLoading, logout } = useAuth(); // Sử dụng hook useAuth để lấy thông tin người dùng và trạng thái xác thực
   const [scrolled, setScrolled] = useState(false);
 
   // Auth Modal State
@@ -284,13 +284,15 @@ export const Header: React.FC = () => {
     setMobileExpandedSection((prev) => (prev === label ? null : label));
   };
 
+  // Logout Logic
   const handleLogout = async () => {
     try {
-      await logout();
-      setUserMenuOpen(false);
+      setUserMenuOpen(false); // Đóng dropdown menudesktop
+      setIsMobileMenuOpen(false); // Đóng drawer mobile menu
+      await logout(); // Gọi API logout từ AuthProvider
       navigate("/");
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Đăng xuất thất bại", error);
     }
   };
 
@@ -567,23 +569,42 @@ export const Header: React.FC = () => {
             {/* Lặp lại nút đăng nhập cho Mobile ở cuối menu */}
             <div className="p-6">
               {isSignedIn ? (
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border border-white/10 bg-white/5 text-cine-text font-semibold active:scale-95 transition-transform"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-cine-primary/15 text-sm font-semibold text-cine-primary">
-                    {user?.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={displayName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span>{avatarInitial}</span>
-                    )}
-                  </div>
-                  <span>{displayName}</span>
-                </button>
+                <div className="flex flex-col gap-3">
+                  {/* Nút Xem Hồ sơ */}
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate("/profile");
+                    }}
+                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-white/10 bg-white/5 text-cine-text font-semibold active:scale-95 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-cine-primary/15 text-sm font-semibold text-cine-primary">
+                        {user?.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={displayName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span>{avatarInitial}</span>
+                        )}
+                      </div>
+                      <span className="truncate">{displayName}</span>
+                    </div>
+                    <span className="text-xs text-cine-primary font-bold">
+                      Hồ sơ →
+                    </span>
+                  </button>
+
+                  {/* 🚀 NÚT ĐĂNG XUẤT CHO MOBILE */}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full py-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 font-bold text-sm active:scale-95 transition-all hover:bg-red-500/20"
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => {
