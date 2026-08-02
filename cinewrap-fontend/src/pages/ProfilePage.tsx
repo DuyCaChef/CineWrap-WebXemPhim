@@ -323,7 +323,6 @@ export const ProfilePage: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/");
     } catch (error) {
       console.error("Đăng xuất thất bại", error);
     }
