@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { HeroBanner } from "../components/home/HeroBanner";
 import { ContinueWatching } from "../components/home/ContinueWatching";
@@ -8,17 +8,48 @@ import { CategoriesGrid } from "../components/home/CategoriesGrid";
 import { Recommended } from "../components/home/Recommended";
 import { TopSeries } from "../components/home/TopSeries";
 import { Footer } from "../components/Footer";
+// Bỏ bớt MovieCardSkeleton và SeriesCardSkeleton dư thừa
+import {
+  HeroBannerSkeleton,
+  MovieSectionSkeleton,
+} from "../components/home/HomeSkeletons";
 
 const HomePage: React.FC = () => {
-  // Ép cuộn lên đỉnh khi vừa vào trang
+  // State để quản lý trạng thái loading của trang
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 1. useEffect CHỈ DÙNG ĐỂ xử lý side-effects (cuộn trang & hẹn giờ API)
   useEffect(() => {
+    // Ép cuộn lên đỉnh khi vừa vào trang
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: "instant", // Dùng "instant" để trang nhảy lên đỉnh ngay lập tức khi load, người dùng không bị thấy màn hình bị giật cuộn
+      behavior: "instant",
     });
-  }, []); // Mảng rỗng [] đảm bảo code này chỉ chạy DUY NHẤT 1 LẦN khi trang mở lên
 
+    // Giả lập thời gian load dữ liệu từ API (1.5 giây)
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    // Cleanup timer khi component unmount
+    return () => clearTimeout(timer);
+  }, []); // Mảng rỗng [] chạy 1 lần duy nhất khi mount
+
+  // 2. CHUYỂN CÂU LỆNH IF RỜI KHỎI useEffect VỀ BÊN NGOÀI COMPONENT BODY
+  if (isLoading) {
+    return (
+      <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
+        <Header />
+        <HeroBannerSkeleton />
+        <MovieSectionSkeleton />
+        <MovieSectionSkeleton />
+        <Footer />
+      </main>
+    );
+  }
+
+  // 3. Render giao diện chính khi đã load dữ liệu xong
   return (
     <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
       {/* Header */}

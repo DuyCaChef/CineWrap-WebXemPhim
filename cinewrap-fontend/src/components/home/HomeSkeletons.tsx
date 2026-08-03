@@ -15,7 +15,7 @@ export const HeroBannerSkeleton: React.FC = () => {
           </div>
           {/* Title Skeleton */}
           <Skeleton className="h-12 w-3/4 sm:h-16 lg:h-20" />
-          {/* Synopsis Skeleton */}
+          {/* Synopsis Skeleton */}~
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-2/3" />
           {/* Buttons Skeleton */}
