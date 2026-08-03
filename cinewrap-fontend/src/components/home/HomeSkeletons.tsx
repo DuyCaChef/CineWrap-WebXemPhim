@@ -85,3 +85,21 @@ export const SeriesCardSkeleton: React.FC = () => {
     </div>
   );
 };
+
+// 5. Skeleton cho cả hàng Phim Bộ (TopSeries)
+export const SeriesSectionSkeleton: React.FC = () => {
+  return (
+    <section className="px-4 py-6 sm:px-8 sm:py-10 lg:px-16">
+      <div className="mb-6 flex items-center justify-between">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-9 w-24 rounded-full" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <SeriesCardSkeleton />
+        <SeriesCardSkeleton />
+        <SeriesCardSkeleton />
+        <SeriesCardSkeleton />
+      </div>
+    </section>
+  );
+};

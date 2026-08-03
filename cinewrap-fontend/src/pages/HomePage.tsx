@@ -12,6 +12,7 @@ import { Footer } from "../components/Footer";
 import {
   HeroBannerSkeleton,
   MovieSectionSkeleton,
+  SeriesSectionSkeleton,
 } from "../components/home/HomeSkeletons";
 
 const HomePage: React.FC = () => {
@@ -43,7 +44,7 @@ const HomePage: React.FC = () => {
         <Header />
         <HeroBannerSkeleton />
         <MovieSectionSkeleton />
-        <MovieSectionSkeleton />
+        <SeriesSectionSkeleton />
         <Footer />
       </main>
     );
