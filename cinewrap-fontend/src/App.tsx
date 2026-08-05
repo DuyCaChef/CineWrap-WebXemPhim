@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WelcomePage from "./pages/WelcomePage"; // Trang chào mừng với video nền
 import HomePage from "./pages/HomePage"; //(Trang chủ của bạn)
 import ProfilePage from "./pages/ProfilePage"; // Trang profile
-import FilterPage from "./pages/FilterPage"; // Trang filter
+import FilterPage from "./pages/MoviesPage"; // Trang filter
 
 function App() {
   return (

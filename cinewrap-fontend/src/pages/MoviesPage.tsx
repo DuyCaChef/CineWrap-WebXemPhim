@@ -107,10 +107,10 @@ const MOCK_CATALOG_MOVIES: Movie[] = Array.from({ length: 32 }).map(
 const ITEMS_PER_PAGE = 24; // 24 phim / trang
 
 // ---------------------------------------------------------------------------
-// Sub-component: FilterPageSkeleton
+// Sub-component: MoviesPageSkeleton
 // ---------------------------------------------------------------------------
 
-const FilterPageSkeleton: React.FC = () => (
+const MoviesPageSkeleton: React.FC = () => (
   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5">
     {Array.from({ length: 10 }).map((_, i) => (
       <div key={i} className="space-y-2">
@@ -123,10 +123,10 @@ const FilterPageSkeleton: React.FC = () => (
 );
 
 // ---------------------------------------------------------------------------
-// Main Component: FilterPage
+// Main Component: MoviesPage
 // ---------------------------------------------------------------------------
 
-const FilterPage: React.FC = () => {
+const MoviesPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -447,7 +447,7 @@ const FilterPage: React.FC = () => {
 
         {/* ── MAIN CONTENT GRID ── */}
         {isLoading ? (
-          <FilterPageSkeleton />
+          <MoviesPageSkeleton />
         ) : paginatedMovies.length === 0 ? (
           /* ── EMPTY STATE ── */
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -591,4 +591,4 @@ const FilterPage: React.FC = () => {
   );
 };
 
-export default FilterPage;
+export default MoviesPage;
