@@ -300,8 +300,8 @@ export const Header: React.FC = () => {
     <header
       className={`fixed top-0 left-0 w-full h-20 z-50 px-4 md:px-8 flex justify-between items-center transition-all duration-300 ${
         scrolled || isMobileMenuOpen || searchOpen
-          ? "bg-cine-bg-primary/95 backdrop-blur-sm border-b border-white/10"
-          : "bg-gradient-to-b from-cine-bg-primary/90 to-transparent border-b border-transparent"
+          ? "bg-cine-bg-primary/95 backdrop-blur-sm border-b border-white/40"
+          : "bg-cine-bg-primary/95 backdrop-blur-sm border-b border-white/20"
       }`}
     >
       {/* ── SEARCH OVERLAY ── */}

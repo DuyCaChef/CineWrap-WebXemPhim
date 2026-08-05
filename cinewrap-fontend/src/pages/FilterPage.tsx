@@ -205,7 +205,7 @@ const FilterPage: React.FC = () => {
   );
 
   return (
-    <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
+    <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text">
       <Header />
 
       <div className="pt-24 pb-16 px-4 sm:px-8 lg:px-16 max-w-[1600px] mx-auto">
