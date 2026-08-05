@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WelcomePage from "./pages/WelcomePage"; // Trang chào mừng với video nền
 import HomePage from "./pages/HomePage"; //(Trang chủ của bạn)
 import ProfilePage from "./pages/ProfilePage"; // Trang profile
-import FilterPage from "./pages/MoviesPage"; // Trang filter
+import MoviesPage from "./pages/MoviesPage"; // Trang filter
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
 
         {/* Trang Filter */}
-        <Route path="/movies" element={<FilterPage />} />
+        <Route path="/movies" element={<MoviesPage />} />
 
         {/* Trang Profile */}
         <Route path="/profile" element={<ProfilePage />} />

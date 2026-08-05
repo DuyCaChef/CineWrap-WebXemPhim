@@ -17,47 +17,41 @@ interface Movie {
   year: number;
   country: string;
   ageRating: string;
+  type: string;
+  status: string;
+  quality: string;
   isHot?: boolean;
 }
 
 interface FilterOptions {
-  genre: string;
-  country: string;
-  age: string;
+  type: string;
+  status: string;
   year: string;
+  quality: string;
   sort: string;
 }
 
 // ---------------------------------------------------------------------------
-// Mock Meta Data cho Dropdowns Filter
+// Meta Data mới cho Filter Bar (Không trùng với Header)
 // ---------------------------------------------------------------------------
 
-const GENRES = [
-  { label: "Tất cả thể loại", value: "" },
-  { label: "Hành Động", value: "action" },
-  { label: "Viễn Tưởng", value: "sci-fi" },
-  { label: "Kinh Dị", value: "horror" },
-  { label: "Tình Cảm", value: "romance" },
-  { label: "Tâm Lý", value: "drama" },
-  { label: "Hình Sự", value: "crime" },
-  { label: "Hoạt Hình", value: "animation" },
+const MOVIE_TYPES = [
+  { label: "Tất cả định dạng", value: "" },
+  { label: "Phim Lẻ", value: "single" },
+  { label: "Phim Bộ", value: "series" },
+  { label: "Hoạt Hình / Anime", value: "animation" },
 ];
 
-const COUNTRIES = [
-  { label: "Tất cả quốc gia", value: "" },
-  { label: "Mỹ", value: "us" },
-  { label: "Hàn Quốc", value: "kr" },
-  { label: "Việt Nam", value: "vn" },
-  { label: "Nhật Bản", value: "jp" },
-  { label: "Trung Quốc", value: "cn" },
+const MOVIE_STATUSES = [
+  { label: "Tất cả trạng thái", value: "" },
+  { label: "Phim Trọn Bộ", value: "complete" },
+  { label: "Đang Chiếu / Tập Mới", value: "ongoing" },
 ];
 
-const AGE_RATINGS = [
-  { label: "Tất cả độ tuổi", value: "" },
-  { label: "P - Mọi lứa tuổi", value: "P" },
-  { label: "13+ Khuyên dùng", value: "13+" },
-  { label: "16+ Khuyên dùng", value: "16+" },
-  { label: "18+ Giới hạn", value: "18+" },
+const QUALITIES = [
+  { label: "Tất cả chất lượng", value: "" },
+  { label: "HD 4K Ultra", value: "4k" },
+  { label: "Full HD 1080p", value: "1080p" },
 ];
 
 const YEARS = [
@@ -75,36 +69,42 @@ const SORT_OPTIONS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Mock Movies Data (32 Phim để test Phân Trang)
+// Mock Movies Data (32 Phim)
 // ---------------------------------------------------------------------------
 
 const MOCK_CATALOG_MOVIES: Movie[] = Array.from({ length: 32 }).map(
   (_, idx) => {
-    const genres = ["action", "sci-fi", "horror", "romance", "drama", "crime"];
-    const countries = ["us", "kr", "vn", "jp", "cn"];
-    const ages = ["P", "13+", "16+", "18+"];
+    const genres = [
+      "Hành Động",
+      "Viễn Tưởng",
+      "Kinh Dị",
+      "Tình Cảm",
+      "Hình Sự",
+    ];
+    const countries = ["Mỹ", "Hàn Quốc", "Việt Nam", "Nhật Bản"];
+    const types = ["single", "series", "animation"];
+    const statuses = ["complete", "ongoing"];
+    const qualities = ["4k", "1080p"];
     const years = [2024, 2023, 2022, 2021];
-
-    const g = genres[idx % genres.length];
-    const c = countries[idx % countries.length];
-    const a = ages[idx % ages.length];
-    const y = years[idx % years.length];
 
     return {
       id: `cat-m-${idx + 1}`,
       title: `Bộ Phim CineWrap ${idx + 1}`,
       poster: `https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80`,
       rating: (7.5 + (idx % 25) * 0.1).toFixed(1),
-      genre: GENRES.find((item) => item.value === g)?.label || "Hành Động",
-      year: y,
-      country: c,
-      ageRating: a,
+      genre: genres[idx % genres.length],
+      year: years[idx % years.length],
+      country: countries[idx % countries.length],
+      ageRating: "16+",
+      type: types[idx % types.length],
+      status: statuses[idx % statuses.length],
+      quality: qualities[idx % qualities.length],
       isHot: idx % 3 === 0,
     };
   },
 );
 
-const ITEMS_PER_PAGE = 24; // 24 phim / trang
+const ITEMS_PER_PAGE = 24;
 
 // ---------------------------------------------------------------------------
 // Sub-component: MoviesPageSkeleton
@@ -136,16 +136,16 @@ const MoviesPage: React.FC = () => {
   // Đọc params từ URL
   const currentGenre = searchParams.get("genre") || "";
   const currentCountry = searchParams.get("country") || "";
-  const currentAge = searchParams.get("age") || "";
+  const currentType = searchParams.get("type") || "";
+  const currentStatus = searchParams.get("status") || "";
   const currentYear = searchParams.get("year") || "";
+  const currentQuality = searchParams.get("quality") || "";
   const currentSort = searchParams.get("sort") || "newest";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  // Cuộn trang lên đỉnh và tắt Loading sau khi params thay đổi
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-    // Tắt loading sau 0.6 giây giả lập fetch API
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 600);
@@ -153,16 +153,16 @@ const MoviesPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchParams]);
 
-  // Cập nhật URL Parameter khi thay đổi bộ lọc
+  // Cập nhật bộ lọc
   const updateFilter = (key: keyof FilterOptions, value: string) => {
-    setIsLoading(true); // Bật loading ở event handler trước khi đổi URL
+    setIsLoading(true);
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key, value);
     } else {
       newParams.delete(key);
     }
-    newParams.set("page", "1"); // Đặt lại về trang 1 khi lọc mới
+    newParams.set("page", "1");
     setSearchParams(newParams);
   };
 
@@ -181,10 +181,11 @@ const MoviesPage: React.FC = () => {
     setSearchParams(newParams);
   };
 
-  // Lọc dữ liệu client giả lập
+  // Lọc dữ liệu client
   const filteredMovies = MOCK_CATALOG_MOVIES.filter((m) => {
-    if (currentCountry && m.country !== currentCountry) return false;
-    if (currentAge && m.ageRating !== currentAge) return false;
+    if (currentType && m.type !== currentType) return false;
+    if (currentStatus && m.status !== currentStatus) return false;
+    if (currentQuality && m.quality !== currentQuality) return false;
     if (currentYear === "older" && m.year >= 2022) return false;
     if (
       currentYear &&
@@ -222,53 +223,57 @@ const MoviesPage: React.FC = () => {
             <span className="text-[#00a3ff] font-semibold">Thư viện phim</span>
           </div>
           <h1 className="text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
-            Khám Phá Phim
+            {currentGenre
+              ? `Thể loại: ${currentGenre}`
+              : currentCountry
+                ? `Phim ${currentCountry}`
+                : "Khám Phá Phim"}
           </h1>
         </div>
 
-        {/* ── FILTER BAR FOR DESKTOP (Ẩn trên mobile) ── */}
+        {/* ── FILTER BAR CHO DESKTOP (Đã thay đổi các trường lọc) ── */}
         <div className="hidden lg:flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#1e293b]/70 border border-white/10 p-4 backdrop-blur-md mb-8">
           <div className="flex flex-wrap items-center gap-3 flex-1">
-            {/* Genre Select */}
+            {/* Filter 1: Định dạng Phim (Single / Series / Anime) */}
             <select
-              value={currentGenre}
-              onChange={(e) => updateFilter("genre", e.target.value)}
+              value={currentType}
+              onChange={(e) => updateFilter("type", e.target.value)}
               className="rounded-xl border border-white/15 bg-[#0f172a] px-3.5 py-2 text-sm font-semibold text-white focus:border-[#00a3ff] focus:outline-none"
             >
-              {GENRES.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
+              {MOVIE_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
                 </option>
               ))}
             </select>
 
-            {/* Country Select */}
+            {/* Filter 2: Trạng thái (Trọn bộ / Đang chiếu) */}
             <select
-              value={currentCountry}
-              onChange={(e) => updateFilter("country", e.target.value)}
+              value={currentStatus}
+              onChange={(e) => updateFilter("status", e.target.value)}
               className="rounded-xl border border-white/15 bg-[#0f172a] px-3.5 py-2 text-sm font-semibold text-white focus:border-[#00a3ff] focus:outline-none"
             >
-              {COUNTRIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
+              {MOVIE_STATUSES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
                 </option>
               ))}
             </select>
 
-            {/* Age Rating Select */}
+            {/* Filter 3: Chất lượng Video (4K / 1080p) */}
             <select
-              value={currentAge}
-              onChange={(e) => updateFilter("age", e.target.value)}
+              value={currentQuality}
+              onChange={(e) => updateFilter("quality", e.target.value)}
               className="rounded-xl border border-white/15 bg-[#0f172a] px-3.5 py-2 text-sm font-semibold text-white focus:border-[#00a3ff] focus:outline-none"
             >
-              {AGE_RATINGS.map((a) => (
-                <option key={a.value} value={a.value}>
-                  {a.label}
+              {QUALITIES.map((q) => (
+                <option key={q.value} value={q.value}>
+                  {q.label}
                 </option>
               ))}
             </select>
 
-            {/* Year Select */}
+            {/* Filter 4: Năm phát hành */}
             <select
               value={currentYear}
               onChange={(e) => updateFilter("year", e.target.value)}
@@ -282,7 +287,12 @@ const MoviesPage: React.FC = () => {
             </select>
 
             {/* Clear button */}
-            {(currentGenre || currentCountry || currentAge || currentYear) && (
+            {(currentType ||
+              currentStatus ||
+              currentQuality ||
+              currentYear ||
+              currentGenre ||
+              currentCountry) && (
               <button
                 type="button"
                 onClick={clearAllFilters}
@@ -310,7 +320,7 @@ const MoviesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── MOBILE FILTER TRIGGER BUTTON (Hiện trên mobile) ── */}
+        {/* ── MOBILE FILTER TRIGGER BUTTON ── */}
         <div className="flex lg:hidden items-center justify-between gap-3 mb-6">
           <button
             type="button"
@@ -358,16 +368,16 @@ const MoviesPage: React.FC = () => {
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-semibold text-[#9ca3af] mb-1">
-                    Thể loại
+                    Định dạng
                   </label>
                   <select
-                    value={currentGenre}
-                    onChange={(e) => updateFilter("genre", e.target.value)}
+                    value={currentType}
+                    onChange={(e) => updateFilter("type", e.target.value)}
                     className="w-full rounded-xl border border-white/15 bg-[#1e293b] p-3 text-sm text-white"
                   >
-                    {GENRES.map((g) => (
-                      <option key={g.value} value={g.value}>
-                        {g.label}
+                    {MOVIE_TYPES.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
                       </option>
                     ))}
                   </select>
@@ -375,16 +385,16 @@ const MoviesPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-[#9ca3af] mb-1">
-                    Quốc gia
+                    Trạng thái
                   </label>
                   <select
-                    value={currentCountry}
-                    onChange={(e) => updateFilter("country", e.target.value)}
+                    value={currentStatus}
+                    onChange={(e) => updateFilter("status", e.target.value)}
                     className="w-full rounded-xl border border-white/15 bg-[#1e293b] p-3 text-sm text-white"
                   >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
+                    {MOVIE_STATUSES.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
                       </option>
                     ))}
                   </select>
@@ -392,16 +402,16 @@ const MoviesPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-[#9ca3af] mb-1">
-                    Độ tuổi
+                    Chất lượng
                   </label>
                   <select
-                    value={currentAge}
-                    onChange={(e) => updateFilter("age", e.target.value)}
+                    value={currentQuality}
+                    onChange={(e) => updateFilter("quality", e.target.value)}
                     className="w-full rounded-xl border border-white/15 bg-[#1e293b] p-3 text-sm text-white"
                   >
-                    {AGE_RATINGS.map((a) => (
-                      <option key={a.value} value={a.value}>
-                        {a.label}
+                    {QUALITIES.map((q) => (
+                      <option key={q.value} value={q.value}>
+                        {q.label}
                       </option>
                     ))}
                   </select>
@@ -515,7 +525,6 @@ const MoviesPage: React.FC = () => {
         {!isLoading && totalPages > 1 && (
           <div className="mt-12 flex flex-col items-center gap-3">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Trang đầu */}
               <button
                 type="button"
                 disabled={validPage === 1}
@@ -525,7 +534,6 @@ const MoviesPage: React.FC = () => {
                 «
               </button>
 
-              {/* Trang trước */}
               <button
                 type="button"
                 disabled={validPage === 1}
@@ -535,7 +543,6 @@ const MoviesPage: React.FC = () => {
                 ‹
               </button>
 
-              {/* Các nút trang số */}
               {Array.from({ length: totalPages }).map((_, idx) => {
                 const pageNum = idx + 1;
                 const isActive = pageNum === validPage;
@@ -556,7 +563,6 @@ const MoviesPage: React.FC = () => {
                 );
               })}
 
-              {/* Trang sau */}
               <button
                 type="button"
                 disabled={validPage === totalPages}
@@ -566,7 +572,6 @@ const MoviesPage: React.FC = () => {
                 ›
               </button>
 
-              {/* Trang cuối */}
               <button
                 type="button"
                 disabled={validPage === totalPages}
@@ -577,7 +582,6 @@ const MoviesPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Thông tin số trang */}
             <span className="text-xs text-[#9ca3af] font-medium">
               Trang <strong className="text-white">{validPage}</strong> /{" "}
               {totalPages} (Tổng {filteredMovies.length} phim)
