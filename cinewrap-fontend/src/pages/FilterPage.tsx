@@ -104,7 +104,7 @@ const MOCK_CATALOG_MOVIES: Movie[] = Array.from({ length: 32 }).map(
   },
 );
 
-const ITEMS_PER_PAGE = 10; // 10 phim / trang
+const ITEMS_PER_PAGE = 24; // 24 phim / trang
 
 // ---------------------------------------------------------------------------
 // Sub-component: FilterPageSkeleton
