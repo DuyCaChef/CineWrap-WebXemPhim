@@ -129,7 +129,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const selectedOption =
     options.find((opt) => opt.value === value) || options[0];
 
-  // Tự động đóng menu khi click chuột ra bất kỳ đâu bên ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -151,7 +150,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       ref={dropdownRef}
       className={`relative inline-block text-left ${fullWidth ? "w-full" : ""}`}
     >
-      {/* Nút bấm hiển thị tiêu đề hiện tại */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -177,11 +175,10 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         </svg>
       </button>
 
-      {/* Menu thả xuống - Lọc bỏ hoàn toàn tùy chọn "Tất cả..." (opt.value !== "") */}
       {isOpen && (
         <div className="absolute left-0 z-50 mt-2 min-w-[190px] w-full origin-top-left rounded-[8px] border border-white/15 bg-[#0f172a] p-1.5 shadow-2xl backdrop-blur-2xl animate-fade-in">
           {options
-            .filter((opt) => opt.value !== "") // 👈 LỌC BỎ HOÀN TOÀN DÒNG "TẤT CẢ..." KHỎI DANH SÁCH MỞ RỘNG
+            .filter((opt) => opt.value !== "")
             .map((opt) => {
               const isSelected = opt.value === value;
               return (
@@ -417,10 +414,16 @@ const MoviesPage: React.FC = () => {
           </span>
         </div>
 
-        {/* ── MOBILE BOTTOM SHEET FILTER (ĐỒNG BỘ 100% CustomDropdown NHƯ DESKTOP) ── */}
+        {/* ── MOBILE BOTTOM SHEET FILTER (🟢 ĐÃ THÊM TÍNH NĂNG TỰ ĐÓNG KHI CLICK BACKDROP BÊN NGOÀI) ── */}
         {isMobileFilterOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden overflow-hidden">
-            <div className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto overflow-x-hidden space-y-4">
+          <div
+            onClick={() => setIsMobileFilterOpen(false)} // 👈 Click lớp phủ tối bên ngoài sẽ tự động đóng
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden overflow-hidden cursor-pointer animate-fade-in"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()} // 👈 Chặn sự kiện click bên trong khung để không bị đóng nhầm
+              className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto overflow-x-hidden space-y-4 cursor-default"
+            >
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <h3 className="text-lg font-bold text-white">
                   Bộ lọc tìm kiếm
@@ -428,7 +431,7 @@ const MoviesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="text-white/70 text-xl font-bold p-1"
+                  className="text-white/70 text-xl font-bold p-1 active:scale-90 transition"
                 >
                   ✕
                 </button>
@@ -500,14 +503,14 @@ const MoviesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="flex-1 rounded-xl border border-white/20 bg-white/10 py-3 text-xs font-bold text-white"
+                  className="flex-1 rounded-xl border border-white/20 bg-white/10 py-3 text-xs font-bold text-white active:scale-95 transition"
                 >
                   Xóa lọc
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="flex-1 rounded-xl bg-[#00a3ff] py-3 text-xs font-bold text-white shadow-lg"
+                  className="flex-1 rounded-xl bg-[#00a3ff] py-3 text-xs font-bold text-white shadow-lg active:scale-95 transition"
                 >
                   Áp dụng
                 </button>
