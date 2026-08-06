@@ -107,7 +107,7 @@ const MOCK_CATALOG_MOVIES: Movie[] = Array.from({ length: 32 }).map(
 const ITEMS_PER_PAGE = 24;
 
 // ---------------------------------------------------------------------------
-// Sub-component: CustomDropdown (Không dùng select/option thuần -> Hết sạch 100% lỗi lặp)
+// Sub-component: CustomDropdown
 // ---------------------------------------------------------------------------
 
 interface CustomDropdownProps {
@@ -129,7 +129,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const selectedOption =
     options.find((opt) => opt.value === value) || options[0];
 
-  // Tự động đóng khi click chuột bất kỳ đâu ra ngoài ô dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -151,7 +150,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       ref={dropdownRef}
       className={`relative inline-block text-left ${fullWidth ? "w-full" : ""}`}
     >
-      {/* Nút bấm chính */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -177,12 +175,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         </svg>
       </button>
 
-      {/* Menu thả xuống custom bo tròn rounded-[8px] và mt-2 */}
       {isOpen && (
         <div className="absolute left-0 z-50 mt-2 min-w-[190px] origin-top-left rounded-[8px] border border-white/15 bg-[#0f172a] p-1.5 shadow-2xl backdrop-blur-2xl">
-          {options
-            .filter((opt) => opt.value !== "")
-            .map((opt) => (
+          {options.map((opt) => {
+            const isSelected = opt.value === value;
+            return (
               <button
                 key={opt.value}
                 type="button"
@@ -190,15 +187,19 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
-                className={`flex w-full items-center rounded-[6px] px-3 py-2 text-xs font-medium transition ${
-                  opt.value === value
-                    ? "bg-[#00a3ff] text-white font-bold shadow-md"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                className={`flex w-full items-center justify-between rounded-[6px] px-3 py-2 text-xs transition ${
+                  isSelected
+                    ? "bg-[#00a3ff]/15 text-[#00a3ff] font-bold border border-[#00a3ff]/30"
+                    : "text-white/80 hover:bg-white/10 hover:text-white font-medium"
                 }`}
               >
-                {opt.label}
+                <span>{opt.label}</span>
+                {isSelected && (
+                  <span className="text-[#00a3ff] text-xs">✓</span>
+                )}
               </button>
-            ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -305,10 +306,11 @@ const MoviesPage: React.FC = () => {
   );
 
   return (
-    <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text">
+    /* 💥 ĐÃ THÊM overflow-x-hidden VÀO THẺ MAIN ĐỂ KHÓA CHẶN DỰ DƯ CUỘN NGANG */
+    <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text overflow-x-hidden">
       <Header />
 
-      <div className="pt-24 pb-16 px-4 sm:px-8 lg:px-16 max-w-[1600px] mx-auto">
+      <div className="pt-24 pb-16 px-4 sm:px-8 lg:px-16 max-w-[1600px] mx-auto w-full">
         {/* ── Title & Breadcrumb ── */}
         <div className="mb-6">
           <div className="flex items-center gap-2 text-xs text-[#9ca3af] mb-2">
@@ -330,38 +332,33 @@ const MoviesPage: React.FC = () => {
           </h1>
         </div>
 
-        {/* ── FILTER BAR CHO DESKTOP (Đã chuẩn hóa 100% bằng CustomDropdown) ── */}
+        {/* ── FILTER BAR CHO DESKTOP (lg:flex) ── */}
         <div className="relative z-30 hidden lg:flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#131c2e]/80 border border-white/10 p-3.5 backdrop-blur-xl mt-3 mb-8 shadow-2xl">
           <div className="flex flex-wrap items-center gap-3 flex-1">
-            {/* Filter 1: Định dạng */}
             <CustomDropdown
               options={MOVIE_TYPES}
               value={currentType}
               onChange={(val) => updateFilter("type", val)}
             />
 
-            {/* Filter 2: Trạng thái */}
             <CustomDropdown
               options={MOVIE_STATUSES}
               value={currentStatus}
               onChange={(val) => updateFilter("status", val)}
             />
 
-            {/* Filter 3: Chất lượng Video */}
             <CustomDropdown
               options={QUALITIES}
               value={currentQuality}
               onChange={(val) => updateFilter("quality", val)}
             />
 
-            {/* Filter 4: Năm phát hành */}
             <CustomDropdown
               options={YEARS}
               value={currentYear}
               onChange={(val) => updateFilter("year", val)}
             />
 
-            {/* Clear button */}
             {(currentType ||
               currentStatus ||
               currentQuality ||
@@ -378,7 +375,6 @@ const MoviesPage: React.FC = () => {
             )}
           </div>
 
-          {/* Sort Option */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-[#9ca3af] font-medium">Sắp xếp:</span>
             <CustomDropdown
@@ -417,10 +413,10 @@ const MoviesPage: React.FC = () => {
           </span>
         </div>
 
-        {/* ── MOBILE BOTTOM SHEET FILTER (Cũng chuyển sang CustomDropdown chuẩn) ── */}
+        {/* ── MOBILE BOTTOM SHEET FILTER ── */}
         {isMobileFilterOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden">
-            <div className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto space-y-4">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden overflow-hidden">
+            <div className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto overflow-x-hidden space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <h3 className="text-lg font-bold text-white">
                   Bộ lọc tìm kiếm
@@ -570,10 +566,36 @@ const MoviesPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── NUMBERED PAGINATION ── */}
+        {/* ── NUMBERED PAGINATION (ĐÃ TỐI ƯU 100% RESPONSIVE DÀNH CHO MOBILE & DESKTOP) ── */}
         {!isLoading && totalPages > 1 && (
-          <div className="mt-12 flex flex-col items-center gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="mt-12 flex flex-col items-center gap-3 w-full overflow-hidden">
+            {/* 1. GIAO DIỆN PHÂN TRANG CHO MOBILE (< 640px): Gọn gàng 3 nút không bao giờ tràn */}
+            <div className="flex sm:hidden items-center justify-between w-full max-w-xs px-2 gap-2">
+              <button
+                type="button"
+                disabled={validPage === 1}
+                onClick={() => goToPage(validPage - 1)}
+                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                ‹ Trước
+              </button>
+
+              <span className="text-xs text-[#00a3ff] font-extrabold px-3 py-2 rounded-xl bg-[#00a3ff]/10 border border-[#00a3ff]/20">
+                {validPage} / {totalPages}
+              </span>
+
+              <button
+                type="button"
+                disabled={validPage === totalPages}
+                onClick={() => goToPage(validPage + 1)}
+                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Sau ›
+              </button>
+            </div>
+
+            {/* 2. GIAO DIỆN PHÂN TRANG ĐẦY ĐỦ CHO TABLET & DESKTOP (≥ 640px) */}
+            <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full">
               <button
                 type="button"
                 disabled={validPage === 1}
@@ -631,6 +653,7 @@ const MoviesPage: React.FC = () => {
               </button>
             </div>
 
+            {/* Thông tin số trang */}
             <span className="text-xs text-[#9ca3af] font-medium">
               Trang <strong className="text-white">{validPage}</strong> /{" "}
               {totalPages} (Tổng {filteredMovies.length} phim)
