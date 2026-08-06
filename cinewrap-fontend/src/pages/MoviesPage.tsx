@@ -129,6 +129,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const selectedOption =
     options.find((opt) => opt.value === value) || options[0];
 
+  // Tự động đóng menu khi click chuột ra bất kỳ đâu bên ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -150,6 +151,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       ref={dropdownRef}
       className={`relative inline-block text-left ${fullWidth ? "w-full" : ""}`}
     >
+      {/* Nút bấm hiển thị tiêu đề hiện tại */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -175,31 +177,34 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         </svg>
       </button>
 
+      {/* Menu thả xuống - Lọc bỏ hoàn toàn tùy chọn "Tất cả..." (opt.value !== "") */}
       {isOpen && (
-        <div className="absolute left-0 z-50 mt-2 min-w-[190px] origin-top-left rounded-[8px] border border-white/15 bg-[#0f172a] p-1.5 shadow-2xl backdrop-blur-2xl">
-          {options.map((opt) => {
-            const isSelected = opt.value === value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-                className={`flex w-full items-center justify-between rounded-[6px] px-3 py-2 text-xs transition ${
-                  isSelected
-                    ? "bg-[#00a3ff]/15 text-[#00a3ff] font-bold border border-[#00a3ff]/30"
-                    : "text-white/80 hover:bg-white/10 hover:text-white font-medium"
-                }`}
-              >
-                <span>{opt.label}</span>
-                {isSelected && (
-                  <span className="text-[#00a3ff] text-xs">✓</span>
-                )}
-              </button>
-            );
-          })}
+        <div className="absolute left-0 z-50 mt-2 min-w-[190px] w-full origin-top-left rounded-[8px] border border-white/15 bg-[#0f172a] p-1.5 shadow-2xl backdrop-blur-2xl animate-fade-in">
+          {options
+            .filter((opt) => opt.value !== "") // 👈 LỌC BỎ HOÀN TOÀN DÒNG "TẤT CẢ..." KHỎI DANH SÁCH MỞ RỘNG
+            .map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-[6px] px-3 py-2 text-xs transition ${
+                    isSelected
+                      ? "bg-[#00a3ff] text-white font-bold shadow-md"
+                      : "text-white/80 hover:bg-white/10 hover:text-white font-medium"
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {isSelected && (
+                    <span className="text-white text-xs font-bold">✓</span>
+                  )}
+                </button>
+              );
+            })}
         </div>
       )}
     </div>
@@ -306,7 +311,6 @@ const MoviesPage: React.FC = () => {
   );
 
   return (
-    /* 💥 ĐÃ THÊM overflow-x-hidden VÀO THẺ MAIN ĐỂ KHÓA CHẶN DỰ DƯ CUỘN NGANG */
     <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text overflow-x-hidden">
       <Header />
 
@@ -413,7 +417,7 @@ const MoviesPage: React.FC = () => {
           </span>
         </div>
 
-        {/* ── MOBILE BOTTOM SHEET FILTER ── */}
+        {/* ── MOBILE BOTTOM SHEET FILTER (ĐỒNG BỘ 100% CustomDropdown NHƯ DESKTOP) ── */}
         {isMobileFilterOpen && (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden overflow-hidden">
             <div className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto overflow-x-hidden space-y-4">
@@ -463,6 +467,18 @@ const MoviesPage: React.FC = () => {
                     options={QUALITIES}
                     value={currentQuality}
                     onChange={(val) => updateFilter("quality", val)}
+                    fullWidth
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#9ca3af] mb-1.5">
+                    Năm phát hành
+                  </label>
+                  <CustomDropdown
+                    options={YEARS}
+                    value={currentYear}
+                    onChange={(val) => updateFilter("year", val)}
                     fullWidth
                   />
                 </div>
@@ -566,10 +582,10 @@ const MoviesPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── NUMBERED PAGINATION (ĐÃ TỐI ƯU 100% RESPONSIVE DÀNH CHO MOBILE & DESKTOP) ── */}
+        {/* ── NUMBERED PAGINATION ── */}
         {!isLoading && totalPages > 1 && (
           <div className="mt-12 flex flex-col items-center gap-3 w-full overflow-hidden">
-            {/* 1. GIAO DIỆN PHÂN TRANG CHO MOBILE (< 640px): Gọn gàng 3 nút không bao giờ tràn */}
+            {/* Mobile (< 640px) */}
             <div className="flex sm:hidden items-center justify-between w-full max-w-xs px-2 gap-2">
               <button
                 type="button"
@@ -594,7 +610,7 @@ const MoviesPage: React.FC = () => {
               </button>
             </div>
 
-            {/* 2. GIAO DIỆN PHÂN TRANG ĐẦY ĐỦ CHO TABLET & DESKTOP (≥ 640px) */}
+            {/* Desktop & Tablet (≥ 640px) */}
             <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full">
               <button
                 type="button"
