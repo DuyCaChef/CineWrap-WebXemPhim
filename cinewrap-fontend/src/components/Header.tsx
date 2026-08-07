@@ -54,9 +54,10 @@ const actors: DropdownItem[] = [
 ];
 
 const navItems: NavItem[] = [
+  { label: "Thư viện phim", href: "/movies" },
   { label: "Thể Loại", dropdown: genres },
-  { label: "Phim Lẻ", href: "/phim-le" },
-  { label: "Phim Bộ", href: "/phim-bo" },
+  { label: "Phim Lẻ", href: "/movies?type=single" },
+  { label: "Phim Bộ", href: "/movies?type=series" },
   { label: "Quốc Gia", dropdown: countries },
   { label: "Diễn Viên", dropdown: actors },
 ];
