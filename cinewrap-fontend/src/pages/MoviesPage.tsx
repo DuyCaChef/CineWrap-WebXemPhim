@@ -316,7 +316,7 @@ const MoviesPage: React.FC = () => {
         <div className="mb-6">
           <div className="flex items-center gap-2 text-xs text-[#9ca3af] mb-2">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/home")}
               className="hover:text-white transition"
             >
               Trang chủ
