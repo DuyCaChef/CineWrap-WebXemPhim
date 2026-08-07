@@ -3,6 +3,7 @@ import WelcomePage from "./pages/WelcomePage"; // Trang chào mừng với video
 import HomePage from "./pages/HomePage"; //(Trang chủ của bạn)
 import ProfilePage from "./pages/ProfilePage"; // Trang profile
 import MoviesPage from "./pages/MoviesPage"; // Trang filter
+import MovieDetailPage from "./pages/MovieDetailPage"; // Trang chi tiết phim
 
 function App() {
   return (
@@ -14,11 +15,14 @@ function App() {
         {/* Nút "Bắt đầu" sẽ trỏ về đây */}
         <Route path="/home" element={<HomePage />} />
 
-        {/* Trang Filter */}
-        <Route path="/movies" element={<MoviesPage />} />
-
         {/* Trang Profile */}
         <Route path="/profile" element={<ProfilePage />} />
+
+        {/* Trang MoviesPage */}
+        <Route path="/movies" element={<MoviesPage />} />
+
+        {/* Trang Chi Tiết Phim */}
+        <Route path="/movie/:slug" element={<MovieDetailPage />} />
       </Routes>
     </BrowserRouter>
   );
