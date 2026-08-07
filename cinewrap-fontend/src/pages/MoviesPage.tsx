@@ -550,6 +550,7 @@ const MoviesPage: React.FC = () => {
               <button
                 key={movie.id}
                 type="button"
+                onClick={() => navigate(`/movie/${movie.id}`)}
                 className="group text-left focus-visible:outline-none"
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]">
