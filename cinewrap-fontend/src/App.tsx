@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage"; //(Trang chủ của bạn)
 import ProfilePage from "./pages/ProfilePage"; // Trang profile
 import MoviesPage from "./pages/MoviesPage"; // Trang filter
 import MovieDetailPage from "./pages/MovieDetailPage"; // Trang chi tiết phim
+import WatchPage from "./pages/WatchPage"; // Trang xem phim
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
 
         {/* Trang Chi Tiết Phim */}
         <Route path="/movie/:slug" element={<MovieDetailPage />} />
+
+        {/* Trang Xem Phim */}
+        <Route path="/watch/:slug" element={<WatchPage />} />
       </Routes>
     </BrowserRouter>
   );
