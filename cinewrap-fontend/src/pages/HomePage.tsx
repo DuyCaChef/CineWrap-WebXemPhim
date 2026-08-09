@@ -8,18 +8,25 @@ import { CategoriesGrid } from "../components/home/CategoriesGrid";
 import { Recommended } from "../components/home/Recommended";
 import { TopSeries } from "../components/home/TopSeries";
 import { Footer } from "../components/Footer";
-// Bỏ bớt MovieCardSkeleton và SeriesCardSkeleton dư thừa
+
 import {
   HeroBannerSkeleton,
   MovieSectionSkeleton,
   SeriesSectionSkeleton,
 } from "../components/home/HomeSkeletons";
 
-const HomePage: React.FC = () => {
-  // State để quản lý trạng thái loading của trang
-  const [isLoading, setIsLoading] = useState(true);
+// Import Service gọi API và Kiểu dữ liệu BackendMovie
+import { movieService } from "../services/movieService";
+import type { BackendMovie } from "../services/movieService";
 
-  // 1. useEffect CHỈ DÙNG ĐỂ xử lý side-effects (cuộn trang & hẹn giờ API)
+const HomePage: React.FC = () => {
+  // Quản lý trạng thái loading & dữ liệu thực tế từ NestJS
+  const [isLoading, setIsLoading] = useState(true);
+  const [heroMovies, setHeroMovies] = useState<BackendMovie[]>([]);
+  const [latestMovies, setLatestMovies] = useState<BackendMovie[]>([]);
+  const [topRatedMovies, setTopRatedMovies] = useState<BackendMovie[]>([]);
+  const [seriesMovies, setSeriesMovies] = useState<BackendMovie[]>([]);
+
   useEffect(() => {
     // Ép cuộn lên đỉnh khi vừa vào trang
     window.scrollTo({
@@ -28,16 +35,42 @@ const HomePage: React.FC = () => {
       behavior: "instant",
     });
 
-    // Giả lập thời gian load dữ liệu từ API (1.5 giây)
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const fetchHomeData = async () => {
+      try {
+        setIsLoading(true);
 
-    // Cleanup timer khi component unmount
-    return () => clearTimeout(timer);
-  }, []); // Mảng rỗng [] chạy 1 lần duy nhất khi mount
+        // Gọi đồng thời các API để phủ đầy dữ liệu cho các khối giao diện
+        const [hotData, latestRes, topRatedRes, seriesRes] = await Promise.all([
+          movieService.getHotMovies(5), // Top 5 phim xem nhiều cho Hero Banner
+          movieService.getMovies({
+            page: 1,
+            limit: 12,
+            sortBy: "created_at",
+            sortOrder: "desc",
+          }), // Phim mới cập nhật
+          movieService.getMovies({
+            page: 1,
+            limit: 10,
+            sortBy: "view_count",
+            sortOrder: "desc",
+          }), // Top Bảng xếp hạng
+          movieService.getMovies({ page: 1, limit: 10, type: "SERIES" }), // Phim bộ nổi bật
+        ]);
 
-  // 2. CHUYỂN CÂU LỆNH IF RỜI KHỎI useEffect VỀ BÊN NGOÀI COMPONENT BODY
+        setHeroMovies(hotData);
+        setLatestMovies(latestRes.data);
+        setTopRatedMovies(topRatedRes.data);
+        setSeriesMovies(seriesRes.data);
+      } catch (error) {
+        console.error("Lỗi khi kết nối API NestJS:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
   if (isLoading) {
     return (
       <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
@@ -50,7 +83,6 @@ const HomePage: React.FC = () => {
     );
   }
 
-  // 3. Render giao diện chính khi đã load dữ liệu xong
   return (
     <main className="min-h-screen w-full bg-cine-bg-primary font-sans text-cine-text">
       {/* Header */}
@@ -58,26 +90,26 @@ const HomePage: React.FC = () => {
 
       <div className="pt-20"></div>
 
-      {/* 1. Hero Banner */}
-      <HeroBanner />
+      {/* 1. Hero Banner: Truyền danh sách phim Hot */}
+      <HeroBanner movies={heroMovies} />
 
-      {/* 2. Tiếp tục xem */}
+      {/* 2. Tiếp tục xem (Lịch sử xem - giữ component tĩnh hoặc lấy từ LocalStorage/WatchHistory API) */}
       <ContinueWatching />
 
-      {/* 3. Phim mới */}
-      <NewReleases />
+      {/* 3. Phim mới cập nhật */}
+      <NewReleases movies={latestMovies} />
 
-      {/* 4. Top movies */}
-      <TopMovies />
+      {/* 4. Bảng xếp hạng Top Movies */}
+      <TopMovies movies={topRatedMovies} />
 
-      {/* 5. Thể loại */}
+      {/* 5. Thể loại Phim */}
       <CategoriesGrid />
 
-      {/* 6. Có thể bạn sẽ thích */}
-      <Recommended />
+      {/* 6. Có thể bạn sẽ thích (Phim đề xuất) */}
+      <Recommended movies={latestMovies} />
 
-      {/* 7. Top series */}
-      <TopSeries />
+      {/* 7. Top Series (Phim bộ) */}
+      <TopSeries movies={seriesMovies} />
 
       {/* Footer */}
       <Footer />

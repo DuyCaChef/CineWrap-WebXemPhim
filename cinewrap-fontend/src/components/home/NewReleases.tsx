@@ -1,140 +1,44 @@
 import React from "react";
+import type { BackendMovie } from "../../services/movieService";
+import { getCategoryViName } from "../../utils/formatters";
+import { useNavigate } from "react-router-dom";
 
 // ---------------------------------------------------------------------------
-// Types
+// Props Interface
 // ---------------------------------------------------------------------------
 
-interface Movie {
-  id: string;
-  title: string;
-  /** URL ảnh dọc tỷ lệ 2:3 từ Unsplash */
-  poster: string;
-  /** Điểm đánh giá, VD: "8.5" */
-  rating: string;
-  genre: string;
-  year: number;
-  /** Hiển thị badge "HOT" ở góc trên trái khi true */
-  isHot: boolean;
+interface NewReleasesProps {
+  movies?: BackendMovie[];
 }
-
-// ---------------------------------------------------------------------------
-// Mock data  (8 phim)
-// ---------------------------------------------------------------------------
-
-const MOVIES: Movie[] = [
-  {
-    id: "nr-1",
-    title: "Chiến Binh Bóng Đêm",
-    poster:
-      "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=400&h=600&fit=crop&auto=format",
-    rating: "8.7",
-    genre: "Hành động",
-    year: 2024,
-    isHot: true,
-  },
-  {
-    id: "nr-2",
-    title: "Khoảng Lặng Vô Tận",
-    poster:
-      "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop&auto=format",
-    rating: "9.1",
-    genre: "Tâm lý",
-    year: 2024,
-    isHot: false,
-  },
-  {
-    id: "nr-3",
-    title: "Thiên Đường Đã Mất",
-    poster:
-      "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=400&h=600&fit=crop&auto=format",
-    rating: "7.9",
-    genre: "Tình cảm",
-    year: 2024,
-    isHot: false,
-  },
-  {
-    id: "nr-4",
-    title: "Kỷ Nguyên Sắt",
-    poster:
-      "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=400&h=600&fit=crop&auto=format",
-    rating: "8.3",
-    genre: "Viễn tưởng",
-    year: 2024,
-    isHot: true,
-  },
-  {
-    id: "nr-5",
-    title: "Mắt Bão",
-    poster:
-      "https://images.unsplash.com/photo-1619983081563-430f63602796?w=400&h=600&fit=crop&auto=format",
-    rating: "8.0",
-    genre: "Kinh dị",
-    year: 2024,
-    isHot: true,
-  },
-  {
-    id: "nr-6",
-    title: "Giai Điệu Cuối Mùa",
-    poster:
-      "https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=400&h=600&fit=crop&auto=format",
-    rating: "7.6",
-    genre: "Âm nhạc",
-    year: 2024,
-    isHot: false,
-  },
-  {
-    id: "nr-7",
-    title: "Vòng Xoáy Định Mệnh",
-    poster:
-      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop&auto=format",
-    rating: "8.9",
-    genre: "Hình sự",
-    year: 2024,
-    isHot: false,
-  },
-  {
-    id: "nr-8",
-    title: "Ánh Sáng Phương Nam",
-    poster:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=600&fit=crop&auto=format",
-    rating: "8.4",
-    genre: "Phiêu lưu",
-    year: 2024,
-    isHot: false,
-  },
-  {
-    id: "nr-9",
-    title: "Vòng Xoáy Định Mệnh",
-    poster:
-      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop&auto=format",
-    rating: "8.9",
-    genre: "Hình sự",
-    year: 2024,
-    isHot: false,
-  },
-];
 
 // ---------------------------------------------------------------------------
 // Sub-component: MovieCard
 // ---------------------------------------------------------------------------
 
 interface MovieCardProps {
-  movie: Movie;
+  movie: BackendMovie;
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+  const navigate = useNavigate();
+
+  // Helper lấy poster fallback nếu dữ liệu null
+  const posterUrl =
+    movie.poster_url ||
+    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80";
+
   return (
     <button
       type="button"
+      onClick={() => navigate(`/movie/${movie.slug}`)}
       aria-label={`Xem phim ${movie.title}`}
-      className="group w-36 shrink-0 snap-start sm:w-44 lg:w-48"
+      className="group w-36 shrink-0 snap-start sm:w-44 lg:w-48 text-left cursor-pointer"
     >
       {/* ── Poster wrapper ── */}
       <div
         className={[
           "relative aspect-2/3 w-full overflow-hidden rounded-2xl",
           "bg-[#1e293b]",
-          // Hiệu ứng hover: nhấc lên + phóng to + glow xanh Cyan
           "transition-all duration-300 ease-out",
           "group-hover:-translate-y-2 group-hover:scale-105",
           "group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]",
@@ -142,7 +46,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
       >
         {/* Ảnh phim */}
         <img
-          src={movie.poster}
+          src={posterUrl}
           alt={movie.title}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
@@ -157,18 +61,18 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
           ].join(" ")}
         />
 
-        {/* Badge HOT */}
-        {movie.isHot && (
+        {/* Badge VIP / HOT */}
+        {movie.is_vip && (
           <span
-            aria-label="Phim hot"
+            aria-label="Phim VIP"
             className={[
               "absolute left-2 top-2",
-              "rounded-md bg-[#e50914] px-1.5 py-0.5",
-              "text-[10px] font-extrabold tracking-widest text-white",
+              "rounded-md bg-[#ffc107] px-1.5 py-0.5",
+              "text-[10px] font-extrabold tracking-widest text-[#0d1425]",
               "shadow-lg",
             ].join(" ")}
           >
-            HOT
+            VIP
           </span>
         )}
 
@@ -181,17 +85,18 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
             "text-[11px] font-semibold text-[#ffc107]",
           ].join(" ")}
         >
-          ★ {movie.rating}
+          ★ {movie.average_rating ? movie.average_rating.toFixed(1) : "8.5"}
         </span>
       </div>
 
       {/* ── Thông tin dưới thẻ ── */}
       <div className="mt-2.5 px-0.5 text-left">
-        <p className="truncate text-sm font-bold text-white leading-tight">
+        <p className="truncate text-sm font-bold text-white leading-tight group-hover:text-[#00a3ff] transition-colors">
           {movie.title}
         </p>
         <p className="mt-0.5 truncate text-xs text-[#9ca3af]">
-          {movie.genre}&nbsp;·&nbsp;{movie.year}
+          {getCategoryViName(movie.categories?.[0])}&nbsp;·&nbsp;
+          {movie.release_year || new Date(movie.created_at).getFullYear()}
         </p>
       </div>
     </button>
@@ -202,7 +107,9 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
 // Main component: NewReleases
 // ---------------------------------------------------------------------------
 
-export const NewReleases: React.FC = () => {
+export const NewReleases: React.FC<NewReleasesProps> = ({ movies = [] }) => {
+  const navigate = useNavigate();
+
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
       {/* ── Section header ── */}
@@ -221,8 +128,9 @@ export const NewReleases: React.FC = () => {
         {/* Nút xem tất cả */}
         <button
           type="button"
+          onClick={() => navigate("/movies")}
           className={[
-            "group inline-flex h-9 items-center justify-center gap-1.5 rounded-full",
+            "group inline-flex h-9 items-center justify-center gap-1.5 rounded-full cursor-pointer",
             "border border-white/10 bg-white/5 px-3.5 text-xs font-semibold text-[#00a3ff] sm:text-sm",
             "shadow-[0_0_0_1px_rgba(255,255,255,0.02)_inset] backdrop-blur-sm",
             "transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white",
@@ -249,23 +157,22 @@ export const NewReleases: React.FC = () => {
         </button>
       </div>
 
-      {/*
-        ── Scroll container ──
-        pt-8 pb-6 px-1 : không gian buffer để glow + scale không bị clip
-        snap-x snap-mandatory scroll-smooth : khựng đúng tâm mỗi thẻ khi vuốt
-        [&::-webkit-scrollbar]:hidden ... : ẩn scrollbar mọi trình duyệt
-      */}
+      {/* ── Scroll container ── */}
       <div
         className={[
           "flex gap-4 overflow-x-auto sm:gap-5",
           "scroll-smooth snap-x snap-mandatory",
-          "pt-8 pl-8 pr-8 pb-6 px-1",
+          "pt-4 pb-6 px-1",
           "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none",
         ].join(" ")}
       >
-        {MOVIES.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
+        {movies.length > 0 ? (
+          movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)
+        ) : (
+          <p className="text-xs text-[#9ca3af] italic">
+            Đang cập nhật danh sách phim mới...
+          </p>
+        )}
       </div>
     </section>
   );
