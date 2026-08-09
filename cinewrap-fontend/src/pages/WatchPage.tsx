@@ -112,6 +112,19 @@ const WatchPage: React.FC = () => {
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Ref quản lý khung Player
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+
+  // Tự động cuộn góc nhìn vào giữa Player khi Bật/Tắt Rạp phim
+  useEffect(() => {
+    if (isCinemaMode && playerContainerRef.current) {
+      playerContainerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [isCinemaMode]);
+
   // Video Ref
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -178,7 +191,7 @@ const WatchPage: React.FC = () => {
       {/* Phông nền đen bao phủ khi bật Chế độ Rạp Phim (Cinema Mode) */}
       {isCinemaMode && (
         <div
-          className="fixed inset-0 z-40 bg-black/95 transition-opacity duration-500 cursor-pointer"
+          className="fixed inset-0 z-[80] bg-black/95 transition-opacity duration-500 cursor-pointer backdrop-blur-md"
           onClick={() => setIsCinemaMode(false)}
           title="Bấm để tắt chế độ rạp phim"
         />
@@ -217,10 +230,11 @@ const WatchPage: React.FC = () => {
 
         {/* ── 1. MAIN VIDEO PLAYER CONTAINER ── */}
         <div
+          ref={playerContainerRef}
           className={`relative w-full aspect-video rounded-2xl bg-black border border-white/10 overflow-hidden shadow-2xl transition-all duration-300 ${
             isCinemaMode
-              ? "relative z-50 shadow-[0_0_50px_rgba(0,163,255,0.3)]"
-              : ""
+              ? "relative z-[90] shadow-[0_0_60px_rgba(0,163,255,0.4)] ring-2 ring-[#00a3ff]/40"
+              : "z-10"
           }`}
         >
           <video
