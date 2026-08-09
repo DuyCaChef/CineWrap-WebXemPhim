@@ -250,7 +250,7 @@ const WatchPage: React.FC = () => {
         </div>
 
         {/* ── 2. PLAYER ACTION BAR (Chuyển tập, Đổi Server, Rạp phim) ── */}
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#131c2e]/80 border border-white/10 p-4 backdrop-blur-xl">
+        <div className="relative z-[90] flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#131c2e]/80 border border-white/10 p-4 backdrop-blur-xl">
           {/* Cụm điều hướng Tập trước/Tập sau */}
           <div className="flex items-center gap-2">
             <button
@@ -297,13 +297,23 @@ const WatchPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsCinemaMode(!isCinemaMode)}
-              className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
+              className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-extrabold transition active:scale-95 ${
                 isCinemaMode
-                  ? "border-[#ffc107] bg-[#ffc107]/20 text-[#ffc107]"
-                  : "border-white/10 bg-[#0f172a] text-white hover:bg-white/10"
+                  ? "border-[#ffc107] bg-[#ffc107] text-[#0d1425] shadow-[0_0_20px_rgba(255,193,7,0.5)] animate-pulse"
+                  : "border-white/10 bg-[#0f172a] text-white hover:border-[#00a3ff]/50 hover:bg-[#1e293b]"
               }`}
             >
-              {isCinemaMode ? "☀️ Tắt Rạp Phim" : "🌙 Chế Độ Rạp Phim"}
+              {isCinemaMode ? (
+                <>
+                  <span>☀️</span>
+                  <span>Thoát Rạp Phim</span>
+                </>
+              ) : (
+                <>
+                  <span>🌙</span>
+                  <span>Chế Độ Rạp Phim</span>
+                </>
+              )}
             </button>
             <button
               type="button"
