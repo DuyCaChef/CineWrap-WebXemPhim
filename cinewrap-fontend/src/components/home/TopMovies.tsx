@@ -1,139 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { BackendMovie } from "../../services/movieService";
+import { getCategoryViName } from "../../utils/formatters";
 
 // ---------------------------------------------------------------------------
-// Types
+// Props Interfaces
 // ---------------------------------------------------------------------------
 
-interface TopMovie {
-  id: string;
-  title: string;
-  /** Poster dọc 2:3 từ Unsplash */
-  poster: string;
-  rating: string;
-  genre: string;
-  year: number;
-  /** Số lượt xem, VD: "2.4M" */
-  views: string;
-  /** Thời lượng, VD: "2h 18m" */
-  duration: string;
+interface TopMoviesProps {
+  movies?: BackendMovie[];
 }
 
-// ---------------------------------------------------------------------------
-// Mock data — Top 10 phim
-// ---------------------------------------------------------------------------
-
-const TOP_MOVIES: TopMovie[] = [
-  {
-    id: "tm-1",
-    title: "Vực Thẳm Vô Tận",
-    poster:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format",
-    rating: "9.4",
-    genre: "Hành động",
-    year: 2024,
-    views: "4.1M",
-    duration: "2h 32m",
-  },
-  {
-    id: "tm-2",
-    title: "Khoảng Lặng Vô Tận",
-    poster:
-      "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop&auto=format",
-    rating: "9.1",
-    genre: "Tâm lý",
-    year: 2024,
-    views: "3.7M",
-    duration: "1h 58m",
-  },
-  {
-    id: "tm-3",
-    title: "Thiên Hà Tan Vỡ",
-    poster:
-      "https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?w=400&h=600&fit=crop&auto=format",
-    rating: "8.9",
-    genre: "Viễn tưởng",
-    year: 2024,
-    views: "3.2M",
-    duration: "2h 14m",
-  },
-  {
-    id: "tm-4",
-    title: "Chiến Binh Bóng Đêm",
-    poster:
-      "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=400&h=600&fit=crop&auto=format",
-    rating: "8.7",
-    genre: "Hành động",
-    year: 2024,
-    views: "2.9M",
-    duration: "2h 05m",
-  },
-  {
-    id: "tm-5",
-    title: "Vòng Xoáy Định Mệnh",
-    poster:
-      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop&auto=format",
-    rating: "8.5",
-    genre: "Hình sự",
-    year: 2024,
-    views: "2.6M",
-    duration: "1h 47m",
-  },
-  {
-    id: "tm-6",
-    title: "Kỷ Nguyên Sắt",
-    poster:
-      "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=400&h=600&fit=crop&auto=format",
-    rating: "8.3",
-    genre: "Viễn tưởng",
-    year: 2024,
-    views: "2.1M",
-    duration: "2h 21m",
-  },
-  {
-    id: "tm-7",
-    title: "Mắt Bão",
-    poster:
-      "https://images.unsplash.com/photo-1619983081563-430f63602796?w=400&h=600&fit=crop&auto=format",
-    rating: "8.1",
-    genre: "Kinh dị",
-    year: 2024,
-    views: "1.9M",
-    duration: "1h 52m",
-  },
-  {
-    id: "tm-8",
-    title: "Ánh Sáng Phương Nam",
-    poster:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=600&fit=crop&auto=format",
-    rating: "7.9",
-    genre: "Phiêu lưu",
-    year: 2024,
-    views: "1.6M",
-    duration: "2h 03m",
-  },
-  {
-    id: "tm-9",
-    title: "Giai Điệu Cuối Mùa",
-    poster:
-      "https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=400&h=600&fit=crop&auto=format",
-    rating: "7.7",
-    genre: "Âm nhạc",
-    year: 2024,
-    views: "1.3M",
-    duration: "1h 44m",
-  },
-  {
-    id: "tm-10",
-    title: "Thiên Đường Đã Mất",
-    poster:
-      "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=400&h=600&fit=crop&auto=format",
-    rating: "7.5",
-    genre: "Tình cảm",
-    year: 2024,
-    views: "1.1M",
-    duration: "1h 38m",
-  },
-];
+interface RankingCardProps {
+  movie: BackendMovie;
+  rank: number;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -167,17 +48,18 @@ const outlineStyle = (rank: number): React.CSSProperties => {
 // Sub-component: RankingCard
 // ---------------------------------------------------------------------------
 
-interface RankingCardProps {
-  movie: TopMovie;
-  rank: number;
-}
-
 const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
+  const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
+
+  const posterUrl =
+    movie.poster_url ||
+    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format";
 
   return (
     <button
       type="button"
+      onClick={() => navigate(`/movie/${movie.slug}`)}
       aria-label={`Hạng ${rank}: ${movie.title}`}
       className="group relative flex w-full items-center focus-visible:outline-none"
     >
@@ -223,7 +105,7 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
         <div className="relative aspect-2/3 h-20 flex-none overflow-hidden rounded-lg sm:h-24 lg:h-28">
           {!imgError ? (
             <img
-              src={movie.poster}
+              src={posterUrl}
               alt={movie.title}
               loading="lazy"
               onError={() => setImgError(true)}
@@ -248,7 +130,8 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
 
           {/* Genre · Year */}
           <p className="text-xs text-[#9ca3af]">
-            {movie.genre}&nbsp;·&nbsp;{movie.year}
+            {getCategoryViName(movie.categories?.[0])}&nbsp;·&nbsp;
+            {movie.release_year || new Date(movie.created_at).getFullYear()}
           </p>
 
           {/* Rating + Duration */}
@@ -261,7 +144,7 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
               >
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              {movie.rating}
+              {movie.average_rating ? movie.average_rating.toFixed(1) : "8.5"}
             </span>
 
             <span className="flex items-center gap-1 text-xs text-[#9ca3af]">
@@ -279,7 +162,7 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
                   d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"
                 />
               </svg>
-              {movie.duration}
+              {movie.duration ? `${movie.duration}m` : "120m"}
             </span>
 
             <span className="flex items-center gap-1 text-xs text-[#9ca3af]">
@@ -302,7 +185,7 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
               </svg>
-              {movie.views}
+              {movie.view_count || 0}
             </span>
           </div>
         </div>
@@ -328,10 +211,12 @@ const RankingCard: React.FC<RankingCardProps> = ({ movie, rank }) => {
 // Main component: TopMovies
 // ---------------------------------------------------------------------------
 
-export const TopMovies: React.FC = () => {
-  // Chia 10 phim thành 2 cột trên desktop (5 phim / cột)
-  const leftCol = TOP_MOVIES.slice(0, 5);
-  const rightCol = TOP_MOVIES.slice(5, 10);
+export const TopMovies: React.FC<TopMoviesProps> = ({ movies = [] }) => {
+  const navigate = useNavigate();
+
+  // Chia danh sách phim thành 2 cột (5 phim mỗi cột)
+  const leftCol = movies.slice(0, 5);
+  const rightCol = movies.slice(5, 10);
 
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-10 lg:px-16">
@@ -348,6 +233,7 @@ export const TopMovies: React.FC = () => {
         </div>
         <button
           type="button"
+          onClick={() => navigate("/movies")}
           className="group inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 text-xs font-semibold text-[#00a3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.02)_inset] backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a3ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:text-sm"
         >
           Xem tất cả
