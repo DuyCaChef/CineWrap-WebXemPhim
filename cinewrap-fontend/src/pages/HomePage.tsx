@@ -19,7 +19,7 @@ import {
 import { movieService } from "../services/movieService";
 import type { BackendMovie } from "../services/movieService";
 
-const HomePage: React.FC = () => {
+export const HomePage: React.FC = () => {
   // Quản lý trạng thái loading & dữ liệu thực tế từ NestJS
   const [isLoading, setIsLoading] = useState(true);
   const [heroMovies, setHeroMovies] = useState<BackendMovie[]>([]);
@@ -34,6 +34,8 @@ const HomePage: React.FC = () => {
       left: 0,
       behavior: "instant",
     });
+
+    let isMounted = true; // Cờ chặn memory leak khi unmount
 
     const fetchHomeData = async () => {
       try {
@@ -57,18 +59,26 @@ const HomePage: React.FC = () => {
           movieService.getMovies({ page: 1, limit: 10, type: "SERIES" }), // Phim bộ nổi bật
         ]);
 
-        setHeroMovies(hotData);
-        setLatestMovies(latestRes.data);
-        setTopRatedMovies(topRatedRes.data);
-        setSeriesMovies(seriesRes.data);
+        if (isMounted) {
+          setHeroMovies(hotData || []);
+          setLatestMovies(latestRes?.data || []);
+          setTopRatedMovies(topRatedRes?.data || []);
+          setSeriesMovies(seriesRes?.data || []);
+        }
       } catch (error) {
         console.error("Lỗi khi kết nối API NestJS:", error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchHomeData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (isLoading) {
@@ -88,12 +98,10 @@ const HomePage: React.FC = () => {
       {/* Header */}
       <Header />
 
-      <div className="pt-20"></div>
-
       {/* 1. Hero Banner: Truyền danh sách phim Hot */}
       <HeroBanner movies={heroMovies} />
 
-      {/* 2. Tiếp tục xem (Lịch sử xem - giữ component tĩnh hoặc lấy từ LocalStorage/WatchHistory API) */}
+      {/* 2. Tiếp tục xem */}
       <ContinueWatching />
 
       {/* 3. Phim mới cập nhật */}
