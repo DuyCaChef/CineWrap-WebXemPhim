@@ -1,55 +1,26 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-interface ContinueItem {
+export interface ContinueItem {
   id: string;
   title: string;
+  slug: string;
   thumbnail: string;
   progress: number; // 0 - 100
   episode?: string;
 }
 
-const CONTINUE_ITEMS: ContinueItem[] = [
-  {
-    id: "cw-1",
-    title: "Vực Thẳm Vô Tận",
-    thumbnail:
-      "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=800&auto=format&fit=crop",
-    progress: 70,
-  },
-  {
-    id: "cw-2",
-    title: "Biên Niên Sử Phương Bắc",
-    thumbnail:
-      "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=800&auto=format&fit=crop",
-    progress: 32,
-    episode: "Tập 5",
-  },
-  {
-    id: "cw-3",
-    title: "Thiên Hà Tan Vỡ",
-    thumbnail:
-      "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=800&auto=format&fit=crop",
-    progress: 80,
-  },
-  {
-    id: "cw-4",
-    title: "Đêm Không Ngủ",
-    thumbnail:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=800&auto=format&fit=crop",
-    progress: 15,
-    episode: "Tập 2",
-  },
-  {
-    id: "cw-5",
-    title: "Lửa Và Băng",
-    thumbnail:
-      "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=800&auto=format&fit=crop",
-    progress: 50,
-  },
-];
+interface ContinueWatchingProps {
+  items?: ContinueItem[];
+}
 
-export const ContinueWatching: React.FC = () => {
-  if (CONTINUE_ITEMS.length === 0) return null;
+export const ContinueWatching: React.FC<ContinueWatchingProps> = ({
+  items = [],
+}) => {
+  const navigate = useNavigate();
+
+  // Guard clause: Nếu không có lịch sử xem thì ẩn hoàn toàn section
+  if (!items || items.length === 0) return null;
 
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
@@ -64,16 +35,18 @@ export const ContinueWatching: React.FC = () => {
       </div>
 
       <div className="-mx-4 pt-8 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:gap-4 sm:px-8 lg:-mx-16 lg:px-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {CONTINUE_ITEMS.map((item) => (
+        {items.map((item) => (
           <button
             key={item.id}
             type="button"
-            className="group relative w-[260px] flex-shrink-0 overflow-hidden rounded-lg sm:w-[300px] lg:w-[340px]"
+            onClick={() => navigate(`/watch/${item.slug}`)}
+            className="group relative w-[260px] flex-shrink-0 overflow-hidden rounded-lg sm:w-[300px] lg:w-[340px] text-left cursor-pointer"
           >
             <div className="aspect-video w-full overflow-hidden bg-cine-surface">
               <img
                 src={item.thumbnail}
                 alt={item.title}
+                loading="lazy"
                 className="h-full w-full object-cover transition duration-300 group-hover:scale-105 group-hover:brightness-50"
               />
             </div>
