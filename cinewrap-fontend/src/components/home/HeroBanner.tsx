@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import type { BackendMovie } from "../../services/movieService";
 import { getCategoryViName } from "../../utils/formatters";
 
+//Hình ảnh Fallback khi không có backdrop/poster
+import Poster_Fallback from "../../assets/images/Poster_Fallback.jpg";
+import Backdrop_Fallback from "../../assets/images/Backdrop_Fallback.jpg";
+
 interface HeroBannerProps {
   movies?: BackendMovie[];
 }
@@ -43,13 +47,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
 
   // Helper lấy ảnh backdrop/poster fallback an toàn
   const backdropUrl =
-    movie.backdrop_url ||
-    movie.poster_url ||
-    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=600&fit=crop";
+    movie.backdrop_url || movie.poster_url || Backdrop_Fallback;
 
-  const posterUrl =
-    movie.poster_url ||
-    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop";
+  const posterUrl = movie.poster_url || Poster_Fallback;
 
   // Xử lý chuyển slide
   const goTo = (direction: "prev" | "next") => {

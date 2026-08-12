@@ -3,6 +3,9 @@ import type { BackendMovie } from "../../services/movieService";
 import { getCategoryViName } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
 
+//Hình ảnh Fallback khi không có backdrop/poster
+import Poster_Fallback from "../../assets/images/Poster_Fallback.jpg";
+
 // ---------------------------------------------------------------------------
 // Props Interface
 // ---------------------------------------------------------------------------
@@ -23,9 +26,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
   const navigate = useNavigate();
 
   // Helper lấy poster fallback nếu dữ liệu null
-  const posterUrl =
-    movie.poster_url ||
-    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80";
+  const posterUrl = movie.poster_url || Poster_Fallback;
 
   return (
     <button
