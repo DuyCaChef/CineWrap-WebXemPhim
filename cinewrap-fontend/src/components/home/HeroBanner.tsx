@@ -14,11 +14,32 @@ const Badge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
+  // 1. KÍCH HOẠT TẤT CẢ REẠCT HOOKS Ở TRÊN CÙNG (Tránh lỗi Rules of Hooks)
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
 
+  // Cuộn mượt poster vào giữa khi active đổi
+  useEffect(() => {
+    // Chỉ thực hiện cuộn nếu mảng phim có dữ liệu
+    if (movies && movies.length > 0) {
+      const activePoster = document.getElementById(`poster-${active}`);
+      if (activePoster) {
+        activePoster.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      }
+    }
+  }, [active, movies]);
+
+  // 2. CÂU LỆNH EARLY RETURN (BẮT BỘC ĐẶT SAU TẤT CẢ CÁC HOOKS)
+  if (!movies || movies.length === 0 || !movies[active]) {
+    return null;
+  }
+
   // Lấy bộ phim đang được chọn ở slide
-  const movie = movies[active] || movies[0];
+  const movie = movies[active];
 
   // Helper lấy ảnh backdrop/poster fallback an toàn
   const backdropUrl =
@@ -38,26 +59,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
     });
   };
 
-  // Cuộn mượt poster vào giữa khi active đổi
-  useEffect(() => {
-    const activePoster = document.getElementById(`poster-${active}`);
-    if (activePoster) {
-      activePoster.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest",
-      });
-    }
-  }, [active]);
-
-  // Guard clause: Nếu mảng phim rỗng (API chưa về hoặc chưa có data), trả về null
-  if (!movies || movies.length === 0) {
-    return null;
-  }
-
   return (
     <section className="relative flex flex-col min-h-[calc(100vh-80px)] w-full overflow-hidden bg-cine-bg-primary pt-20">
-      {/* Background image (giả lập trailer auto-play) */}
+      {/* Background image */}
       <div className="absolute inset-0">
         <img
           key={movie.id}
@@ -65,7 +69,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
           alt={movie.title}
           className="h-full w-full animate-[heroZoom_12s_ease-in-out_infinite_alternate] object-cover"
         />
-        {/* Lớp phủ đen Gradient để Text nổi bật */}
         <div className="absolute inset-0 bg-gradient-to-t from-cine-bg-primary via-cine-bg-primary/70 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-cine-bg-primary/90 via-cine-bg-primary/30 to-transparent" />
       </div>
@@ -116,7 +119,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
         </>
       )}
 
-      {/* ─── PHẦN THÔNG TIN PHIM (Nằm trên dải Poster) ─── */}
+      {/* ─── PHẦN THÔNG TIN PHIM ─── */}
       <div className="relative z-20 w-full px-4 sm:px-8 lg:px-20 flex-1 flex flex-col justify-center items-start pt-8 pb-4">
         <div className="max-w-3xl">
           {/* Badge Thông Tin */}
@@ -159,7 +162,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
             </button>
           </div>
 
-          {/* Chỉ báo Glassmorphism Viên thuốc */}
+          {/* Chỉ báo Viên thuốc */}
           <div className="mt-6 sm:mt-8 inline-flex items-center gap-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 px-3.5 py-2.5 shadow-lg">
             {movies.map((m, idx) => (
               <button
@@ -184,7 +187,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
           {movies.map((m, idx) => (
             <div
               key={m.id}
-              id={`poster-${idx}`} // ID để scrollIntoView
+              id={`poster-${idx}`}
               onClick={() => setActive(idx)}
               className={`relative snap-center shrink-0 overflow-hidden rounded-xl cursor-pointer transition-all duration-500 ease-out origin-bottom ${
                 active === idx
@@ -198,7 +201,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ movies = [] }) => {
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              {/* Lớp phủ đen làm chìm các poster không active */}
               <div
                 className={`absolute inset-0 bg-black transition-opacity duration-500 ${
                   active === idx ? "opacity-0" : "opacity-40"
