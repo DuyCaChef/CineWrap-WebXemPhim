@@ -1,124 +1,37 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import type { BackendMovie } from "../../services/movieService";
+import { getCategoryViName } from "../../utils/formatters";
 
 // ---------------------------------------------------------------------------
-// Types
+// Props Interface
 // ---------------------------------------------------------------------------
 
-interface RecommendedMovie {
-  id: string;
-  title: string;
-  /** Poster dọc tỷ lệ 2:3 từ Unsplash */
-  poster: string;
-  rating: string;
-  genre: string;
-  year: number;
-  /**
-   * Micro-copy cá nhân hóa — lý do gợi ý phim này.
-   * VD: "Vì bạn đã xem Inception"
-   */
-  reason: string;
+interface RecommendedProps {
+  movies?: BackendMovie[];
 }
 
-// ---------------------------------------------------------------------------
-// Mock data (8 phim gợi ý)
-// ---------------------------------------------------------------------------
-
-const RECOMMENDED_MOVIES: RecommendedMovie[] = [
-  {
-    id: "rc-1",
-    title: "Mê Cung Ký Ức",
-    poster:
-      "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=400&h=600&fit=crop&auto=format",
-    rating: "8.6",
-    genre: "Viễn tưởng",
-    year: 2023,
-    reason: "Vì bạn đã xem Inception",
-  },
-  {
-    id: "rc-2",
-    title: "Bóng Tối Sau Cánh Cửa",
-    poster:
-      "https://images.unsplash.com/photo-1619983081563-430f63602796?w=400&h=600&fit=crop&auto=format",
-    rating: "8.0",
-    genre: "Kinh dị",
-    year: 2023,
-    reason: "Dựa trên thể loại Kinh dị bạn thích",
-  },
-  {
-    id: "rc-3",
-    title: "Hành Trình Phương Bắc",
-    poster:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=600&fit=crop&auto=format",
-    rating: "8.3",
-    genre: "Phiêu lưu",
-    year: 2023,
-    reason: "Vì bạn đã xem Interstellar",
-  },
-  {
-    id: "rc-4",
-    title: "Trò Chơi Quyền Lực",
-    poster:
-      "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop&auto=format",
-    rating: "9.0",
-    genre: "Hình sự",
-    year: 2023,
-    reason: "Thịnh hành cùng người xem giống bạn",
-  },
-  {
-    id: "rc-5",
-    title: "Nhịp Tim Thành Phố",
-    poster:
-      "https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=400&h=600&fit=crop&auto=format",
-    rating: "7.8",
-    genre: "Âm nhạc",
-    year: 2023,
-    reason: "Vì bạn đã xem La La Land",
-  },
-  {
-    id: "rc-6",
-    title: "Vết Sẹo Của Biển",
-    poster:
-      "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=400&h=600&fit=crop&auto=format",
-    rating: "8.1",
-    genre: "Tâm lý",
-    year: 2023,
-    reason: "Dựa trên thể loại Tâm lý bạn thích",
-  },
-  {
-    id: "rc-7",
-    title: "Đế Chế Sụp Đổ",
-    poster:
-      "https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?w=400&h=600&fit=crop&auto=format",
-    rating: "8.7",
-    genre: "Hành động",
-    year: 2023,
-    reason: "Vì bạn đã xem Gladiator",
-  },
-  {
-    id: "rc-8",
-    title: "Ánh Trăng Vỡ",
-    poster:
-      "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop&auto=format",
-    rating: "7.9",
-    genre: "Tình cảm",
-    year: 2023,
-    reason: "Vì bạn đã xem The Notebook",
-  },
-];
+interface RecommendedCardProps {
+  movie: BackendMovie;
+}
 
 // ---------------------------------------------------------------------------
 // Sub-component: RecommendedCard
 // ---------------------------------------------------------------------------
 
-interface RecommendedCardProps {
-  movie: RecommendedMovie;
-}
-
 const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
+  const navigate = useNavigate();
+
+  // Helper lấy poster fallback nếu dữ liệu null
+  const posterUrl =
+    movie.poster_url ||
+    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80";
+
   return (
     <button
       type="button"
-      aria-label={`Xem phim ${movie.title}, ${movie.reason}`}
+      onClick={() => navigate(`/movie/${movie.slug}`)}
+      aria-label={`Xem phim ${movie.title} `}
       className="group w-36 shrink-0 snap-start sm:w-44 lg:w-48"
     >
       {/* ── Poster wrapper ── */}
@@ -133,7 +46,7 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
       >
         {/* Ảnh phim */}
         <img
-          src={movie.poster}
+          src={posterUrl}
           alt={movie.title}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
@@ -157,7 +70,7 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
             "text-[11px] font-semibold text-[#ffc107]",
           ].join(" ")}
         >
-          ★ {movie.rating}
+          ★ {movie.average_rating ? movie.average_rating.toFixed(1) : "8.5"}
         </span>
       </div>
 
@@ -167,7 +80,8 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
           {movie.title}
         </p>
         <p className="mt-0.5 truncate text-xs text-[#9ca3af]">
-          {movie.genre}&nbsp;·&nbsp;{movie.year}
+          {getCategoryViName(movie.categories?.[0])}&nbsp;·&nbsp;
+          {movie.release_year || new Date(movie.created_at).getFullYear()}
         </p>
 
         {/* ── Micro-copy cá nhân hóa ── */}
@@ -177,7 +91,7 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
             "transition-colors duration-200 group-hover:text-[#00a3ff]/80",
           ].join(" ")}
         >
-          {movie.reason}
+          Đề xuất dành riêng cho bạn
         </p>
       </div>
     </button>
@@ -188,7 +102,7 @@ const RecommendedCard: React.FC<RecommendedCardProps> = ({ movie }) => {
 // Main component: Recommended
 // ---------------------------------------------------------------------------
 
-export const Recommended: React.FC = () => {
+export const Recommended: React.FC<RecommendedProps> = ({ movies = [] }) => {
   return (
     <section className="px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
       {/* ── Section header ── */}
@@ -246,7 +160,7 @@ export const Recommended: React.FC = () => {
           "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none",
         ].join(" ")}
       >
-        {RECOMMENDED_MOVIES.map((movie) => (
+        {movies.map((movie) => (
           <RecommendedCard key={movie.id} movie={movie} />
         ))}
       </div>
