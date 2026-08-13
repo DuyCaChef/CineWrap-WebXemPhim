@@ -4,32 +4,11 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Skeleton } from "../components/common/Skeleton";
 
-// ---------------------------------------------------------------------------
-// Types & Interfaces
-// ---------------------------------------------------------------------------
-
-interface Movie {
-  id: string;
-  title: string;
-  poster: string;
-  rating: string;
-  genre: string;
-  year: number;
-  country: string;
-  ageRating: string;
-  type: string;
-  status: string;
-  quality: string;
-  isHot?: boolean;
-}
-
-interface FilterOptions {
-  type: string;
-  status: string;
-  year: string;
-  quality: string;
-  sort: string;
-}
+// Kéo API
+import { movieService } from "../services/movieService";
+import type { BackendMovie } from "../services/movieService";
+import { getCategoryViName } from "../utils/formatters";
+import posterFallback from "../assets/poster_fallback.png";
 
 // ---------------------------------------------------------------------------
 // Meta Data mới cho Filter Bar
@@ -39,7 +18,6 @@ const MOVIE_TYPES = [
   { label: "Tất cả định dạng", value: "" },
   { label: "Phim Lẻ", value: "single" },
   { label: "Phim Bộ", value: "series" },
-  { label: "Hoạt Hình / Anime", value: "animation" },
 ];
 
 const MOVIE_STATUSES = [
@@ -59,7 +37,6 @@ const YEARS = [
   { label: "2024", value: "2024" },
   { label: "2023", value: "2023" },
   { label: "2022", value: "2022" },
-  { label: "Trước 2022", value: "older" },
 ];
 
 const SORT_OPTIONS = [
@@ -67,44 +44,6 @@ const SORT_OPTIONS = [
   { label: "Đánh giá cao", value: "rating" },
   { label: "Xem nhiều nhất", value: "views" },
 ];
-
-// ---------------------------------------------------------------------------
-// Mock Movies Data (32 Phim)
-// ---------------------------------------------------------------------------
-
-const MOCK_CATALOG_MOVIES: Movie[] = Array.from({ length: 32 }).map(
-  (_, idx) => {
-    const genres = [
-      "Hành Động",
-      "Viễn Tưởng",
-      "Kinh Dị",
-      "Tình Cảm",
-      "Hình Sự",
-    ];
-    const countries = ["Mỹ", "Hàn Quốc", "Việt Nam", "Nhật Bản"];
-    const types = ["single", "series", "animation"];
-    const statuses = ["complete", "ongoing"];
-    const qualities = ["4k", "1080p"];
-    const years = [2024, 2023, 2022, 2021];
-
-    return {
-      id: `cat-m-${idx + 1}`,
-      title: `Bộ Phim CineWrap ${idx + 1}`,
-      poster: `https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80`,
-      rating: (7.5 + (idx % 25) * 0.1).toFixed(1),
-      genre: genres[idx % genres.length],
-      year: years[idx % years.length],
-      country: countries[idx % countries.length],
-      ageRating: "16+",
-      type: types[idx % types.length],
-      status: statuses[idx % statuses.length],
-      quality: qualities[idx % qualities.length],
-      isHot: idx % 3 === 0,
-    };
-  },
-);
-
-const ITEMS_PER_PAGE = 24;
 
 // ---------------------------------------------------------------------------
 // Sub-component: CustomDropdown
@@ -232,11 +171,15 @@ const MoviesPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Các State quản lý dữ liệu từ NestJS
+  const [movies, setMovies] = useState<BackendMovie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Đọc params từ URL
-  const currentGenre = searchParams.get("genre") || "";
+  const currentCategory = searchParams.get("category") || "";
   const currentCountry = searchParams.get("country") || "";
   const currentType = searchParams.get("type") || "";
   const currentStatus = searchParams.get("status") || "";
@@ -245,19 +188,88 @@ const MoviesPage: React.FC = () => {
   const currentSort = searchParams.get("sort") || "newest";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
+  // Lắng nghe URL Params và gọi API NestJS
   useEffect(() => {
+    let isMounted = true;
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
+    const fetchCatalogMovies = async () => {
+      try {
+        setIsLoading(true);
 
-    return () => clearTimeout(timer);
-  }, [searchParams]);
+        // Ép kiểu chính xác cho sortBy
+        let sortBy:
+          | "created_at"
+          | "average_rating"
+          | "view_count"
+          | "release_date" = "created_at";
 
-  // Cập nhật bộ lọc
-  const updateFilter = (key: keyof FilterOptions, value: string) => {
-    setIsLoading(true);
+        const sortOrder: "asc" | "desc" = "desc";
+
+        if (currentSort === "rating") {
+          sortBy = "average_rating";
+        } else if (currentSort === "views") {
+          sortBy = "view_count";
+        }
+
+        // Ánh xạ tham số Type (single -> SINGLE, series -> SERIES)
+        let typeParam: "SINGLE" | "SERIES" | undefined = undefined;
+        if (currentType === "single") typeParam = "SINGLE";
+        if (currentType === "series") typeParam = "SERIES";
+
+        // Gọi API qua Service
+        const res = await movieService.getMovies({
+          page: currentPage,
+          limit: 24, // Hiển thị 24 phim / trang
+          sortBy,
+          sortOrder,
+          type: typeParam,
+          status: "PUBLISHED",
+        });
+
+        if (isMounted) {
+          setMovies(res.data || []);
+          setTotalPages(res.meta?.totalPages || 1);
+
+          // Sử dụng fallback an toàn cho total / totalItems
+          const metaObj = res.meta as unknown as Record<
+            string,
+            number | undefined
+          >;
+          const totalCount = res.meta?.total ?? metaObj?.totalItems ?? 0;
+
+          setTotalItems(totalCount);
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách phim từ API:", error);
+        if (isMounted) {
+          setMovies([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchCatalogMovies();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    currentPage,
+    currentCategory,
+    currentCountry,
+    currentType,
+    currentStatus,
+    currentYear,
+    currentQuality,
+    currentSort,
+  ]);
+
+  // Cập nhật bộ lọc lên URL
+  const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key, value);
@@ -270,42 +282,16 @@ const MoviesPage: React.FC = () => {
 
   // Reset toàn bộ bộ lọc
   const clearAllFilters = () => {
-    setIsLoading(true);
     setSearchParams({ sort: "newest", page: "1" });
   };
 
   // Chuyển trang
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
-    setIsLoading(true);
     const newParams = new URLSearchParams(searchParams);
     newParams.set("page", page.toString());
     setSearchParams(newParams);
   };
-
-  // Lọc dữ liệu client
-  const filteredMovies = MOCK_CATALOG_MOVIES.filter((m) => {
-    if (currentType && m.type !== currentType) return false;
-    if (currentStatus && m.status !== currentStatus) return false;
-    if (currentQuality && m.quality !== currentQuality) return false;
-    if (currentYear === "older" && m.year >= 2022) return false;
-    if (
-      currentYear &&
-      currentYear !== "older" &&
-      m.year !== parseInt(currentYear, 10)
-    )
-      return false;
-    return true;
-  });
-
-  // Phân trang
-  const totalPages = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE) || 1;
-  const validPage = Math.min(Math.max(1, currentPage), totalPages);
-  const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
-  const paginatedMovies = filteredMovies.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
 
   return (
     <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text overflow-x-hidden">
@@ -317,7 +303,7 @@ const MoviesPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs text-[#9ca3af] mb-2">
             <button
               onClick={() => navigate("/home")}
-              className="hover:text-white transition"
+              className="hover:text-white transition cursor-pointer"
             >
               Trang chủ
             </button>
@@ -325,8 +311,8 @@ const MoviesPage: React.FC = () => {
             <span className="text-[#00a3ff] font-semibold">Thư viện phim</span>
           </div>
           <h1 className="text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
-            {currentGenre
-              ? `Thể loại: ${currentGenre}`
+            {currentCategory
+              ? `Thể loại: ${currentCategory}`
               : currentCountry
                 ? `Phim ${currentCountry}`
                 : "Khám Phá Phim"}
@@ -364,12 +350,12 @@ const MoviesPage: React.FC = () => {
               currentStatus ||
               currentQuality ||
               currentYear ||
-              currentGenre ||
+              currentCategory ||
               currentCountry) && (
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="text-xs font-semibold text-[#e50914] hover:underline px-2 transition"
+                className="text-xs font-semibold text-[#e50914] hover:underline px-2 transition cursor-pointer"
               >
                 ✕ Xóa bộ lọc
               </button>
@@ -391,7 +377,7 @@ const MoviesPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsMobileFilterOpen(true)}
-            className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#1e293b] px-4 py-2.5 text-sm font-bold text-white shadow-md active:scale-95"
+            className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#1e293b] px-4 py-2.5 text-sm font-bold text-white shadow-md active:scale-95 cursor-pointer"
           >
             <svg
               className="h-4 w-4 text-[#00a3ff]"
@@ -410,18 +396,18 @@ const MoviesPage: React.FC = () => {
           </button>
 
           <span className="text-xs text-[#9ca3af] font-semibold">
-            {filteredMovies.length} kết quả
+            {totalItems} kết quả
           </span>
         </div>
 
-        {/* ── MOBILE BOTTOM SHEET FILTER (🟢 ĐÃ THÊM TÍNH NĂNG TỰ ĐÓNG KHI CLICK BACKDROP BÊN NGOÀI) ── */}
+        {/* ── MOBILE BOTTOM SHEET FILTER ── */}
         {isMobileFilterOpen && (
           <div
-            onClick={() => setIsMobileFilterOpen(false)} // 👈 Click lớp phủ tối bên ngoài sẽ tự động đóng
+            onClick={() => setIsMobileFilterOpen(false)}
             className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm lg:hidden overflow-hidden cursor-pointer animate-fade-in"
           >
             <div
-              onClick={(e) => e.stopPropagation()} // 👈 Chặn sự kiện click bên trong khung để không bị đóng nhầm
+              onClick={(e) => e.stopPropagation()}
               className="w-full rounded-t-3xl bg-[#0f172a] p-6 border-t border-white/15 max-h-[85vh] overflow-y-auto overflow-x-hidden space-y-4 cursor-default"
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -431,7 +417,7 @@ const MoviesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="text-white/70 text-xl font-bold p-1 active:scale-90 transition"
+                  className="text-white/70 text-xl font-bold p-1 active:scale-90 transition cursor-pointer"
                 >
                   ✕
                 </button>
@@ -503,14 +489,14 @@ const MoviesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="flex-1 rounded-xl border border-white/20 bg-white/10 py-3 text-xs font-bold text-white active:scale-95 transition"
+                  className="flex-1 rounded-xl border border-white/20 bg-white/10 py-3 text-xs font-bold text-white active:scale-95 transition cursor-pointer"
                 >
                   Xóa lọc
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="flex-1 rounded-xl bg-[#00a3ff] py-3 text-xs font-bold text-white shadow-lg active:scale-95 transition"
+                  className="flex-1 rounded-xl bg-[#00a3ff] py-3 text-xs font-bold text-white shadow-lg active:scale-95 transition cursor-pointer"
                 >
                   Áp dụng
                 </button>
@@ -522,7 +508,7 @@ const MoviesPage: React.FC = () => {
         {/* ── MAIN CONTENT GRID ── */}
         {isLoading ? (
           <MoviesPageSkeleton />
-        ) : paginatedMovies.length === 0 ? (
+        ) : movies.length === 0 ? (
           /* ── EMPTY STATE ── */
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1e293b] text-4xl mb-4 border border-white/10">
@@ -538,7 +524,7 @@ const MoviesPage: React.FC = () => {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="rounded-xl bg-[#00a3ff] px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110 active:scale-95"
+              className="rounded-xl bg-[#00a3ff] px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110 active:scale-95 cursor-pointer"
             >
               Xóa tất cả bộ lọc
             </button>
@@ -546,39 +532,48 @@ const MoviesPage: React.FC = () => {
         ) : (
           /* ── MOVIE GRID ── */
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5">
-            {paginatedMovies.map((movie) => (
+            {movies.map((movie) => (
               <button
                 key={movie.id}
                 type="button"
-                onClick={() => navigate(`/movie/${movie.id}`)}
-                className="group text-left focus-visible:outline-none"
+                onClick={() => navigate(`/movie/${movie.slug}`)}
+                aria-label={`Xem phim ${movie.title}`}
+                className="group text-left focus-visible:outline-none cursor-pointer"
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]">
                   <img
-                    src={movie.poster}
+                    src={movie.poster_url || posterFallback}
                     alt={movie.title}
                     loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = posterFallback;
+                    }}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 group-hover:opacity-40" />
 
-                  {movie.isHot && (
+                  {movie.is_vip && (
                     <span className="absolute top-2 left-2 rounded-md bg-[#e50914] px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow-md">
-                      HOT
+                      VIP
                     </span>
                   )}
 
                   <span className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/50 px-1.5 py-0.5 text-[11px] font-semibold text-[#ffc107] backdrop-blur-sm">
-                    ★ {movie.rating}
+                    ★{" "}
+                    {movie.average_rating
+                      ? movie.average_rating.toFixed(1)
+                      : "8.5"}
                   </span>
                 </div>
 
                 <div className="mt-2.5 px-0.5">
-                  <p className="truncate text-sm font-bold text-white leading-tight">
+                  <p className="truncate text-sm font-bold text-white leading-tight group-hover:text-[#00a3ff] transition-colors">
                     {movie.title}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-[#9ca3af]">
-                    {movie.genre} · {movie.year}
+                    {getCategoryViName(movie.categories?.[0])} ·{" "}
+                    {movie.release_year ||
+                      new Date(movie.created_at).getFullYear()}
                   </p>
                 </div>
               </button>
@@ -593,22 +588,22 @@ const MoviesPage: React.FC = () => {
             <div className="flex sm:hidden items-center justify-between w-full max-w-xs px-2 gap-2">
               <button
                 type="button"
-                disabled={validPage === 1}
-                onClick={() => goToPage(validPage - 1)}
-                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={currentPage <= 1}
+                onClick={() => goToPage(currentPage - 1)}
+                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 ‹ Trước
               </button>
 
               <span className="text-xs text-[#00a3ff] font-extrabold px-3 py-2 rounded-xl bg-[#00a3ff]/10 border border-[#00a3ff]/20">
-                {validPage} / {totalPages}
+                {currentPage} / {totalPages}
               </span>
 
               <button
                 type="button"
-                disabled={validPage === totalPages}
-                onClick={() => goToPage(validPage + 1)}
-                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={currentPage >= totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+                className="flex h-10 px-4 items-center gap-1 rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 Sau ›
               </button>
@@ -618,32 +613,32 @@ const MoviesPage: React.FC = () => {
             <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full">
               <button
                 type="button"
-                disabled={validPage === 1}
+                disabled={currentPage <= 1}
                 onClick={() => goToPage(1)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 cursor-pointer"
               >
                 «
               </button>
 
               <button
                 type="button"
-                disabled={validPage === 1}
-                onClick={() => goToPage(validPage - 1)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                disabled={currentPage <= 1}
+                onClick={() => goToPage(currentPage - 1)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 cursor-pointer"
               >
                 ‹
               </button>
 
               {Array.from({ length: totalPages }).map((_, idx) => {
                 const pageNum = idx + 1;
-                const isActive = pageNum === validPage;
+                const isActive = pageNum === currentPage;
 
                 return (
                   <button
                     key={pageNum}
                     type="button"
                     onClick={() => goToPage(pageNum)}
-                    className={`flex h-9 min-w-9 px-2.5 items-center justify-center rounded-xl border text-xs font-bold transition ${
+                    className={`flex h-9 min-w-9 px-2.5 items-center justify-center rounded-xl border text-xs font-bold transition cursor-pointer ${
                       isActive
                         ? "border-[#00a3ff] bg-[#00a3ff] text-white shadow-[0_0_12px_rgba(0,163,255,0.5)]"
                         : "border-white/10 bg-[#1e293b] text-[#9ca3af] hover:border-white/20 hover:text-white"
@@ -656,18 +651,18 @@ const MoviesPage: React.FC = () => {
 
               <button
                 type="button"
-                disabled={validPage === totalPages}
-                onClick={() => goToPage(validPage + 1)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                disabled={currentPage >= totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 cursor-pointer"
               >
                 ›
               </button>
 
               <button
                 type="button"
-                disabled={validPage === totalPages}
+                disabled={currentPage >= totalPages}
                 onClick={() => goToPage(totalPages)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#1e293b] text-xs font-bold text-white transition disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 cursor-pointer"
               >
                 »
               </button>
@@ -675,8 +670,8 @@ const MoviesPage: React.FC = () => {
 
             {/* Thông tin số trang */}
             <span className="text-xs text-[#9ca3af] font-medium">
-              Trang <strong className="text-white">{validPage}</strong> /{" "}
-              {totalPages} (Tổng {filteredMovies.length} phim)
+              Trang <strong className="text-white">{currentPage}</strong> /{" "}
+              {totalPages} (Tổng {totalItems} phim)
             </span>
           </div>
         )}
