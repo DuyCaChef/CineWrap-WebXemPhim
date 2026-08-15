@@ -1,28 +1,25 @@
-// DTO để chuẩn hóa các tham số Admin truyền lên khi lọc danh sách và đổi số tập.
 import { IsOptional, IsInt, IsString, Min, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
-// LƯU Ý: Ở Phase 2, bạn nên import EpisodeStatus từ '@prisma/client'
-// thay vì tự định nghĩa, sau khi đã đổi cột status trong schema.prisma thành Enum.
-import { EpisodeStatus } from './create-episode.dto';
+import { EpisodeStatus } from '@prisma/client';
 
 export class QueryEpisodeDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  @Min(1)
+  @IsInt({ message: 'Trang phải là số nguyên' })
+  @Min(1, { message: 'Trang phải lớn hơn hoặc bằng 1' })
   page?: number = 1;
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  @Min(1)
+  @IsInt({ message: 'Số lượng mỗi trang phải là số nguyên' })
+  @Min(1, { message: 'Số lượng mỗi trang phải lớn hơn hoặc bằng 1' })
   limit?: number = 20;
 
   @IsOptional()
-  @IsEnum(EpisodeStatus)
+  @IsEnum(EpisodeStatus, { message: 'Trạng thái lọc không hợp lệ' })
   status?: EpisodeStatus;
 
   @IsOptional()
-  @IsString()
-  search?: string; // Tìm theo tiêu đề tập phim
+  @IsString({ message: 'Từ khóa tìm kiếm phải là chuỗi' })
+  search?: string; // Tìm kiếm theo tiêu đề tập phim
 }

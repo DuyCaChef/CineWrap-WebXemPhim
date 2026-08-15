@@ -1,13 +1,12 @@
-// Tính năng Reorder (Sắp xếp lại tập phim) cho phép Frontend hiển thị một danh sách để Admin kéo thả (drag & drop) thứ tự các tập phim.
-//  Sau khi kéo thả xong, Frontend sẽ gửi lên một Mảng (Array) chứa danh sách các tập phim cần đổi số.
 import { IsInt, IsNotEmpty, Min } from 'class-validator';
 
 export class ReorderEpisodeDto {
-  @IsInt()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'ID tập phim không được để trống' })
+  @IsInt({ message: 'ID tập phim phải là số nguyên' })
   id!: number;
 
-  @IsInt()
-  @Min(1)
+  @IsNotEmpty({ message: 'Số tập mới không được để trống' })
+  @IsInt({ message: 'Số tập mới phải là số nguyên' })
+  @Min(1, { message: 'Số tập mới không được nhỏ hơn 1' })
   episode_number!: number;
 }

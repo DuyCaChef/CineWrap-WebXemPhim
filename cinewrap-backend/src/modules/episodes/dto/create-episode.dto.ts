@@ -6,12 +6,7 @@ import {
   IsEnum,
   IsNotEmpty,
 } from 'class-validator';
-
-export enum EpisodeStatus {
-  DRAFT = 'DRAFT',
-  PUBLISHED = 'PUBLISHED',
-  ARCHIVED = 'ARCHIVED',
-}
+import { EpisodeStatus } from '@prisma/client';
 
 export class CreateEpisodeDto {
   @IsOptional()
@@ -28,15 +23,15 @@ export class CreateEpisodeDto {
   episode_number!: number;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Tiêu đề tập phim phải là chuỗi' })
   title?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Slug tập phim phải là chuỗi' })
   slug?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Mô tả tập phim phải là chuỗi' })
   description?: string;
 
   @IsOptional()
@@ -45,6 +40,8 @@ export class CreateEpisodeDto {
   duration?: number;
 
   @IsOptional()
-  @IsEnum(EpisodeStatus, { message: 'Trạng thái không hợp lệ' })
+  @IsEnum(EpisodeStatus, {
+    message: 'Trạng thái tập phim không hợp lệ (DRAFT, PUBLISHED, ARCHIVED)',
+  })
   status?: EpisodeStatus;
 }
