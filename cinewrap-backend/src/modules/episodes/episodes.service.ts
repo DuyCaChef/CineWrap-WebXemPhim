@@ -364,8 +364,8 @@ export class EpisodesService {
     // Xác định ID của bộ phim gốc để tăng view cho cả Movie
     const rootMovieId = episode.movie_id || episode.season?.movie_id;
 
-    // Chạy Transaction để tăng View cho cả Tập và Phim gốc cùng lúc
-    const updates: any[] = [
+    // Chạy Transaction để tăng View cho cả Tập và Phim gốc cùng lúc (Type-safe)
+    const updates: Prisma.PrismaPromise<unknown>[] = [
       this.prisma.episode.update({
         where: { id },
         data: { view_count: { increment: 1 } },
