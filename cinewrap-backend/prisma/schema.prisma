@@ -193,14 +193,14 @@ model Episode {
   season_id      Int?              // Dành cho phim bộ
   episode_number Int
   title          String?
-  slug           String?           @default("DRAFT") // Phục vụ luật "Public chỉ xem PUBLISHED"
+  slug           String?           // Đường dẫn URL tập phim (vd: tap-1, tap-dac-biet)
   description    String?           @db.Text
   duration       Int?              // Thời lượng riêng của tập này (phút)
-  status         EpisodeStatus     @default(DRAFT)
-  
+  status         EpisodeStatus     @default(DRAFT) // Kiểm soát Public/Draft/Archived
+
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt
-  
+
   movie          Movie?            @relation(fields: [movie_id], references: [id], onDelete: Cascade)
   season         Season?           @relation(fields: [season_id], references: [id], onDelete: Cascade)
   servers        VideoServer[]
@@ -210,7 +210,7 @@ model Episode {
 
   categories     EpisodeCategory[]
 
-  // Đảm bảo trong một Season không trùng số tập, hoặc trong một Phim lẻ không trùng số tập
+  // Đảm bảo không trùng số tập trong cùng một Season hoặc cùng một Phim lẻ
   @@unique([season_id, episode_number])
   @@unique([movie_id, episode_number])
 }
