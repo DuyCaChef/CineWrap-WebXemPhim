@@ -15,67 +15,46 @@ import {
 import { EpisodesService } from './episodes.service';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
 import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { QueryEpisodeDto } from './dto/query-episode.dto';
+import { ReorderEpisodeDto } from './dto/reorder-episode.dto';
 
-// Import các Guard của bạn (Đường dẫn tùy thuộc vào cấu trúc thư mục của bạn)
+// Import Guards & Decorators Phân quyền
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum'; // Enum chứa 'ADMIN', 'MODERATOR', 'USER'
-import { ReorderEpisodeDto } from './dto/reorder-episode.dto';
-import { QueryEpisodeDto } from './dto/query-episode.dto';
+import { Role } from '../../common/enums/role.enum'; // Hoặc '../users/enums/role.enum' tùy cấu trúc dự án
 
 @Controller('episodes')
 export class EpisodesController {
   constructor(private readonly episodesService: EpisodesService) {}
 
-  // ==================== PHẠM VI ADMIN ====================
-  // Chỉ Admin và Mod mới được gọi 3 API dưới đây
+  // =========================================================================
+  // 🔐 PHẠM VI ADMIN / MODERATOR (Yêu cầu JWT Token & Phân quyền Role)
+  // =========================================================================
 
-  // API tạo tập phim mới
+  /**
+   * 1. Tạo tập phim đơn lẻ (Hỗ trợ cả Movie lẻ hoặc Season của Phim bộ)
+   */
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard) // 💡 Khóa cửa: Yêu cầu Token hợp lệ
-  @Roles(Role.ADMIN, Role.MODERATOR) // 💡 Kiểm tra thẻ nhân viên: Chỉ cho ADMIN/MOD
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
   create(@Body() createEpisodeDto: CreateEpisodeDto) {
     return this.episodesService.create(createEpisodeDto);
   }
 
-  // API cập nhật thông tin tập phim
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateEpisodeDto: UpdateEpisodeDto,
-  ) {
-    return this.episodesService.update(id, updateEpisodeDto);
-  }
-
-  // API xóa mềm tập phim (soft delete)
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.episodesService.remove(id); // Gọi hàm xóa mềm
-  }
-
-  // API lấy danh sách tập phim cho Admin, có phân trang và lọc nâng cao
+  /**
+   * 2. Lấy danh sách tập phim cho Admin (Hỗ trợ Pagination, Search, Filter Status)
+   */
   @Get('admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
   findAllAdmin(@Query() query: QueryEpisodeDto) {
-    // Controller cực sạch, ValidationPipe tự ép kiểu page/limit qua QueryEpisodeDto
     return this.episodesService.findAllAdmin(query);
   }
 
-  // API khôi phục tập phim đã xóa mềm
-  @Patch('admin/:id/restore')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR)
-  restore(@Param('id', ParseIntPipe) id: number) {
-    return this.episodesService.restore(id);
-  }
-
-  // API tạo hàng loạt tập phim (Bulk Create) - Dành cho Admin/Mod khi cần nhập nhiều tập cùng lúc
+  /**
+   * 3. Nhập tập phim hàng loạt (Bulk Create)
+   */
   @Post('admin/bulk')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
@@ -83,11 +62,12 @@ export class EpisodesController {
     @Body(new ParseArrayPipe({ items: CreateEpisodeDto }))
     dtos: CreateEpisodeDto[],
   ) {
-    // ParseArrayPipe giúp validate TỪNG PHẦN TỬ trong mảng JSON gửi lên
     return this.episodesService.bulkCreate(dtos);
   }
 
-  // API sắp xếp lại thứ tự tập phim (Reorder) - Dành cho Admin/Mod
+  /**
+   * 4. Sắp xếp / Đổi số tập hàng loạt (Reorder - Chống lỗi P2002 Unique Constraint)
+   */
   @Patch('admin/reorder')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MODERATOR)
@@ -98,13 +78,49 @@ export class EpisodesController {
     return this.episodesService.reorder(updates);
   }
 
-  // ==================== PHẠM VI PUBLIC ====================
-  // Public API không gắn Guard, ai cũng xem được (nhưng Service đã chặn chỉ trả PUBLISHED)
+  /**
+   * 5. Khôi phục tập phim đã xóa mềm từ ARCHIVED về DRAFT
+   */
+  @Patch('admin/:id/restore')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  restore(@Param('id', ParseIntPipe) id: number) {
+    return this.episodesService.restore(id);
+  }
 
+  /**
+   * 6. Cập nhật thông tin tập phim
+   */
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateEpisodeDto: UpdateEpisodeDto,
+  ) {
+    return this.episodesService.update(id, updateEpisodeDto);
+  }
+
+  /**
+   * 7. Xóa mềm tập phim (Chuyển trạng thái sang ARCHIVED)
+   */
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.episodesService.remove(id);
+  }
+
+  // =========================================================================
+  // 🌍 PHẠM VI PUBLIC (Không yêu cầu đăng nhập - Chỉ trả về tập PUBLISHED)
+  // =========================================================================
+
+  /**
+   * 8. Lấy toàn bộ danh sách tập theo Movie ID (Có phân trang)
+   */
   @Get('public/movie/:movieId')
   findAllByMovie(
     @Param('movieId', ParseIntPipe) movieId: number,
-    // Tự động ép kiểu số, nếu không truyền sẽ lấy mặc định là 1 và 20
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) pageNum: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limitNum: number,
   ) {
@@ -115,14 +131,18 @@ export class EpisodesController {
     );
   }
 
-  // Lấy danh sách tập riêng cho 1 Season cụ thể
+  /**
+   * 9. Lấy danh sách tập theo Season ID (Dành cho giao diện chọn Season của Phim bộ)
+   */
   @Get('public/season/:seasonId')
   findAllBySeason(@Param('seasonId', ParseIntPipe) seasonId: number) {
     return this.episodesService.findAllPublicBySeason(seasonId);
   }
 
-  // Lấy chi tiết tập phim để chạy Player xem phim (Tìm bằng movieSlug + số tập)
-  // URL Ví dụ thực tế: /episodes/public/watch/tay-du-ky/episode/1
+  /**
+   * 10. Lấy chi tiết tập phim kèm danh sách Server Video và Navigation Next/Prev
+   * Ví dụ URL: GET /episodes/public/watch/tay-du-ky/episode/1
+   */
   @Get('public/watch/:movieSlug/episode/:episodeNumber')
   findOneDetail(
     @Param('movieSlug') movieSlug: string,
@@ -134,7 +154,9 @@ export class EpisodesController {
     );
   }
 
-  // API Ghi nhận lượt xem (Gọi ngầm khi Player bắt đầu phát video)
+  /**
+   * 11. Ghi nhận lượt xem (+1 view) cho Tập phim và Phim gốc
+   */
   @Post('public/:id/view')
   increaseViewCount(@Param('id', ParseIntPipe) id: number) {
     return this.episodesService.increaseViewCount(id);
