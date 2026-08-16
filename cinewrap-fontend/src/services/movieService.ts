@@ -133,6 +133,49 @@ export interface FilterQueryParams {
   type?: MovieType;
 }
 
+// ---------------------------------------------------------------------------
+// Types & Interfaces cho Trình Phát Phim (Watch / Streaming)
+// ---------------------------------------------------------------------------
+
+// Struct phản hồi của API GET /episodes/public/watch/:movieSlug/episode/:episodeNumber
+export interface VideoServerSource {
+  id: number;
+  server_name: string;
+  url: string;
+  quality: string;
+}
+
+export interface WatchEpisodeDetail {
+  id: number;
+  episode_number: number;
+  title: string | null;
+  slug: string | null;
+  duration: number | null;
+  view_count: number;
+  servers: VideoServerSource[];
+  movie?: {
+    title: string;
+    slug: string;
+    poster_url: string | null;
+  } | null;
+  season?: {
+    title: string | null;
+    season_number: number;
+  } | null;
+}
+
+export interface EpisodeNavigationItem {
+  episode_number: number;
+  slug: string | null;
+}
+
+export interface WatchEpisodeResponse {
+  episode: WatchEpisodeDetail;
+  navigation: {
+    prev: EpisodeNavigationItem | null;
+    next: EpisodeNavigationItem | null;
+  };
+}
 // ============================================================================
 // 🚀 MOVIE SERVICE API CLIENT
 // ============================================================================
@@ -150,6 +193,7 @@ export const movieService = {
         status: params.status || "PUBLISHED",
         sortBy: params.sortBy || "created_at",
         sortOrder: params.sortOrder || "desc",
+        type: params.type,
       },
     });
     return response.data;
@@ -184,6 +228,36 @@ export const movieService = {
    */
   async getMovieBySlug(slug: string): Promise<BackendMovie> {
     const response = await api.get<BackendMovie>(`/movies/slug/${slug}`);
+    return response.data;
+  },
+
+  /**
+   * Lấy chi tiết tập phim đang phát, danh sách server video và nút Next/Prev
+   * @param movieSlug Slug của bộ phim (vd: "bon-mua-phan-2")
+   * @param episodeNumber Số tập đang xem (mặc định là 1)
+   */
+  async getWatchEpisodeDetail(
+    movieSlug: string,
+    episodeNumber: number = 1,
+  ): Promise<WatchEpisodeResponse> {
+    // Gọi đến API NestJS: GET /episodes/public/watch/:movieSlug/episode/:episodeNumber
+    const response = await api.get<WatchEpisodeResponse>(
+      `/episodes/public/watch/${movieSlug}/episode/${episodeNumber}`,
+    );
+    return response.data;
+  },
+
+  /**
+   * Gửi tín hiệu tăng lượt xem cho tập phim và phim gốc
+   * @param episodeId ID của tập phim đang phát
+   */
+  async increaseEpisodeView(
+    episodeId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    // Gọi đến API NestJS: POST /episodes/public/:id/view
+    const response = await api.post<{ success: boolean; message: string }>(
+      `/episodes/public/${episodeId}/view`,
+    );
     return response.data;
   },
 };
