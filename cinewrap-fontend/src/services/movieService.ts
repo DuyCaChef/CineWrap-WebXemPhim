@@ -178,4 +178,12 @@ export const movieService = {
     });
     return response.data.data;
   },
+
+  /**
+   * Lấy chi tiết bộ phim theo slug
+   */
+  async getMovieBySlug(slug: string): Promise<BackendMovie> {
+    const response = await api.get<BackendMovie>(`/movies/slug/${slug}`);
+    return response.data;
+  },
 };
