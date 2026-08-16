@@ -142,8 +142,38 @@ export const MovieDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading || !movie) {
+  // 1. Chỉ hiện Skeleton KHI ĐANG TẢI DỮ LIỆU
+  if (isLoading) {
     return <MovieDetailSkeleton />;
+  }
+
+  // 2. Nếu đã tải xong mà KHÔNG TÌM THẤY PHIM TRONG DB -> Hiện giao diện thông báo lỗi thân thiện
+  if (!movie) {
+    return (
+      <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text">
+        <Header />
+        <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1e293b] text-4xl mb-4 border border-white/10">
+            🎬
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Không tìm thấy bộ phim này
+          </h2>
+          <p className="text-sm text-[#9ca3af] max-w-md mb-6">
+            Bộ phim bạn đang tìm kiếm có thể chưa được xuất bản hoặc đường dẫn
+            không chính xác.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/movies")}
+            className="rounded-xl bg-[#00a3ff] px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110 active:scale-95 cursor-pointer"
+          >
+            Quay lại Thư viện phim
+          </button>
+        </div>
+        <Footer />
+      </main>
+    );
   }
 
   // Lấy mùa phim đang chọn nếu là phim bộ
