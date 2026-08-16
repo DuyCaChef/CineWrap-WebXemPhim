@@ -4,119 +4,12 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Skeleton } from "../components/common/Skeleton";
 
-// ---------------------------------------------------------------------------
-// Types & Interfaces
-// ---------------------------------------------------------------------------
-
-interface Episode {
-  id: number;
-  episodeNumber: number;
-  title: string;
-  thumbnail?: string;
-  duration?: string;
-  videoUrl: string;
-}
-
-interface Season {
-  id: number;
-  seasonNumber: number;
-  title: string;
-  episodes: Episode[];
-}
-
-interface MovieDetail {
-  id: string;
-  title: string;
-  originalTitle: string;
-  slug: string;
-  synopsis: string;
-  poster: string;
-  backdrop: string;
-  rating: string;
-  year: number;
-  ageRating: string;
-  quality: string;
-  type: "SINGLE" | "SERIES";
-  country: string;
-  countryCode: string;
-  genres: { label: string; value: string }[];
-  director: string;
-  actors: string[];
-  trailerUrl?: string;
-  isSaved?: boolean;
-  seasons?: Season[];
-  singleEpisodes?: Episode[];
-}
-
-// ---------------------------------------------------------------------------
-// Mock Data cho Chi Tiết Phim (Đã bao gồm cả Phim Bộ và Phim Lẻ)
-// ---------------------------------------------------------------------------
-
-const MOCK_MOVIE_DETAIL: MovieDetail = {
-  id: "m-101",
-  title: "Đấu Phá Thương Khung: Niên Phiên",
-  originalTitle: "Battle Through the Heavens (Season 5)",
-  slug: "dau-pha-thuong-khung-nien-phien",
-  synopsis:
-    "Tiêu Viêm sau khi giải quyết ân oán với Vân Lam Tông đã lên đường đến Già Nam Học Viện để tìm kiếm dị hỏa tiếp theo. Tại đây, anh gặp gỡ những người bạn mới, tham gia vào các cuộc thi đấu khốc liệt và tiếp tục hành trình phục thù, bảo vệ những người thân yêu trước thế lực tà ác Hồn Điện.",
-  poster:
-    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&h=750&fit=crop&auto=format&q=80",
-  backdrop:
-    "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&h=900&fit=crop&auto=format&q=80",
-  rating: "9.4",
-  year: 2024,
-  ageRating: "16+",
-  quality: "HD 4K Ultra",
-  type: "SERIES",
-  country: "Trung Quốc",
-  countryCode: "cn",
-  genres: [
-    { label: "Hành Động", value: "action" },
-    { label: "Viễn Tưởng", value: "sci-fi" },
-    { label: "Hoạt Hình", value: "animation" },
-  ],
-  director: "Mẫn Cường",
-  actors: ["Tiêu Viêm", "Huân Nhi", "Mỹ Đỗ Toa", "Dược Lão"],
-  trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  isSaved: false,
-  seasons: [
-    {
-      id: 1,
-      seasonNumber: 1,
-      title: "Mùa 1: Già Nam Học Viện",
-      episodes: Array.from({ length: 12 }).map((_, idx) => ({
-        id: idx + 1,
-        episodeNumber: idx + 1,
-        title: `Tập ${idx + 1}: Quyết Chiến Tân Sinh`,
-        thumbnail: `https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&h=170&fit=crop&auto=format&q=80`,
-        duration: "24 phút",
-        videoUrl: `https://v.phimapi.com/stream/tap-${idx + 1}.m3u8`,
-      })),
-    },
-    {
-      id: 2,
-      seasonNumber: 2,
-      title: "Mùa 2: Hồn Điện Trỗi Dậy",
-      episodes: Array.from({ length: 8 }).map((_, idx) => ({
-        id: idx + 13,
-        episodeNumber: idx + 1,
-        title: `Tập ${idx + 1}: Dị Hỏa Xuất Thế`,
-        thumbnail: `https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&h=170&fit=crop&auto=format&q=80`,
-        duration: "25 phút",
-        videoUrl: `https://v.phimapi.com/stream/s2-tap-${idx + 1}.m3u8`,
-      })),
-    },
-  ],
-};
-
-const MOCK_RELATED_MOVIES = Array.from({ length: 6 }).map((_, idx) => ({
-  id: `rel-${idx + 1}`,
-  title: `Phim Tương Tự CineWrap ${idx + 1}`,
-  poster: `https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop&auto=format&q=80`,
-  rating: (8.0 + idx * 0.2).toFixed(1),
-  year: 2024,
-  genre: "Hành Động",
-}));
+// Kéo Service API, Kiểu dữ liệu & Helper Formatters
+import { movieService } from "../services/movieService";
+import type { BackendMovie } from "../services/movieService";
+import { getCategoryViName } from "../utils/formatters";
+import Poster_Fallback from "../assets/images/Poster_Fallback.jpg";
+import Backdrop_Fallback from "../assets/images/Backdrop_Fallback.jpg";
 
 // ---------------------------------------------------------------------------
 // Sub-component: Skeleton Loading cho trang Detail
@@ -149,39 +42,70 @@ const MovieDetailSkeleton: React.FC = () => (
 // Main Component: MovieDetailPage
 // ---------------------------------------------------------------------------
 
-const MovieDetailPage: React.FC = () => {
+export const MovieDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const [movie, setMovie] = useState<MovieDetail | null>(null);
+  // State quản lý dữ liệu thực tế từ NestJS
+  const [movie, setMovie] = useState<BackendMovie | null>(null);
+  const [relatedMovies, setRelatedMovies] = useState<BackendMovie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // State giao diện
   const [isSaved, setIsSaved] = useState(false);
   const [isSynopsisExpanded, setIsSynopsisExpanded] = useState(false);
   const [showTrailerModal, setShowTrailerModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Mùa phim đang chọn (Cho Phim Bộ)
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number>(1);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
 
   useEffect(() => {
-    // 1. Ép cuộn lên đầu trang
+    let isMounted = true;
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-    // 2. Giả lập Fetch API lấy dữ liệu chi tiết phim theo slug
-    const timer = setTimeout(() => {
-      // Cập nhật dữ liệu phim mới và tóm tắt
-      setMovie(MOCK_MOVIE_DETAIL);
-      setIsSaved(MOCK_MOVIE_DETAIL.isSaved || false);
+    const fetchMovieData = async () => {
+      if (!slug) return;
 
-      if (MOCK_MOVIE_DETAIL.seasons && MOCK_MOVIE_DETAIL.seasons.length > 0) {
-        setSelectedSeasonId(MOCK_MOVIE_DETAIL.seasons[0].id);
+      try {
+        setIsLoading(true);
+
+        // Gọi song song: Lấy chi tiết phim và 6 phim liên quan (Dùng getMovies)
+        const [movieData, relatedMoviesData] = await Promise.all([
+          movieService.getMovieBySlug(slug),
+          movieService.getMovies({
+            page: 1,
+            limit: 6,
+            sortBy: "view_count",
+            sortOrder: "desc",
+          }),
+        ]);
+
+        if (isMounted && movieData) {
+          setMovie(movieData);
+          setRelatedMovies(relatedMoviesData?.data || []);
+
+          // Nếu có seasons, mặc định chọn season đầu tiên
+          if (movieData.seasons && movieData.seasons.length > 0) {
+            setSelectedSeasonId(movieData.seasons[0].id);
+          } else {
+            setSelectedSeasonId(null);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi chi tiết phim:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
+    };
 
-      // Tắt trạng thái loading sau khi dữ liệu đã sẵn sàng
-      setIsLoading(false);
-    }, 600);
+    fetchMovieData();
 
-    return () => clearTimeout(timer);
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
   // Toast thông báo
@@ -206,13 +130,13 @@ const MovieDetailPage: React.FC = () => {
     showToast("Đã sao chép liên kết phim vào bộ nhớ tạm!");
   };
 
-  // Chuyển sang phát phim
-  const handleWatchMovie = (episodeId?: number) => {
+  // Chuyển sang trang phát video (WatchPage)
+  const handleWatchMovie = (episodeNumber?: number) => {
     if (!movie) return;
     if (movie.type === "SINGLE") {
       navigate(`/watch/${movie.slug}`);
     } else {
-      navigate(`/watch/${movie.slug}?ep=${episodeId || 1}`);
+      navigate(`/watch/${movie.slug}?ep=${episodeNumber || 1}`);
     }
   };
 
@@ -220,7 +144,16 @@ const MovieDetailPage: React.FC = () => {
     return <MovieDetailSkeleton />;
   }
 
+  // Lấy mùa phim đang chọn nếu là phim bộ
   const currentSeason = movie.seasons?.find((s) => s.id === selectedSeasonId);
+  const episodesList =
+    movie.type === "SERIES"
+      ? currentSeason?.episodes || []
+      : movie.episodes || [];
+
+  const posterSrc = movie.poster_url || Poster_Fallback;
+  const backdropSrc =
+    movie.backdrop_url || movie.poster_url || Backdrop_Fallback;
 
   return (
     <main className="min-h-screen w-full bg-[#0d1425] font-sans text-cine-text overflow-x-hidden">
@@ -236,11 +169,14 @@ const MovieDetailPage: React.FC = () => {
       {/* ── 1. HERO BACKDROP SECTION ── */}
       <div className="relative w-full h-[55vh] md:h-[70vh] overflow-hidden">
         <img
-          src={movie.backdrop}
+          src={backdropSrc}
           alt={movie.title}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = Backdrop_Fallback;
+          }}
           className="h-full w-full object-cover object-center scale-105 filter brightness-90"
         />
-        {/* Gradients Phủ Mờ Đã Chuẩn Hóa Cinematics */}
+        {/* Gradients Phủ Mờ Cinematics */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d1425] via-[#0d1425]/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1425] via-[#0d1425]/40 to-transparent hidden md:block" />
       </div>
@@ -252,13 +188,18 @@ const MovieDetailPage: React.FC = () => {
           <div className="shrink-0 w-44 sm:w-60 md:w-72 mx-auto md:mx-0">
             <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-white/10">
               <img
-                src={movie.poster}
+                src={posterSrc}
                 alt={movie.title}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = Poster_Fallback;
+                }}
                 className="h-full w-full object-cover"
               />
-              <span className="absolute top-3 left-3 rounded-md bg-[#e50914] px-2 py-0.5 text-[11px] font-extrabold text-white shadow-md">
-                {movie.quality}
-              </span>
+              {movie.is_vip && (
+                <span className="absolute top-3 left-3 rounded-md bg-[#e50914] px-2 py-0.5 text-[11px] font-extrabold text-white shadow-md">
+                  VIP
+                </span>
+              )}
             </div>
           </div>
 
@@ -267,15 +208,17 @@ const MovieDetailPage: React.FC = () => {
             {/* Breadcrumb */}
             <div className="flex items-center justify-center md:justify-start gap-2 text-xs text-[#9ca3af]">
               <button
-                onClick={() => navigate("/")}
-                className="hover:text-white transition"
+                type="button"
+                onClick={() => navigate("/home")}
+                className="hover:text-white transition cursor-pointer"
               >
                 Trang chủ
               </button>
               <span>/</span>
               <button
+                type="button"
                 onClick={() => navigate("/movies")}
-                className="hover:text-white transition"
+                className="hover:text-white transition cursor-pointer"
               >
                 Thư viện
               </button>
@@ -290,21 +233,24 @@ const MovieDetailPage: React.FC = () => {
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
                 {movie.title}
               </h1>
-              <p className="text-sm sm:text-base text-[#9ca3af] italic mt-1 font-medium">
-                {movie.originalTitle}
-              </p>
+              {movie.original_title && (
+                <p className="text-sm sm:text-base text-[#9ca3af] italic mt-1 font-medium">
+                  {movie.original_title}
+                </p>
+              )}
             </div>
 
             {/* Badges thông tin */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 pt-1">
               <span className="flex items-center gap-1 rounded-full bg-[#ffc107]/15 border border-[#ffc107]/30 px-3 py-1 text-xs font-bold text-[#ffc107]">
-                ★ {movie.rating}
+                ★{" "}
+                {movie.average_rating ? movie.average_rating.toFixed(1) : "8.5"}
               </span>
               <span className="rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs font-semibold text-white">
-                {movie.year}
+                {movie.release_year || new Date(movie.created_at).getFullYear()}
               </span>
               <span className="rounded-full bg-[#e50914]/15 border border-[#e50914]/30 px-3 py-1 text-xs font-bold text-[#e50914]">
-                {movie.ageRating}
+                {movie.age_rating || "16+"}
               </span>
               <span className="rounded-full bg-[#00a3ff]/15 border border-[#00a3ff]/30 px-3 py-1 text-xs font-semibold text-[#00a3ff]">
                 {movie.type === "SINGLE" ? "Phim Lẻ" : "Phim Bộ"}
@@ -313,13 +259,16 @@ const MovieDetailPage: React.FC = () => {
 
             {/* Thẻ Thể loại */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              {movie.genres.map((g) => (
+              {movie.categories?.map((catRel, idx) => (
                 <button
-                  key={g.value}
-                  onClick={() => navigate(`/movies?genre=${g.value}`)}
-                  className="rounded-lg bg-[#1e293b] px-3 py-1 text-xs font-medium text-[#9ca3af] hover:bg-[#00a3ff] hover:text-white transition-all"
+                  key={catRel.categoryId || idx}
+                  type="button"
+                  onClick={() =>
+                    navigate(`/movies?category=${catRel.category?.slug}`)
+                  }
+                  className="rounded-lg bg-[#1e293b] px-3 py-1 text-xs font-medium text-[#9ca3af] hover:bg-[#00a3ff] hover:text-white transition-all cursor-pointer"
                 >
-                  {g.label}
+                  {getCategoryViName(catRel)}
                 </button>
               ))}
             </div>
@@ -333,37 +282,25 @@ const MovieDetailPage: React.FC = () => {
                     : "line-clamp-none"
                 }
               >
-                {movie.synopsis}
+                {movie.description ||
+                  "Chưa có thông tin tóm tắt cho bộ phim này."}
               </p>
-              <button
-                type="button"
-                onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
-                className="mt-1 text-xs font-bold text-[#00a3ff] hover:underline focus:outline-none"
-              >
-                {isSynopsisExpanded ? "Thu gọn ▲" : "Đọc thêm ▼"}
-              </button>
+              {movie.description && movie.description.length > 150 && (
+                <button
+                  type="button"
+                  onClick={() => setIsSynopsisExpanded(!isSynopsisExpanded)}
+                  className="mt-1 text-xs font-bold text-[#00a3ff] hover:underline focus:outline-none cursor-pointer"
+                >
+                  {isSynopsisExpanded ? "Thu gọn ▲" : "Đọc thêm ▼"}
+                </button>
+              )}
             </div>
 
-            {/* Đạo diễn & Diễn viên */}
+            {/* Lượt xem */}
             <div className="pt-2 text-xs space-y-1 text-[#9ca3af]">
               <p>
-                <strong className="text-white">Đạo diễn:</strong>{" "}
-                {movie.director}
-              </p>
-              <p>
-                <strong className="text-white">Diễn viên:</strong>{" "}
-                {movie.actors.join(", ")}
-              </p>
-              <p>
-                <strong className="text-white">Quốc gia:</strong>{" "}
-                <button
-                  onClick={() =>
-                    navigate(`/movies?country=${movie.countryCode}`)
-                  }
-                  className="hover:text-[#00a3ff] underline"
-                >
-                  {movie.country}
-                </button>
+                <strong className="text-white">Lượt xem:</strong>{" "}
+                {movie.view_count?.toLocaleString("vi-VN") || 0} lượt
               </p>
             </div>
 
@@ -373,7 +310,7 @@ const MovieDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleWatchMovie()}
-                className="flex items-center gap-2 rounded-xl bg-[#00a3ff] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_0_20px_rgba(0,163,255,0.4)] transition hover:brightness-110 active:scale-95"
+                className="flex items-center gap-2 rounded-xl bg-[#00a3ff] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_0_20px_rgba(0,163,255,0.4)] transition hover:brightness-110 active:scale-95 cursor-pointer"
               >
                 <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
@@ -382,11 +319,11 @@ const MovieDetailPage: React.FC = () => {
               </button>
 
               {/* Nút Xem Trailer */}
-              {movie.trailerUrl && (
+              {movie.trailer_url && (
                 <button
                   type="button"
                   onClick={() => setShowTrailerModal(true)}
-                  className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/20 active:scale-95"
+                  className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/20 active:scale-95 cursor-pointer"
                 >
                   🎬 Trailer
                 </button>
@@ -396,7 +333,7 @@ const MovieDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleToggleSave}
-                className={`flex items-center gap-2 rounded-xl border px-4 py-3.5 text-sm font-bold transition active:scale-95 ${
+                className={`flex items-center gap-2 rounded-xl border px-4 py-3.5 text-sm font-bold transition active:scale-95 cursor-pointer ${
                   isSaved
                     ? "border-[#ffc107] bg-[#ffc107]/20 text-[#ffc107]"
                     : "border-white/15 bg-[#1e293b] text-white hover:bg-white/10"
@@ -409,7 +346,7 @@ const MovieDetailPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleShare}
-                className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-[#1e293b] text-white hover:bg-white/10 transition active:scale-95"
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-[#1e293b] text-white hover:bg-white/10 transition active:scale-95 cursor-pointer"
                 title="Chia sẻ"
               >
                 🔗
@@ -428,7 +365,7 @@ const MovieDetailPage: React.FC = () => {
             <span className="text-xs text-[#9ca3af]">
               {movie.type === "SINGLE"
                 ? "1 Tập (Phim Lẻ)"
-                : `Tổng ${currentSeason?.episodes.length || 0} tập`}
+                : `Tổng ${episodesList.length} tập`}
             </span>
           </div>
 
@@ -444,19 +381,21 @@ const MovieDetailPage: React.FC = () => {
                     Bản Chiếu Rạp Quốc Tế - Full Vietsub
                   </h4>
                   <p className="text-xs text-[#9ca3af]">
-                    Thời lượng: 120 phút · Chất lượng VIP Server 1
+                    Thời lượng: {movie.duration || 120} phút · Chất lượng Server
+                    VIP
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => handleWatchMovie()}
-                className="w-full sm:w-auto rounded-xl bg-[#00a3ff] px-6 py-2.5 text-xs font-bold text-white shadow-md hover:brightness-110 active:scale-95"
+                className="w-full sm:w-auto rounded-xl bg-[#00a3ff] px-6 py-2.5 text-xs font-bold text-white shadow-md hover:brightness-110 active:scale-95 cursor-pointer"
               >
                 Phát Video
               </button>
             </div>
           ) : (
-            /* Phim Bộ UI (Có chọn Season và Episode Grid) */
+            /* Phim Bộ UI */
             <div className="space-y-6">
               {/* Season Tabs */}
               {movie.seasons && movie.seasons.length > 1 && (
@@ -464,98 +403,126 @@ const MovieDetailPage: React.FC = () => {
                   {movie.seasons.map((season) => (
                     <button
                       key={season.id}
+                      type="button"
                       onClick={() => setSelectedSeasonId(season.id)}
-                      className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition ${
+                      className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
                         selectedSeasonId === season.id
                           ? "bg-[#00a3ff] text-white shadow-[0_0_12px_rgba(0,163,255,0.4)]"
                           : "bg-[#0f172a] text-[#9ca3af] hover:text-white"
                       }`}
                     >
-                      {season.title}
+                      {season.title || `Mùa ${season.season_number}`}
                     </button>
                   ))}
                 </div>
               )}
 
               {/* Episode Grid */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {currentSeason?.episodes.map((ep) => (
-                  <button
-                    key={ep.id}
-                    onClick={() => handleWatchMovie(ep.episodeNumber)}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0f172a] transition-all hover:border-[#00a3ff]/50 hover:bg-[#1e293b]"
-                  >
-                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#1e293b]">
-                      <img
-                        src={ep.thumbnail}
-                        alt={ep.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/30 group-hover:bg-transparent transition" />
-                      <span className="absolute bottom-1.5 right-1.5 rounded bg-black/60 px-1 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                        {ep.duration}
-                      </span>
-                    </div>
-                    <div className="p-2.5 text-left">
-                      <p className="text-xs font-bold text-white group-hover:text-[#00a3ff] transition truncate">
-                        {ep.title}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {episodesList.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                  {episodesList.map((ep) => (
+                    <button
+                      key={ep.id}
+                      type="button"
+                      onClick={() => handleWatchMovie(ep.episode_number)}
+                      className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0f172a] transition-all hover:border-[#00a3ff]/50 hover:bg-[#1e293b] cursor-pointer"
+                    >
+                      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#1e293b]">
+                        <img
+                          src={backdropSrc}
+                          alt={ep.title || `Tập ${ep.episode_number}`}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              Poster_Fallback;
+                          }}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/30 group-hover:bg-transparent transition" />
+                        <span className="absolute bottom-1.5 right-1.5 rounded bg-black/60 px-1 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                          {ep.duration ? `${ep.duration} phút` : "24 phút"}
+                        </span>
+                      </div>
+                      <div className="p-2.5 text-left">
+                        <p className="text-xs font-bold text-white group-hover:text-[#00a3ff] transition truncate">
+                          {ep.title || `Tập ${ep.episode_number}`}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-[#9ca3af] italic">
+                  Các tập phim của mùa này đang được cập nhật...
+                </p>
+              )}
             </div>
           )}
         </div>
 
-        {/* ── 4. RELATED MOVIES SECTION (PHIM BỘ/LẺ LIÊN QUAN) ── */}
-        <div className="mt-12 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-              <span className="h-5 w-1.5 rounded-full bg-[#ffc107]" />
-              Có Thể Bạn Sẽ Thích
-            </h2>
-            <button
-              onClick={() => navigate("/movies")}
-              className="text-xs font-semibold text-[#00a3ff] hover:underline"
-            >
-              Xem tất cả →
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {MOCK_RELATED_MOVIES.map((rel) => (
+        {/* ── 4. RELATED MOVIES SECTION ── */}
+        {relatedMovies.length > 0 && (
+          <div className="mt-12 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <span className="h-5 w-1.5 rounded-full bg-[#ffc107]" />
+                Có Thể Bạn Sẽ Thích
+              </h2>
               <button
-                key={rel.id}
-                onClick={() => navigate(`/movie/rel-${rel.id}`)}
-                className="group text-left focus-visible:outline-none"
+                type="button"
+                onClick={() => navigate("/movies")}
+                className="text-xs font-semibold text-[#00a3ff] hover:underline cursor-pointer"
               >
-                <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]">
-                  <img
-                    src={rel.poster}
-                    alt={rel.title}
-                    className="h-full w-full object-cover"
-                  />
-                  <span className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/50 px-1.5 py-0.5 text-[11px] font-semibold text-[#ffc107] backdrop-blur-sm">
-                    ★ {rel.rating}
-                  </span>
-                </div>
-                <div className="mt-2 px-0.5">
-                  <p className="truncate text-xs font-bold text-white">
-                    {rel.title}
-                  </p>
-                  <p className="text-[11px] text-[#9ca3af]">
-                    {rel.genre} · {rel.year}
-                  </p>
-                </div>
+                Xem tất cả →
               </button>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {relatedMovies.map((rel) => (
+                <button
+                  key={rel.id}
+                  type="button"
+                  onClick={() => navigate(`/movie/${rel.slug}`)}
+                  className="group text-left focus-visible:outline-none cursor-pointer"
+                >
+                  <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]">
+                    <img
+                      src={rel.poster_url || Poster_Fallback}
+                      alt={rel.title}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = Poster_Fallback;
+                      }}
+                      className="h-full w-full object-cover"
+                    />
+                    <span className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/50 px-1.5 py-0.5 text-[11px] font-semibold text-[#ffc107] backdrop-blur-sm">
+                      ★{" "}
+                      {rel.average_rating
+                        ? rel.average_rating.toFixed(1)
+                        : "8.5"}
+                    </span>
+                  </div>
+                  <div className="mt-2 px-0.5">
+                    <p className="truncate text-xs font-bold text-white group-hover:text-[#00a3ff] transition-colors">
+                      {rel.title}
+                    </p>
+                    <p className="text-[11px] text-[#9ca3af]">
+                      {getCategoryViName({
+                        category: rel.categories?.[0]?.category,
+                      })}{" "}
+                      ·{" "}
+                      {rel.release_year ||
+                        new Date(rel.created_at).getFullYear()}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ── 5. TRAILER MODAL ── */}
-      {showTrailerModal && (
+      {showTrailerModal && movie.trailer_url && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
           <div className="relative w-full max-w-4xl rounded-2xl bg-[#0f172a] border border-white/15 overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -563,15 +530,16 @@ const MovieDetailPage: React.FC = () => {
                 Trailer: {movie.title}
               </h3>
               <button
+                type="button"
                 onClick={() => setShowTrailerModal(false)}
-                className="text-white/70 hover:text-white font-bold p-1"
+                className="text-white/70 hover:text-white font-bold p-1 cursor-pointer"
               >
                 ✕
               </button>
             </div>
             <div className="relative aspect-video w-full">
               <iframe
-                src={movie.trailerUrl}
+                src={movie.trailer_url}
                 title={`Trailer ${movie.title}`}
                 className="h-full w-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

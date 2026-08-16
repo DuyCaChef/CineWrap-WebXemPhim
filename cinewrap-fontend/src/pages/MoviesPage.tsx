@@ -8,7 +8,7 @@ import { Skeleton } from "../components/common/Skeleton";
 import { movieService } from "../services/movieService";
 import type { BackendMovie } from "../services/movieService";
 import { getCategoryViName } from "../utils/formatters";
-import posterFallback from "../assets/poster_fallback.png";
+import Poster_Fallback from "../assets/images/Poster_Fallback.jpg";
 
 // ---------------------------------------------------------------------------
 // Meta Data mới cho Filter Bar
@@ -542,11 +542,11 @@ const MoviesPage: React.FC = () => {
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[#1e293b] transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(0,163,255,0.4)]">
                   <img
-                    src={movie.poster_url || posterFallback}
+                    src={movie.poster_url || Poster_Fallback}
                     alt={movie.title}
                     loading="lazy"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = posterFallback;
+                      (e.target as HTMLImageElement).src = Poster_Fallback;
                     }}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
