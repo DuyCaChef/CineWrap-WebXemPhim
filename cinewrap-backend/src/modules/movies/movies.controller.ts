@@ -98,6 +98,12 @@ export class MoviesController {
     );
   }
 
+  // Endpoint lấy chi tiết phim theo Slug
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.moviesService.findBySlug(slug);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.moviesService.findOne(+id);
