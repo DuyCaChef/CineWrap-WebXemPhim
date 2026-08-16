@@ -427,6 +427,37 @@ export class MoviesService {
     });
   }
 
+  async findBySlug(slug: string) {
+    const movie = await this.prisma.movie.findUnique({
+      where: { slug },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        seasons: {
+          orderBy: { season_number: 'asc' },
+          include: {
+            episodes: {
+              orderBy: { episode_number: 'asc' },
+            },
+          },
+        },
+        episodes: {
+          where: { season_id: null },
+          orderBy: { episode_number: 'asc' },
+        },
+      },
+    });
+
+    if (!movie) {
+      throw new NotFoundException(`Không tìm thấy bộ phim với slug: ${slug}`);
+    }
+
+    return movie;
+  }
+
   async remove(id: number) {
     const movie = await this.prisma.movie.findUnique({ where: { id } });
     if (!movie) throw new NotFoundException('Không tìm thấy bộ phim này.');
