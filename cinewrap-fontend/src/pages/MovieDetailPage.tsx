@@ -81,6 +81,7 @@ export const MovieDetailPage: React.FC = () => {
           }),
         ]);
 
+        // 2. Chỉ cập nhật State nếu Component VẪN ĐANG CÒN HIỂN THỊ và Request này là MỚI NHẤT
         if (isMounted && movieData) {
           setMovie(movieData);
           setRelatedMovies(relatedMoviesData?.data || []);
@@ -103,8 +104,9 @@ export const MovieDetailPage: React.FC = () => {
 
     fetchMovieData();
 
+    // 3. Cleanup Function: Chạy ngay khi Component bị unmount HOẶC khi slug đổi sang phim mới
     return () => {
-      isMounted = false;
+      isMounted = false; // Đánh dấu Request cũ bị vô hiệu hóa, không được phép setState nữa!
     };
   }, [slug]);
 
