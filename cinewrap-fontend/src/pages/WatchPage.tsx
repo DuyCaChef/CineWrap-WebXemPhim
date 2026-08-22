@@ -289,6 +289,8 @@ export const WatchPage: React.FC = () => {
               ref={videoRef}
               controls
               autoPlay
+              muted //Thêm thuộc tính này để vượt qua chính sách Autoplay của trình duyệt
+              playsInline
               onPlay={handleVideoPlay}
               className="h-full w-full object-contain"
             >
