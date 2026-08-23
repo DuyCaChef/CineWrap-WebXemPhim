@@ -142,7 +142,6 @@ export const WatchPage: React.FC = () => {
     const video = videoRef.current;
     if (!video || !currentSource?.url) return;
 
-    // Làm sạch URL để loại bỏ ký tự Markdown hoặc dấu ngoặc trước khi nạp vào trình phát
     const streamUrl = cleanVideoUrl(currentSource.url);
     if (!streamUrl) return;
 
@@ -165,6 +164,7 @@ export const WatchPage: React.FC = () => {
       }
     } else {
       video.src = streamUrl;
+      video.load();
     }
 
     return () => {
@@ -233,7 +233,7 @@ export const WatchPage: React.FC = () => {
 
   return (
     <main className="min-h-screen w-full bg-[#0d1425] font-sans text-white overflow-x-hidden">
-      {/* Nền đen rạp phim - z-40 */}
+      {/* Nền đen rạp phim */}
       {isCinemaMode && (
         <div
           className="fixed inset-0 z-40 bg-black/95 transition-opacity duration-300 cursor-pointer backdrop-blur-sm"
@@ -275,7 +275,7 @@ export const WatchPage: React.FC = () => {
           </span>
         </div>
 
-        {/* ── 1. MAIN VIDEO PLAYER CONTAINER (z-50 khi bật Cinema Mode để luôn nổi lên trên) ── */}
+        {/* ── 1. MAIN VIDEO PLAYER CONTAINER ── */}
         <div
           ref={playerContainerRef}
           className={`relative w-full aspect-video rounded-2xl bg-black border border-white/10 overflow-hidden shadow-2xl transition-all duration-300 ${
@@ -287,11 +287,11 @@ export const WatchPage: React.FC = () => {
           {currentSource?.url ? (
             <video
               ref={videoRef}
-              key={cleanVideoUrl(currentSource.url)} // Đặt key để reset video khi đổi server
               controls
               playsInline
+              preload="auto"
               onPlay={handleVideoPlay}
-              className="w-full h-full object-contain block"
+              className="w-full h-full object-contain block relative z-10"
             >
               Trình duyệt của bạn không hỗ trợ phát video.
             </video>
@@ -302,7 +302,7 @@ export const WatchPage: React.FC = () => {
           )}
         </div>
 
-        {/* ── 2. PLAYER ACTION BAR (z-50 khi bật Cinema Mode để vẫn bấm được) ── */}
+        {/* ── 2. PLAYER ACTION BAR ── */}
         <div
           className={`flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-[#131c2e]/90 border border-white/10 p-4 backdrop-blur-xl transition-all ${
             isCinemaMode ? "relative z-50" : "relative z-10"
