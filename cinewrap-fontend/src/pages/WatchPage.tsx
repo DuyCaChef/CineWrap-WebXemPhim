@@ -76,6 +76,9 @@ export const WatchPage: React.FC = () => {
   const hlsRef = useRef<Hls | null>(null);
   const hasCountedViewRef = useRef<boolean>(false);
 
+  // Ref lưu mốc thời gian đã ghi gần nhất để tránh spam ghi localStorage
+  const lastSavedTimeRef = useRef<number>(0);
+
   // Cuộn vào khung phát khi bật Cinema Mode
   useEffect(() => {
     if (isCinemaMode && playerContainerRef.current) {
@@ -199,6 +202,52 @@ export const WatchPage: React.FC = () => {
     return <WatchPageSkeleton />;
   }
 
+  // ---------------------------------------------------------------------------
+  // Video Playback Handlers - Xử lí lưu tiến trình xem phim.
+  // ---------------------------------------------------------------------------
+
+  // Tự động Seek tới mốc cũ khi video tải xong Metadata, nhưng chỉ tua tiếp nếu mốc lưu > 5s và cách điểm kết thúc tối thiểu 10s
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video || !slug) return;
+
+    const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
+    const savedTimeStr = localStorage.getItem(progressKey);
+
+    if (savedTimeStr) {
+      const savedTime = parseFloat(savedTimeStr);
+      // Chỉ tua tiếp nếu mốc lưu > 5s và cách điểm kết thúc tối thiểu 10s
+      if (savedTime > 5 && savedTime < video.duration - 10) {
+        video.currentTime = savedTime;
+        const minutes = Math.floor(savedTime / 60);
+        const seconds = Math.floor(savedTime % 60)
+          .toString()
+          .padStart(2, "0");
+        showToast(`Đang phát tiếp từ ${minutes}:${seconds}`);
+      }
+    }
+  };
+
+  // Lưu currentTime vào localStorage mỗi 5 giây
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || !slug) return;
+
+    const now = Math.floor(video.currentTime);
+    if (now - lastSavedTimeRef.current >= 5) {
+      lastSavedTimeRef.current = now;
+      const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
+      localStorage.setItem(progressKey, now.toString());
+    }
+  };
+
+  // Xóa tiến trình khi đã xem hết tập phim
+  const handleVideoEnded = () => {
+    if (slug) {
+      localStorage.removeItem(`cw_progress_${slug}_ep_${currentEpNum}`);
+    }
+  };
+
   if (!movie || !currentEpisode) {
     return (
       <main className="min-h-screen w-full bg-[#0d1425] font-sans text-white">
@@ -290,7 +339,10 @@ export const WatchPage: React.FC = () => {
               controls
               playsInline
               preload="auto"
-              onPlay={handleVideoPlay}
+              onPlay={handleVideoPlay} // Gọi hàm handleVideoPlay khi video bắt đầu phát
+              onLoadedMetadata={handleLoadedMetadata} // Gắn hàm khôi phục tiến trình xem khi metadata được tải
+              onTimeUpdate={handleTimeUpdate} // Gắn hàm lưu tiến trình xem khi thời gian thay đổi
+              onEnded={handleVideoEnded} // Gắn hàm xóa tiến trình khi video kết thúc
               className="w-full h-full object-contain block relative z-10"
             >
               Trình duyệt của bạn không hỗ trợ phát video.
