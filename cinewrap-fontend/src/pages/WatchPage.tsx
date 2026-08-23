@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import Hls from "hls.js";
 import { Header } from "../components/Header";
@@ -16,7 +16,6 @@ import type {
 // ---------------------------------------------------------------------------
 // Sub-component: Skeleton Loading
 // ---------------------------------------------------------------------------
-
 const WatchPageSkeleton: React.FC = () => (
   <div className="min-h-screen w-full bg-[#0d1425] pt-24 px-4 sm:px-8 max-w-[1600px] mx-auto space-y-6">
     <Skeleton className="aspect-video w-full rounded-2xl" />
@@ -51,12 +50,12 @@ const cleanVideoUrl = (rawUrl?: string): string => {
 // ---------------------------------------------------------------------------
 // Main Component: WatchPage
 // ---------------------------------------------------------------------------
-
 export const WatchPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // ── 1. KHAI BÁO CÁC STATE QUẢN LÝ DỮ LIỆU & GIAO DIỆN ──
   const [isLoading, setIsLoading] = useState(true);
   const [movie, setMovie] = useState<BackendMovie | null>(null);
   const [currentEpisode, setCurrentEpisode] =
@@ -71,22 +70,152 @@ export const WatchPage: React.FC = () => {
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // State đếm ngược chuyển tập tự động (5, 4, 3, 2, 1, null)
+  const [nextEpisodeCountdown, setNextEpisodeCountdown] = useState<
+    number | null
+  >(null);
+
+  // ── 2. KHAI BÁO CÁC REFS ĐIỀU KHIỂN VIDEO & BỘ ĐẾM ──
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const hasCountedViewRef = useRef<boolean>(false);
-
-  // Ref lưu mốc thời gian đã ghi gần nhất để tránh spam ghi localStorage
   const lastSavedTimeRef = useRef<number>(0);
-
-  // State lưu số giây đếm ngược (5, 4, 3, 2, 1, 0 hoặc null khi tắt)
-  const [nextEpisodeCountdown, setNextEpisodeCountdown] = useState<
-    number | null
-  >(null);
-  // Ref giữ Timer ID để hủy bất kỳ lúc nào
   const countdownTimerRef = useRef<number | null>(null);
 
-  // Cuộn vào khung phát khi bật Cinema Mode
+  // Nguồn phát video hiện tại
+  const currentSource: VideoServerSource | undefined =
+    currentEpisode?.servers.find((s) => s.id === selectedServerId) ||
+    currentEpisode?.servers[0];
+
+  // ── 3. KHAI BÁO CÁC HÀM XỬ LÝ (HANDLERS) ──
+
+  // Hàm hiển thị Toast thông báo
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  }, []);
+
+  // Hàm đổi tập phim qua query param (?ep=...)
+  const handleSelectEpisode = useCallback(
+    (epNum: number) => {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      setNextEpisodeCountdown(null);
+
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("ep", epNum.toString());
+      setSearchParams(newParams);
+    },
+    [searchParams, setSearchParams],
+  );
+
+  // Fallback Video Server thông minh khi server hiện tại lỗi
+  const triggerServerFallback = useCallback(() => {
+    if (!currentEpisode?.servers || currentEpisode.servers.length <= 1) {
+      showToast("Tất cả nguồn phát hiện tại đều gặp sự cố.");
+      return;
+    }
+
+    const currentIndex = currentEpisode.servers.findIndex(
+      (s) => s.id === selectedServerId,
+    );
+    const nextServer =
+      currentEpisode.servers[currentIndex + 1] || currentEpisode.servers[0];
+
+    if (nextServer && nextServer.id !== selectedServerId) {
+      showToast(
+        `Nguồn phát quá tải. Đang đổi sang ${nextServer.server_name}...`,
+      );
+      setSelectedServerId(nextServer.id);
+    }
+  }, [currentEpisode, selectedServerId, showToast]);
+
+  // Ghi nhận lượt xem (chỉ 1 lần mỗi tập)
+  const handleVideoPlay = () => {
+    if (!hasCountedViewRef.current && currentEpisode?.id) {
+      hasCountedViewRef.current = true;
+      movieService.increaseEpisodeView(currentEpisode.id).catch((err) => {
+        console.error("Lỗi tăng view:", err);
+      });
+    }
+  };
+
+  // Resume Playback: Khôi phục mốc thời gian cũ khi nạp xong Metadata
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video || !slug) return;
+
+    const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
+    const savedTimeStr = localStorage.getItem(progressKey);
+
+    if (savedTimeStr) {
+      const savedTime = parseFloat(savedTimeStr);
+      if (savedTime > 5 && savedTime < video.duration - 10) {
+        video.currentTime = savedTime;
+        const minutes = Math.floor(savedTime / 60);
+        const seconds = Math.floor(savedTime % 60)
+          .toString()
+          .padStart(2, "0");
+        showToast(`Đang phát tiếp từ ${minutes}:${seconds}`);
+      }
+    }
+  };
+
+  // Lưu tiến trình xem vào localStorage mỗi 5 giây
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || !slug) return;
+
+    const now = Math.floor(video.currentTime);
+    if (now - lastSavedTimeRef.current >= 5) {
+      lastSavedTimeRef.current = now;
+      const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
+      localStorage.setItem(progressKey, now.toString());
+    }
+  };
+
+  // Autoplay Next: Đếm ngược chuyển tập khi video kết thúc
+  const handleVideoEnded = () => {
+    if (slug) {
+      localStorage.removeItem(`cw_progress_${slug}_ep_${currentEpNum}`);
+    }
+
+    if (navigation.next) {
+      const nextEp = navigation.next.episode_number;
+      let count = 5;
+      setNextEpisodeCountdown(count);
+
+      countdownTimerRef.current = window.setInterval(() => {
+        count -= 1;
+        if (count <= 0) {
+          if (countdownTimerRef.current) {
+            clearInterval(countdownTimerRef.current);
+            countdownTimerRef.current = null;
+          }
+          setNextEpisodeCountdown(null);
+          handleSelectEpisode(nextEp);
+        } else {
+          setNextEpisodeCountdown(count);
+        }
+      }, 1000);
+    }
+  };
+
+  // Hủy đếm ngược chuyển tập
+  const handleCancelCountdown = () => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setNextEpisodeCountdown(null);
+  };
+
+  // ── 4. KHAI BÁO CÁC SIDE EFFECTS (USEEFFECT) ──
+
+  // Effect 1: Cuộn mượt vào khung phát khi bật Chế độ Rạp phim
   useEffect(() => {
     if (isCinemaMode && playerContainerRef.current) {
       playerContainerRef.current.scrollIntoView({
@@ -96,7 +225,7 @@ export const WatchPage: React.FC = () => {
     }
   }, [isCinemaMode]);
 
-  // 1. Tải dữ liệu từ Backend
+  // Effect 2: Tải dữ liệu bộ phim và chi tiết tập phim từ NestJS
   useEffect(() => {
     let isMounted = true;
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -107,6 +236,7 @@ export const WatchPage: React.FC = () => {
 
       try {
         setIsLoading(true);
+        setNextEpisodeCountdown(null);
 
         const [movieData, watchData] = await Promise.all([
           movieService.getMovieBySlug(slug),
@@ -140,14 +270,13 @@ export const WatchPage: React.FC = () => {
 
     return () => {
       isMounted = false;
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+      }
     };
   }, [slug, currentEpNum]);
 
-  const currentSource: VideoServerSource | undefined =
-    currentEpisode?.servers.find((s) => s.id === selectedServerId) ||
-    currentEpisode?.servers[0];
-
-  // 2. Tải và phát luồng Stream HLS / MP4
+  // Effect 3: Nạp và phát luồng Stream HLS / MP4 với cơ chế Fallback
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !currentSource?.url) return;
@@ -168,6 +297,26 @@ export const WatchPage: React.FC = () => {
         });
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
+
+        // Bắt lỗi HLS Fatal và tự động chuyển server dự phòng
+        hls.on(Hls.Events.ERROR, (_event, data) => {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.warn("HLS Network Error -> Chuyển server dự phòng");
+                triggerServerFallback();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls.recoverMediaError();
+                break;
+              default:
+                hls.destroy();
+                triggerServerFallback();
+                break;
+            }
+          }
+        });
+
         hlsRef.current = hls;
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = streamUrl;
@@ -183,41 +332,11 @@ export const WatchPage: React.FC = () => {
         hlsRef.current = null;
       }
     };
-  }, [currentSource?.url]);
+  }, [currentSource?.url, triggerServerFallback]);
 
-  const handleVideoPlay = () => {
-    if (!hasCountedViewRef.current && currentEpisode?.id) {
-      hasCountedViewRef.current = true;
-      movieService.increaseEpisodeView(currentEpisode.id).catch((err) => {
-        console.error("Lỗi tăng view:", err);
-      });
-    }
-  };
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const handleSelectEpisode = (epNum: number) => {
-    // Xóa bộ đếm ngược nếu đang chạy
-    if (countdownTimerRef.current) {
-      clearTimeout(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setNextEpisodeCountdown(null);
-
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("ep", epNum.toString());
-    setSearchParams(newParams);
-  };
-
-  // ---------------------------------------------------------------------------
-  // Keyboard Shortcuts Handler
-  // ---------------------------------------------------------------------------
+  // Effect 4: Lắng nghe phím tắt điều khiển (Keyboard Shortcuts)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 1. Chặn phím tắt nếu người dùng đang nhập văn bản trong ô input / textarea
       const activeElement = document.activeElement;
       const isInput =
         activeElement instanceof HTMLInputElement ||
@@ -228,9 +347,8 @@ export const WatchPage: React.FC = () => {
       if (!video) return;
 
       switch (e.code) {
-        // Play / Pause
         case "Space":
-          e.preventDefault(); // Tránh cuộn trang web xuống dưới
+          e.preventDefault();
           if (video.paused) {
             video.play();
           } else {
@@ -238,42 +356,36 @@ export const WatchPage: React.FC = () => {
           }
           break;
 
-        // Tua tới 5 giây
         case "ArrowRight":
           e.preventDefault();
           video.currentTime = Math.min(video.duration, video.currentTime + 5);
           showToast(`Tua tới +5s (${Math.floor(video.currentTime)}s)`);
           break;
 
-        // Tua lùi 5 giây
         case "ArrowLeft":
           e.preventDefault();
           video.currentTime = Math.max(0, video.currentTime - 5);
           showToast(`Tua lùi -5s (${Math.floor(video.currentTime)}s)`);
           break;
 
-        // Tăng âm lượng 10%
         case "ArrowUp":
           e.preventDefault();
           video.volume = Math.min(1, Number((video.volume + 0.1).toFixed(1)));
           showToast(`Âm lượng: ${Math.round(video.volume * 100)}%`);
           break;
 
-        // Giảm âm lượng 10%
         case "ArrowDown":
           e.preventDefault();
           video.volume = Math.max(0, Number((video.volume - 0.1).toFixed(1)));
           showToast(`Âm lượng: ${Math.round(video.volume * 100)}%`);
           break;
 
-        // Tắt / Bật tiếng
         case "KeyM":
           e.preventDefault();
           video.muted = !video.muted;
           showToast(video.muted ? "Đã tắt âm (Mute)" : "Đã bật âm");
           break;
 
-        // Toàn màn hình
         case "KeyF":
           e.preventDefault();
           if (!document.fullscreenElement) {
@@ -288,94 +400,16 @@ export const WatchPage: React.FC = () => {
       }
     };
 
-    // Đăng ký sự kiện khi trang mở ra
     window.addEventListener("keydown", handleKeyDown);
-
-    // Hủy đăng ký sự kiện khi rời trang (Clean up)
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [showToast]);
 
+  // ── 5. CONDITIONAL EARLY RETURNS ──
   if (isLoading) {
     return <WatchPageSkeleton />;
   }
-
-  // ---------------------------------------------------------------------------
-  // Video Playback Handlers - Xử lí lưu tiến trình xem phim, chuyển tập, tua video, v.v.
-  // ---------------------------------------------------------------------------
-
-  // Tự động Seek tới mốc cũ khi video tải xong Metadata, nhưng chỉ tua tiếp nếu mốc lưu > 5s và cách điểm kết thúc tối thiểu 10s
-  const handleLoadedMetadata = () => {
-    const video = videoRef.current;
-    if (!video || !slug) return;
-
-    const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
-    const savedTimeStr = localStorage.getItem(progressKey);
-
-    if (savedTimeStr) {
-      const savedTime = parseFloat(savedTimeStr);
-      // Chỉ tua tiếp nếu mốc lưu > 5s và cách điểm kết thúc tối thiểu 10s
-      if (savedTime > 5 && savedTime < video.duration - 10) {
-        video.currentTime = savedTime;
-        const minutes = Math.floor(savedTime / 60);
-        const seconds = Math.floor(savedTime % 60)
-          .toString()
-          .padStart(2, "0");
-        showToast(`Đang phát tiếp từ ${minutes}:${seconds}`);
-      }
-    }
-  };
-
-  // Lưu currentTime vào localStorage mỗi 5 giây
-  const handleTimeUpdate = () => {
-    const video = videoRef.current;
-    if (!video || !slug) return;
-
-    const now = Math.floor(video.currentTime);
-    if (now - lastSavedTimeRef.current >= 5) {
-      lastSavedTimeRef.current = now;
-      const progressKey = `cw_progress_${slug}_ep_${currentEpNum}`;
-      localStorage.setItem(progressKey, now.toString());
-    }
-  };
-
-  // Xóa tiến trình khi đã xem hết tập phim
-  const handleVideoEnded = () => {
-    if (slug) {
-      localStorage.removeItem(`cw_progress_${slug}_ep_${currentEpNum}`);
-    }
-
-    // Nếu có tập kế tiếp, bật bộ đếm ngược 5 giây
-    if (navigation.next) {
-      const nextEp = navigation.next.episode_number;
-      let count = 5;
-      setNextEpisodeCountdown(count);
-
-      countdownTimerRef.current = window.setInterval(() => {
-        count -= 1;
-        if (count <= 0) {
-          if (countdownTimerRef.current) {
-            clearInterval(countdownTimerRef.current);
-            countdownTimerRef.current = null;
-          }
-          setNextEpisodeCountdown(null);
-          handleSelectEpisode(nextEp);
-        } else {
-          setNextEpisodeCountdown(count);
-        }
-      }, 1000);
-    }
-  };
-
-  // Hàm bấm Hủy chuyển tập
-  const handleCancelCountdown = () => {
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setNextEpisodeCountdown(null);
-  };
 
   if (!movie || !currentEpisode) {
     return (
@@ -404,14 +438,16 @@ export const WatchPage: React.FC = () => {
     );
   }
 
+  // Danh sách toàn bộ tập phim
   const allEpisodes =
     movie.type === "SERIES"
       ? movie.seasons?.flatMap((s) => s.episodes || []) || []
       : movie.episodes || [];
 
+  // ── 6. RENDER GIAO DIỆN (JSX) ──
   return (
     <main className="min-h-screen w-full bg-[#0d1425] font-sans text-white overflow-x-hidden">
-      {/* Nền đen rạp phim */}
+      {/* Phông nền đen bao phủ khi bật Chế độ Rạp Phim */}
       {isCinemaMode && (
         <div
           className="fixed inset-0 z-40 bg-black/95 transition-opacity duration-300 cursor-pointer backdrop-blur-sm"
@@ -421,6 +457,7 @@ export const WatchPage: React.FC = () => {
 
       <Header />
 
+      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-24 right-6 z-50 rounded-xl bg-[#00a3ff] px-4 py-3 text-xs font-bold text-white shadow-2xl animate-fade-in">
           ✓ {toastMessage}
@@ -469,23 +506,24 @@ export const WatchPage: React.FC = () => {
                 controls
                 playsInline
                 preload="auto"
-                onPlay={handleVideoPlay} // Gọi hàm handleVideoPlay khi video bắt đầu phát
-                onLoadedMetadata={handleLoadedMetadata} // Gắn hàm khôi phục tiến trình xem khi metadata được tải
-                onTimeUpdate={handleTimeUpdate} // Gắn hàm lưu tiến trình xem khi thời gian thay đổi
-                onEnded={handleVideoEnded} // Gắn hàm xóa tiến trình khi video kết thúc
+                onPlay={handleVideoPlay}
+                onLoadedMetadata={handleLoadedMetadata}
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={handleVideoEnded}
+                onError={triggerServerFallback}
                 className="w-full h-full object-contain block relative z-10"
               >
                 Trình duyệt của bạn không hỗ trợ phát video.
               </video>
 
-              {/*  Overlay đếm ngược tự động chuyển tập */}
+              {/* Overlay Đếm ngược chuyển tập tự động */}
               {nextEpisodeCountdown !== null && navigation.next && (
                 <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in">
                   <p className="text-xs uppercase tracking-widest text-[#9ca3af] mb-1">
                     Chuẩn bị phát tiếp
                   </p>
                   <h3 className="text-lg sm:text-2xl font-black text-white mb-4">
-                    {navigation.next.episode_number}
+                    Tập {navigation.next.episode_number}
                   </h3>
                   <div className="flex items-center gap-3">
                     <button
