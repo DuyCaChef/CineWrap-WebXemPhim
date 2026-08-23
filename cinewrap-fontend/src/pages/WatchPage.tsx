@@ -212,6 +212,91 @@ export const WatchPage: React.FC = () => {
     setSearchParams(newParams);
   };
 
+  // ---------------------------------------------------------------------------
+  // Keyboard Shortcuts Handler
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Chặn phím tắt nếu người dùng đang nhập văn bản trong ô input / textarea
+      const activeElement = document.activeElement;
+      const isInput =
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement;
+      if (isInput) return;
+
+      const video = videoRef.current;
+      if (!video) return;
+
+      switch (e.code) {
+        // Play / Pause
+        case "Space":
+          e.preventDefault(); // Tránh cuộn trang web xuống dưới
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+          break;
+
+        // Tua tới 5 giây
+        case "ArrowRight":
+          e.preventDefault();
+          video.currentTime = Math.min(video.duration, video.currentTime + 5);
+          showToast(`Tua tới +5s (${Math.floor(video.currentTime)}s)`);
+          break;
+
+        // Tua lùi 5 giây
+        case "ArrowLeft":
+          e.preventDefault();
+          video.currentTime = Math.max(0, video.currentTime - 5);
+          showToast(`Tua lùi -5s (${Math.floor(video.currentTime)}s)`);
+          break;
+
+        // Tăng âm lượng 10%
+        case "ArrowUp":
+          e.preventDefault();
+          video.volume = Math.min(1, Number((video.volume + 0.1).toFixed(1)));
+          showToast(`Âm lượng: ${Math.round(video.volume * 100)}%`);
+          break;
+
+        // Giảm âm lượng 10%
+        case "ArrowDown":
+          e.preventDefault();
+          video.volume = Math.max(0, Number((video.volume - 0.1).toFixed(1)));
+          showToast(`Âm lượng: ${Math.round(video.volume * 100)}%`);
+          break;
+
+        // Tắt / Bật tiếng
+        case "KeyM":
+          e.preventDefault();
+          video.muted = !video.muted;
+          showToast(video.muted ? "Đã tắt âm (Mute)" : "Đã bật âm");
+          break;
+
+        // Toàn màn hình
+        case "KeyF":
+          e.preventDefault();
+          if (!document.fullscreenElement) {
+            playerContainerRef.current?.requestFullscreen?.();
+          } else {
+            document.exitFullscreen?.();
+          }
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    // Đăng ký sự kiện khi trang mở ra
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Hủy đăng ký sự kiện khi rời trang (Clean up)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showToast]);
+
   if (isLoading) {
     return <WatchPageSkeleton />;
   }
