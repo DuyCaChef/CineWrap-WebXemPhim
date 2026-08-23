@@ -34,6 +34,21 @@ const WatchPageSkeleton: React.FC = () => (
 );
 
 // ---------------------------------------------------------------------------
+// Helper: Làm sạch chuỗi URL nếu dính ký tự Markdown hoặc dấu ngoặc
+// ---------------------------------------------------------------------------
+const cleanVideoUrl = (rawUrl?: string): string => {
+  if (!rawUrl) return "";
+  let url = rawUrl.trim();
+  const match =
+    url.match(/\((https?:\/\/[^\s)]+)\)/) ||
+    url.match(/(https?:\/\/[^\s[\]]+)/);
+  if (match) {
+    url = match[1];
+  }
+  return url.replace(/[[\]()]/g, "");
+};
+
+// ---------------------------------------------------------------------------
 // Main Component: WatchPage
 // ---------------------------------------------------------------------------
 
@@ -127,7 +142,9 @@ export const WatchPage: React.FC = () => {
     const video = videoRef.current;
     if (!video || !currentSource?.url) return;
 
-    const streamUrl = currentSource.url.trim();
+    // Làm sạch URL để loại bỏ ký tự Markdown hoặc dấu ngoặc trước khi nạp vào trình phát
+    const streamUrl = cleanVideoUrl(currentSource.url);
+    if (!streamUrl) return;
 
     if (hlsRef.current) {
       hlsRef.current.destroy();
@@ -270,7 +287,7 @@ export const WatchPage: React.FC = () => {
           {currentSource?.url ? (
             <video
               ref={videoRef}
-              key={currentSource.url}
+              key={cleanVideoUrl(currentSource.url)} // Đặt key để reset video khi đổi server
               controls
               playsInline
               onPlay={handleVideoPlay}
