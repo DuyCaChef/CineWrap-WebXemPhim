@@ -79,6 +79,13 @@ export const WatchPage: React.FC = () => {
   // Ref lưu mốc thời gian đã ghi gần nhất để tránh spam ghi localStorage
   const lastSavedTimeRef = useRef<number>(0);
 
+  // State lưu số giây đếm ngược (5, 4, 3, 2, 1, 0 hoặc null khi tắt)
+  const [nextEpisodeCountdown, setNextEpisodeCountdown] = useState<
+    number | null
+  >(null);
+  // Ref giữ Timer ID để hủy bất kỳ lúc nào
+  const countdownTimerRef = useRef<number | null>(null);
+
   // Cuộn vào khung phát khi bật Cinema Mode
   useEffect(() => {
     if (isCinemaMode && playerContainerRef.current) {
@@ -193,6 +200,13 @@ export const WatchPage: React.FC = () => {
   };
 
   const handleSelectEpisode = (epNum: number) => {
+    // Xóa bộ đếm ngược nếu đang chạy
+    if (countdownTimerRef.current) {
+      clearTimeout(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setNextEpisodeCountdown(null);
+
     const newParams = new URLSearchParams(searchParams);
     newParams.set("ep", epNum.toString());
     setSearchParams(newParams);
@@ -203,7 +217,7 @@ export const WatchPage: React.FC = () => {
   }
 
   // ---------------------------------------------------------------------------
-  // Video Playback Handlers - Xử lí lưu tiến trình xem phim.
+  // Video Playback Handlers - Xử lí lưu tiến trình xem phim, chuyển tập, tua video, v.v.
   // ---------------------------------------------------------------------------
 
   // Tự động Seek tới mốc cũ khi video tải xong Metadata, nhưng chỉ tua tiếp nếu mốc lưu > 5s và cách điểm kết thúc tối thiểu 10s
@@ -246,6 +260,36 @@ export const WatchPage: React.FC = () => {
     if (slug) {
       localStorage.removeItem(`cw_progress_${slug}_ep_${currentEpNum}`);
     }
+
+    // Nếu có tập kế tiếp, bật bộ đếm ngược 5 giây
+    if (navigation.next) {
+      const nextEp = navigation.next.episode_number;
+      let count = 5;
+      setNextEpisodeCountdown(count);
+
+      countdownTimerRef.current = window.setInterval(() => {
+        count -= 1;
+        if (count <= 0) {
+          if (countdownTimerRef.current) {
+            clearInterval(countdownTimerRef.current);
+            countdownTimerRef.current = null;
+          }
+          setNextEpisodeCountdown(null);
+          handleSelectEpisode(nextEp);
+        } else {
+          setNextEpisodeCountdown(count);
+        }
+      }, 1000);
+    }
+  };
+
+  // Hàm bấm Hủy chuyển tập
+  const handleCancelCountdown = () => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setNextEpisodeCountdown(null);
   };
 
   if (!movie || !currentEpisode) {
@@ -334,19 +378,51 @@ export const WatchPage: React.FC = () => {
           }`}
         >
           {currentSource?.url ? (
-            <video
-              ref={videoRef}
-              controls
-              playsInline
-              preload="auto"
-              onPlay={handleVideoPlay} // Gọi hàm handleVideoPlay khi video bắt đầu phát
-              onLoadedMetadata={handleLoadedMetadata} // Gắn hàm khôi phục tiến trình xem khi metadata được tải
-              onTimeUpdate={handleTimeUpdate} // Gắn hàm lưu tiến trình xem khi thời gian thay đổi
-              onEnded={handleVideoEnded} // Gắn hàm xóa tiến trình khi video kết thúc
-              className="w-full h-full object-contain block relative z-10"
-            >
-              Trình duyệt của bạn không hỗ trợ phát video.
-            </video>
+            <>
+              <video
+                ref={videoRef}
+                controls
+                playsInline
+                preload="auto"
+                onPlay={handleVideoPlay} // Gọi hàm handleVideoPlay khi video bắt đầu phát
+                onLoadedMetadata={handleLoadedMetadata} // Gắn hàm khôi phục tiến trình xem khi metadata được tải
+                onTimeUpdate={handleTimeUpdate} // Gắn hàm lưu tiến trình xem khi thời gian thay đổi
+                onEnded={handleVideoEnded} // Gắn hàm xóa tiến trình khi video kết thúc
+                className="w-full h-full object-contain block relative z-10"
+              >
+                Trình duyệt của bạn không hỗ trợ phát video.
+              </video>
+
+              {/*  Overlay đếm ngược tự động chuyển tập */}
+              {nextEpisodeCountdown !== null && navigation.next && (
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in">
+                  <p className="text-xs uppercase tracking-widest text-[#9ca3af] mb-1">
+                    Chuẩn bị phát tiếp
+                  </p>
+                  <h3 className="text-lg sm:text-2xl font-black text-white mb-4">
+                    {navigation.next.episode_number}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleSelectEpisode(navigation.next!.episode_number)
+                      }
+                      className="rounded-xl bg-[#00a3ff] px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:brightness-110 transition cursor-pointer"
+                    >
+                      Phát ngay ({nextEpisodeCountdown}s)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelCountdown}
+                      className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition cursor-pointer"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-[#9ca3af]">
               Tập phim này hiện chưa có nguồn phát video khả dụng.
