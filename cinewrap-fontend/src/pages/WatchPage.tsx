@@ -88,8 +88,13 @@ export const WatchPage: React.FC = () => {
     currentEpisode?.servers.find((s) => s.id === selectedServerId) ||
     currentEpisode?.servers[0];
 
-  // ── 3. KHAI BÁO CÁC HÀM XỬ LÝ (HANDLERS) ──
+  // STATE CHO YÊU THÍCH ĐÁNH GIÁ SAO
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
 
+  // ── 3. KHAI BÁO CÁC HÀM XỬ LÝ (HANDLERS) ──
   // Hàm hiển thị Toast thông báo
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
@@ -213,6 +218,35 @@ export const WatchPage: React.FC = () => {
     setNextEpisodeCountdown(null);
   };
 
+  // Xử lý bật/tắt yêu thích (Watchlist)
+  const handleToggleFavorite = () => {
+    if (!slug) return;
+    const watchlist: string[] = JSON.parse(
+      localStorage.getItem("cw_watchlist") || "[]",
+    );
+
+    let updatedList: string[];
+    if (isFavorite) {
+      updatedList = watchlist.filter((s) => s !== slug);
+      setIsFavorite(false);
+      showToast("Đã xóa khỏi danh sách yêu thích!");
+    } else {
+      updatedList = [...watchlist, slug];
+      setIsFavorite(true);
+      showToast("Đã thêm vào danh sách yêu thích!");
+    }
+    localStorage.setItem("cw_watchlist", JSON.stringify(updatedList));
+  };
+
+  // Xử lý gửi đánh giá điểm sao
+  const handleSubmitRating = (score: number) => {
+    if (!slug) return;
+    setUserRating(score);
+    localStorage.setItem(`cw_rating_${slug}`, score.toString());
+    setShowRatingModal(false);
+    showToast(`Cảm ơn bạn đã đánh giá ${score}/10 sao cho bộ phim!`);
+  };
+
   // ── 4. KHAI BÁO CÁC SIDE EFFECTS (USEEFFECT) ──
 
   // Effect 1: Cuộn mượt vào khung phát khi bật Chế độ Rạp phim
@@ -255,6 +289,17 @@ export const WatchPage: React.FC = () => {
             ) {
               setSelectedServerId(watchData.episode.servers[0].id);
             }
+          }
+
+          //  Đọc trạng thái yêu thích & đánh giá sao an toàn sau khi load dữ liệu
+          const watchlist: string[] = JSON.parse(
+            localStorage.getItem("cw_watchlist") || "[]",
+          );
+          setIsFavorite(watchlist.includes(slug));
+
+          const savedRating = localStorage.getItem(`cw_rating_${slug}`);
+          if (savedRating) {
+            setUserRating(Number(savedRating));
           }
         }
       } catch (error) {
@@ -610,6 +655,31 @@ export const WatchPage: React.FC = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Nút Yêu thích */}
+            <button
+              type="button"
+              onClick={handleToggleFavorite}
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                isFavorite
+                  ? "border-pink-500/50 bg-pink-500/20 text-pink-400"
+                  : "border-white/10 bg-[#0f172a] text-[#9ca3af] hover:text-white"
+              }`}
+            >
+              <span>{isFavorite ? "❤️" : "🤍"}</span>
+              <span>{isFavorite ? "Đã Thích" : "Yêu Thích"}</span>
+            </button>
+
+            {/*  Nút Đánh giá */}
+            <button
+              type="button"
+              onClick={() => setShowRatingModal(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#0f172a] px-3 py-1.5 text-xs font-bold text-[#ffc107] hover:bg-[#1e293b] transition cursor-pointer"
+            >
+              <span>★</span>
+              <span>{userRating ? `${userRating}/10` : "Đánh Giá"}</span>
+            </button>
+
+            {/*  Nút chế độ rạp phim */}
             <button
               type="button"
               onClick={() => setIsCinemaMode(!isCinemaMode)}
@@ -701,6 +771,57 @@ export const WatchPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ── MODAL ĐÁNH GIÁ SAO ── */}
+      {showRatingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-sm rounded-2xl bg-[#131c2e] border border-white/10 p-6 shadow-2xl space-y-4 text-center">
+            <h3 className="text-lg font-black text-white">Đánh Giá Bộ Phim</h3>
+            <p className="text-xs text-[#9ca3af]">
+              Chia sẻ cảm nhận của bạn về{" "}
+              <span className="text-white font-semibold">{movie.title}</span>
+            </p>
+
+            {/* Dải 10 ngôi sao */}
+            <div className="flex items-center justify-center gap-1 py-2">
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => handleSubmitRating(star)}
+                  className="text-lg transition transform hover:scale-125 cursor-pointer"
+                >
+                  <span
+                    className={
+                      star <= (hoverRating || userRating || 0)
+                        ? "text-[#ffc107]"
+                        : "text-white/20"
+                    }
+                  >
+                    ★
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-sm font-bold text-[#ffc107]">
+              {hoverRating || userRating || 0} / 10 Điểm
+            </p>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowRatingModal(false)}
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-white hover:bg-white/10 transition cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </main>
