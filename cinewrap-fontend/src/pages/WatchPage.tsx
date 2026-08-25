@@ -13,6 +13,17 @@ import type {
   VideoServerSource,
 } from "../services/movieService";
 
+// Interface cấu trúc bình luận theo tập
+interface EpisodeComment {
+  id: string;
+  userName: string;
+  avatar: string;
+  content: string;
+  isSpoiler: boolean;
+  timestampSeconds?: number;
+  createdAt: string;
+}
+
 // ---------------------------------------------------------------------------
 // Sub-component: Skeleton Loading
 // ---------------------------------------------------------------------------
@@ -100,8 +111,20 @@ export const WatchPage: React.FC = () => {
   const [reportDescription, setReportDescription] = useState<string>("");
   const [isSubmittingReport, setIsSubmittingReport] = useState<boolean>(false);
 
+  // State Phân hệ bình luân
+  const [comments, setComments] = useState<EpisodeComment[]>([]);
+  const [newCommentText, setNewCommentText] = useState<string>("");
+  const [isCommentSpoiler, setIsCommentSpoiler] = useState<boolean>(false);
+  const [revealedSpoilers, setRevealedSpoilers] = useState<
+    Record<string, boolean>
+  >({});
+
   // ── 3. KHAI BÁO CÁC HÀM XỬ LÝ (HANDLERS) ──
   // Hàm hiển thị Toast thông báo
+
+  // ---------------------------------------------------------------------------
+  // Handlers xử lý video playback, server fallback, và lưu tiến trình xem
+  // ---------------------------------------------------------------------------
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -224,6 +247,10 @@ export const WatchPage: React.FC = () => {
     setNextEpisodeCountdown(null);
   };
 
+  // ---------------------------------------------------------------------------
+  // Handlers xử lý phân hệ yêu thích & đánh giá sao
+  // ---------------------------------------------------------------------------
+
   // Xử lý bật/tắt yêu thích (Watchlist)
   const handleToggleFavorite = () => {
     if (!slug) return;
@@ -286,6 +313,108 @@ export const WatchPage: React.FC = () => {
     }
   };
 
+  // ---------------------------------------------------------------------------
+  // Handlers xử lý phân hệ bình luận
+  // ---------------------------------------------------------------------------
+
+  // Helper: Chuyển đổi số giây thành định dạng MM:SS
+  const formatSecondsToTime = (totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  // Helper: Chuyển đổi chuỗi MM:SS thành số giây
+  const parseTimeToSeconds = (timeStr: string): number => {
+    const parts = timeStr.split(":").map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  };
+
+  // Tua video khi click vào Timestamp trong bình luận
+  const handleSeekToTimestamp = (seconds: number) => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = seconds;
+      video.play().catch(() => {});
+      playerContainerRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      showToast(`Đã chuyển tới ${formatSecondsToTime(seconds)}`);
+    }
+  };
+
+  // Nút chèn mốc thời gian hiện tại vào ô nhập
+  const handleInsertCurrentTime = () => {
+    const video = videoRef.current;
+    const currentSec = Math.floor(video?.currentTime || 0);
+    const timeFormatted = `[${formatSecondsToTime(currentSec)}]`;
+    setNewCommentText((prev) =>
+      prev ? `${prev} ${timeFormatted} ` : `${timeFormatted} `,
+    );
+  };
+
+  // Gửi bình luận mới
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCommentText.trim() || !slug) return;
+
+    const currentSec = Math.floor(videoRef.current?.currentTime || 0);
+    const commentItem: EpisodeComment = {
+      id: `comment_${Date.now()}`,
+      userName: "Khán giả CineWrap",
+      avatar: "🎬",
+      content: newCommentText.trim(),
+      isSpoiler: isCommentSpoiler,
+      timestampSeconds: newCommentText.includes("[") ? currentSec : undefined,
+      createdAt: new Date().toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    const updatedComments = [commentItem, ...comments];
+    setComments(updatedComments);
+    localStorage.setItem(
+      `cw_comments_${slug}_ep_${currentEpNum}`,
+      JSON.stringify(updatedComments),
+    );
+
+    setNewCommentText("");
+    setIsCommentSpoiler(false);
+    showToast("Đã đăng bình luận của bạn!");
+  };
+
+  // Mở/Đóng nội dung spoiler
+  const toggleRevealSpoiler = (commentId: string) => {
+    setRevealedSpoilers((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
+  };
+
+  // Render text có thể click vào timestamp
+  const renderCommentContent = (content: string) => {
+    const parts = content.split(/(\[\d{1,2}:\d{2}(?::\d{2})?\])/g);
+    return parts.map((part, index) => {
+      const match = part.match(/\[(\d{1,2}:\d{2}(?::\d{2})?)\]/);
+      if (match) {
+        const timeStr = match[1];
+        const sec = parseTimeToSeconds(timeStr);
+        return (
+          <button
+            key={index}
+            type="button"
+            onClick={() => handleSeekToTimestamp(sec)}
+            className="inline-flex items-center gap-1 rounded-md bg-[#00a3ff]/20 px-1.5 py-0.5 text-xs font-bold text-[#00a3ff] hover:bg-[#00a3ff]/30 transition cursor-pointer mx-1"
+          >
+            ⏱️ {timeStr}
+          </button>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   // ── 4. KHAI BÁO CÁC SIDE EFFECTS (USEEFFECT) ──
 
   // Effect 1: Cuộn mượt vào khung phát khi bật Chế độ Rạp phim
@@ -329,6 +458,13 @@ export const WatchPage: React.FC = () => {
               setSelectedServerId(watchData.episode.servers[0].id);
             }
           }
+
+          //  Load danh sách bình luận từ localStorage
+          const savedCommentsKey = `cw_comments_${slug}_ep_${currentEpNum}`;
+          const localComments = JSON.parse(
+            localStorage.getItem(savedCommentsKey) || "[]",
+          );
+          setComments(localComments);
 
           //  Đọc trạng thái yêu thích & đánh giá sao an toàn sau khi load dữ liệu
           const watchlist: string[] = JSON.parse(
@@ -774,6 +910,119 @@ export const WatchPage: React.FC = () => {
             <p className="text-xs sm:text-sm text-[#9ca3af] leading-relaxed">
               {movie.description || "Chưa có mô tả cho bộ phim này."}
             </p>
+            {/* ── 4. PHÂN HỆ BÌNH LUẬN THEO TẬP ── */}
+            <div className="mt-8 rounded-2xl bg-[#131c2e]/70 border border-white/10 p-5 sm:p-6 backdrop-blur-xl space-y-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <span>💬</span> Bình Luận & Thảo Luận
+                  <span className="text-xs font-normal text-[#00a3ff] bg-[#00a3ff]/10 px-2.5 py-0.5 rounded-full">
+                    Tập {currentEpisode.episode_number} ({comments.length})
+                  </span>
+                </h3>
+              </div>
+
+              {/* Form gửi bình luận */}
+              <form onSubmit={handleAddComment} className="space-y-3">
+                <textarea
+                  rows={3}
+                  value={newCommentText}
+                  onChange={(e) => setNewCommentText(e.target.value)}
+                  placeholder="Chia sẻ cảm nghĩ của bạn về tập phim này..."
+                  className="w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs sm:text-sm text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none transition resize-none"
+                />
+
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    {/* Nút Chèn Timestamp */}
+                    <button
+                      type="button"
+                      onClick={handleInsertCurrentTime}
+                      className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#0f172a] px-3 py-1.5 text-xs font-semibold text-[#00a3ff] hover:bg-[#1e293b] transition cursor-pointer"
+                    >
+                      ⏱️ Chèn mốc thời gian
+                    </button>
+
+                    {/* Checkbox Spoiler */}
+                    <label className="flex items-center gap-2 text-xs font-medium text-[#9ca3af] cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isCommentSpoiler}
+                        onChange={(e) => setIsCommentSpoiler(e.target.checked)}
+                        className="rounded border-white/20 bg-[#0f172a] text-[#00a3ff] focus:ring-0"
+                      />
+                      <span>⚠️ Tiết lộ phim (Spoiler)</span>
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={!newCommentText.trim()}
+                    className="rounded-xl bg-[#00a3ff] px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Gửi bình luận
+                  </button>
+                </div>
+              </form>
+
+              {/* Danh sách bình luận */}
+              <div className="space-y-4 pt-2">
+                {comments.length > 0 ? (
+                  comments.map((comment) => {
+                    const isRevealed = revealedSpoilers[comment.id];
+                    return (
+                      <div
+                        key={comment.id}
+                        className="flex gap-3 rounded-xl bg-[#0f172a]/60 border border-white/5 p-4 transition"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1e293b] text-base border border-white/10">
+                          {comment.avatar}
+                        </div>
+                        <div className="flex-1 space-y-1 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white">
+                              {comment.userName}
+                            </span>
+                            <span className="text-[11px] text-[#64748b]">
+                              {comment.createdAt}
+                            </span>
+                          </div>
+
+                          {comment.isSpoiler && !isRevealed ? (
+                            <div
+                              onClick={() => toggleRevealSpoiler(comment.id)}
+                              className="rounded-lg bg-red-500/10 border border-red-500/20 p-2.5 text-center text-red-300 font-semibold cursor-pointer hover:bg-red-500/20 transition"
+                            >
+                              ⚠️ Bình luận có chứa nội dung tiết lộ phim. Bấm để
+                              xem.
+                            </div>
+                          ) : (
+                            <div className="text-[#cbd5e1] leading-relaxed pt-1">
+                              {renderCommentContent(comment.content)}
+                              {comment.isSpoiler && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    toggleRevealSpoiler(comment.id)
+                                  }
+                                  className="block text-[10px] text-red-400 mt-1 hover:underline cursor-pointer"
+                                >
+                                  Ẩn lại
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-center py-6 text-xs text-[#64748b] italic">
+                    Chưa có bình luận nào cho tập phim này. Hãy là người đầu
+                    tiên để lại cảm nghĩ!
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="rounded-2xl bg-[#131c2e]/70 border border-white/10 p-5 backdrop-blur-xl h-fit space-y-4">
