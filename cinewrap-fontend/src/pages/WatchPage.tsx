@@ -5,6 +5,10 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Skeleton } from "../components/common/Skeleton";
 
+import { RatingModal } from "../components/watch/RatingModal";
+import { ReportModal } from "../components/watch/ReportModal";
+import type { ReportPayload } from "../components/watch/ReportModal";
+
 import { movieService } from "../services/movieService";
 import type {
   BackendMovie,
@@ -99,19 +103,15 @@ export const WatchPage: React.FC = () => {
     currentEpisode?.servers.find((s) => s.id === selectedServerId) ||
     currentEpisode?.servers[0];
 
-  // STATE CHO YÊU THÍCH ĐÁNH GIÁ SAO
+  // State Yêu thích & Đánh giá sao
   const [isFavorite, setIsFavorite] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
-  const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  // State cho Modal Báo lỗi tập phim
+  // State Modal Báo lỗi tập phim
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportReason, setReportReason] = useState<string>("");
-  const [reportDescription, setReportDescription] = useState<string>("");
-  const [isSubmittingReport, setIsSubmittingReport] = useState<boolean>(false);
 
-  // State Phân hệ bình luân
+  // State Phân hệ bình luận
   const [comments, setComments] = useState<EpisodeComment[]>([]);
   const [newCommentText, setNewCommentText] = useState<string>("");
   const [isCommentSpoiler, setIsCommentSpoiler] = useState<boolean>(false);
@@ -120,11 +120,7 @@ export const WatchPage: React.FC = () => {
   >({});
 
   // ── 3. KHAI BÁO CÁC HÀM XỬ LÝ (HANDLERS) ──
-  // Hàm hiển thị Toast thông báo
 
-  // ---------------------------------------------------------------------------
-  // Handlers xử lý video playback, server fallback, và lưu tiến trình xem
-  // ---------------------------------------------------------------------------
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -247,10 +243,6 @@ export const WatchPage: React.FC = () => {
     setNextEpisodeCountdown(null);
   };
 
-  // ---------------------------------------------------------------------------
-  // Handlers xử lý phân hệ yêu thích & đánh giá sao
-  // ---------------------------------------------------------------------------
-
   // Xử lý bật/tắt yêu thích (Watchlist)
   const handleToggleFavorite = () => {
     if (!slug) return;
@@ -280,51 +272,41 @@ export const WatchPage: React.FC = () => {
     showToast(`Cảm ơn bạn đã đánh giá ${score}/10 sao cho bộ phim!`);
   };
 
-  // Xử lý gửi ticket báo lỗi tập phim, lỗi link
-  const handleSubmitReport = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Xử lý gửi ticket báo lỗi tập phim nhận từ ReportModal
+  const handleSubmitReport = async (data: ReportPayload) => {
     if (!movie || !currentEpisode) return;
 
     try {
-      setIsSubmittingReport(true);
-
       const payload = {
         movieId: movie.id,
         episodeId: currentEpisode.id,
         serverId: selectedServerId || currentSource?.id || null,
-        reason: reportReason,
-        description: reportDescription.trim() || undefined,
+        reason: data.reason,
+        description: data.description,
         currentTimestamp: Math.floor(videoRef.current?.currentTime || 0),
       };
 
       console.log("🚩 Gửi ticket báo lỗi tập phim:", payload);
-      // Giả lập thời gian gửi request
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       setShowReportModal(false);
-      setReportDescription("");
-      setReportReason("DEAD_LINK");
       showToast("Cảm ơn bạn! Đã gửi báo lỗi tới ban quản trị.");
     } catch (error) {
       console.error("Lỗi khi gửi báo cáo sự cố:", error);
       showToast("Có lỗi xảy ra khi gửi báo lỗi. Vui lòng thử lại!");
-    } finally {
-      setIsSubmittingReport(false);
     }
   };
 
-  // ---------------------------------------------------------------------------
-  // Handlers xử lý phân hệ bình luận
-  // ---------------------------------------------------------------------------
-
-  // Helper: Chuyển đổi số giây thành định dạng MM:SS
+  // Helper chuyển giây sang định dạng MM:SS
   const formatSecondsToTime = (totalSeconds: number): string => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  // Helper: Chuyển đổi chuỗi MM:SS thành số giây
+  // Helper chuyển chuỗi MM:SS sang số giây
   const parseTimeToSeconds = (timeStr: string): number => {
     const parts = timeStr.split(":").map(Number);
     if (parts.length === 2) return parts[0] * 60 + parts[1];
@@ -459,14 +441,14 @@ export const WatchPage: React.FC = () => {
             }
           }
 
-          //  Load danh sách bình luận từ localStorage
+          // Load danh sách bình luận từ localStorage
           const savedCommentsKey = `cw_comments_${slug}_ep_${currentEpNum}`;
           const localComments = JSON.parse(
             localStorage.getItem(savedCommentsKey) || "[]",
           );
           setComments(localComments);
 
-          //  Đọc trạng thái yêu thích & đánh giá sao an toàn sau khi load dữ liệu
+          // Đọc trạng thái yêu thích & đánh giá sao an toàn sau khi load dữ liệu
           const watchlist: string[] = JSON.parse(
             localStorage.getItem("cw_watchlist") || "[]",
           );
@@ -518,7 +500,6 @@ export const WatchPage: React.FC = () => {
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
 
-        // Bắt lỗi HLS Fatal và tự động chuyển server dự phòng
         hls.on(Hls.Events.ERROR, (_event, data) => {
           if (data.fatal) {
             switch (data.type) {
@@ -658,7 +639,6 @@ export const WatchPage: React.FC = () => {
     );
   }
 
-  // Danh sách toàn bộ tập phim
   const allEpisodes =
     movie.type === "SERIES"
       ? movie.seasons?.flatMap((s) => s.episodes || []) || []
@@ -674,7 +654,6 @@ export const WatchPage: React.FC = () => {
           onClick={() => setIsCinemaMode(false)}
         />
       )}
-
       <Header />
 
       {/* Toast Notification */}
@@ -844,7 +823,7 @@ export const WatchPage: React.FC = () => {
               <span>{isFavorite ? "Đã Thích" : "Yêu Thích"}</span>
             </button>
 
-            {/*  Nút Đánh giá */}
+            {/* Nút Đánh giá */}
             <button
               type="button"
               onClick={() => setShowRatingModal(true)}
@@ -854,7 +833,7 @@ export const WatchPage: React.FC = () => {
               <span>{userRating ? `${userRating}/10` : "Đánh Giá"}</span>
             </button>
 
-            {/*  Nút chế độ rạp phim */}
+            {/* Nút Chế độ rạp phim */}
             <button
               type="button"
               onClick={() => setIsCinemaMode(!isCinemaMode)}
@@ -868,7 +847,7 @@ export const WatchPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => setShowReportModal(true)} // Mở Modal báo lỗi tập phim
+              onClick={() => setShowReportModal(true)}
               className="rounded-xl border border-white/10 bg-[#0f172a] px-3 py-1.5 text-xs font-bold text-red-400 hover:bg-red-500/10 transition cursor-pointer"
             >
               🚩 Báo Lỗi
@@ -910,6 +889,7 @@ export const WatchPage: React.FC = () => {
             <p className="text-xs sm:text-sm text-[#9ca3af] leading-relaxed">
               {movie.description || "Chưa có mô tả cho bộ phim này."}
             </p>
+
             {/* ── 4. PHÂN HỆ BÌNH LUẬN THEO TẬP ── */}
             <div className="mt-8 rounded-2xl bg-[#131c2e]/70 border border-white/10 p-5 sm:p-6 backdrop-blur-xl space-y-6">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -1060,158 +1040,24 @@ export const WatchPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── MODAL ĐÁNH GIÁ SAO ── */}
-      {showRatingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-sm rounded-2xl bg-[#131c2e] border border-white/10 p-6 shadow-2xl space-y-4 text-center">
-            <h3 className="text-lg font-black text-white">Đánh Giá Bộ Phim</h3>
-            <p className="text-xs text-[#9ca3af]">
-              Chia sẻ cảm nhận của bạn về{" "}
-              <span className="text-white font-semibold">{movie.title}</span>
-            </p>
+      {/* Modal đánh giá phim */}
+      <RatingModal
+        isOpen={showRatingModal}
+        movieTitle={movie.title}
+        initialRating={userRating}
+        onClose={() => setShowRatingModal(false)}
+        onSubmit={handleSubmitRating}
+      />
 
-            {/* Dải 10 ngôi sao */}
-            <div className="flex items-center justify-center gap-1 py-2">
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  onClick={() => handleSubmitRating(star)}
-                  className="text-lg transition transform hover:scale-125 cursor-pointer"
-                >
-                  <span
-                    className={
-                      star <= (hoverRating || userRating || 0)
-                        ? "text-[#ffc107]"
-                        : "text-white/20"
-                    }
-                  >
-                    ★
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <p className="text-sm font-bold text-[#ffc107]">
-              {hoverRating || userRating || 0} / 10 Điểm
-            </p>
-
-            <div className="flex gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowRatingModal(false)}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-white hover:bg-white/10 transition cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL BÁO LỖI TẬP PHIM ── */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-[#131c2e] border border-white/10 p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>🚩</span> Báo Lỗi Tập Phim
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowReportModal(false)}
-                className="text-[#9ca3af] hover:text-white transition cursor-pointer text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmitReport} className="space-y-4">
-              <div className="space-y-1.5">
-                <p className="text-xs text-[#9ca3af]">
-                  Bộ phim:{" "}
-                  <span className="text-white font-semibold">
-                    {movie.title}
-                  </span>{" "}
-                  -{" "}
-                  <span className="text-[#00a3ff]">
-                    Tập {currentEpisode.episode_number}
-                  </span>
-                </p>
-                {currentSource && (
-                  <p className="text-xs text-[#9ca3af]">
-                    Máy chủ hiện tại:{" "}
-                    <span className="text-white font-medium">
-                      {currentSource.server_name}
-                    </span>
-                  </p>
-                )}
-              </div>
-
-              {/* Lựa chọn loại lỗi */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#9ca3af]">
-                  Loại sự cố gặp phải <span className="text-red-400">*</span>
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: "DEAD_LINK", label: "🚫 Chết link / Không phát" },
-                    { value: "NO_AUDIO", label: "🔇 Mất tiếng / Rè âm" },
-                    { value: "SUB_ERROR", label: "📝 Lệch / Mất phụ đề" },
-                    { value: "LAG_BUFFER", label: "⏳ Giật lag / Buffering" },
-                  ].map((item) => (
-                    <button
-                      key={item.value}
-                      type="button"
-                      onClick={() => setReportReason(item.value)}
-                      className={`rounded-xl border p-2.5 text-xs font-bold text-left transition cursor-pointer ${
-                        reportReason === item.value
-                          ? "border-[#00a3ff] bg-[#00a3ff]/20 text-[#00a3ff]"
-                          : "border-white/10 bg-[#0f172a] text-[#9ca3af] hover:text-white"
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mô tả chi tiết */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#9ca3af]">
-                  Mô tả chi tiết (không bắt buộc)
-                </label>
-                <textarea
-                  rows={3}
-                  value={reportDescription}
-                  onChange={(e) => setReportDescription(e.target.value)}
-                  placeholder="Ví dụ: Bị đứng hình từ phút 05:20..."
-                  className="w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none transition resize-none"
-                />
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowReportModal(false)}
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-white hover:bg-white/10 transition cursor-pointer"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmittingReport}
-                  className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 py-2.5 text-xs font-bold text-white shadow-lg transition disabled:opacity-50 cursor-pointer"
-                >
-                  {isSubmittingReport ? "Đang gửi..." : "Gửi Báo Lỗi"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Modal báo lỗi tập phim */}
+      <ReportModal
+        isOpen={showReportModal}
+        movieTitle={movie.title}
+        episodeNumber={currentEpisode.episode_number}
+        serverName={currentSource?.server_name}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={handleSubmitReport}
+      />
 
       <Footer />
     </main>
