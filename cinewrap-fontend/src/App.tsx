@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage"; // Trang profile
 import MoviesPage from "./pages/MoviesPage"; // Trang filter
 import MovieDetailPage from "./pages/MovieDetailPage"; // Trang chi tiết phim
 import WatchPage from "./pages/WatchPage"; // Trang xem phim
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminCrawlerPage from "./pages/admin/AdminCrawlerPage"; // Trang quản trị cào phim
 
 function App() {
@@ -28,6 +29,9 @@ function App() {
 
         {/* Trang Xem Phim */}
         <Route path="/watch/:slug" element={<WatchPage />} />
+
+        {/* Trang quản trị */}
+        <Route path="/admin" element={<AdminDashboardPage />} />
 
         {/* Trang quản trị cào phim */}
         <Route path="/admin/crawler" element={<AdminCrawlerPage />} />
