@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { movieService } from "../../../services/movieService";
 import type {
   BackendMovie,
@@ -20,7 +20,7 @@ interface SeasonItem {
 }
 
 export const ServerManagerTab: React.FC = () => {
-  // State quản lý danh sách server
+  // State phim & tập
   const [movies, setMovies] = useState<BackendMovie[]>([]);
   const [selectedMovieSlug, setSelectedMovieSlug] = useState<string>("");
   const [episodes, setEpisodes] = useState<EpisodeOption[]>([]);
@@ -31,6 +31,11 @@ export const ServerManagerTab: React.FC = () => {
   const [isLoadingMovies, setIsLoadingMovies] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
+  // State tìm kiếm phim trong Dropdown (Searchable Combobox)
+  const [isMovieDropdownOpen, setIsMovieDropdownOpen] = useState(false);
+  const [movieSearchKeyword, setMovieSearchKeyword] = useState("");
+  const movieDropdownRef = useRef<HTMLDivElement>(null);
+
   // Form State thêm/sửa
   const [showModal, setShowModal] = useState(false);
   const [editingServerId, setEditingServerId] = useState<number | null>(null);
@@ -39,18 +44,17 @@ export const ServerManagerTab: React.FC = () => {
   const [quality, setQuality] = useState("1080p");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Hàm hiển thị thông báo toast, tự động ẩn sau 3 giây
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Tải danh sách phim ban đầu
+  // 1. Tải danh sách phim ban đầu
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         setIsLoadingMovies(true);
-        const res = await movieService.getMovies({ page: 1, limit: 50 });
+        const res = await movieService.getMovies({ page: 1, limit: 100 });
         setMovies(res.data || []);
         if (res.data && res.data.length > 0) {
           setSelectedMovieSlug(res.data[0].slug);
@@ -64,7 +68,7 @@ export const ServerManagerTab: React.FC = () => {
     fetchMovies();
   }, []);
 
-  // Tải chi tiết tập và server khi chọn phim
+  // 2. Tải chi tiết tập và server khi chọn phim
   useEffect(() => {
     if (!selectedMovieSlug) return;
 
@@ -110,7 +114,28 @@ export const ServerManagerTab: React.FC = () => {
     fetchMovieDetails();
   }, [selectedMovieSlug]);
 
-  // Lấy danh sách server của tập phim hiện tại
+  // Click outside để đóng combobox tìm phim
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        movieDropdownRef.current &&
+        !movieDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsMovieDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Danh sách phim sau khi lọc theo từ khóa tìm kiếm
+  const filteredMovies = movies.filter(
+    (m) =>
+      m.title.toLowerCase().includes(movieSearchKeyword.toLowerCase()) ||
+      m.slug.toLowerCase().includes(movieSearchKeyword.toLowerCase()),
+  );
+
+  const selectedMovie = movies.find((m) => m.slug === selectedMovieSlug);
   const currentEpisode = episodes.find((ep) => ep.id === selectedEpisodeId);
   const currentServers = currentEpisode?.servers || [];
 
@@ -132,7 +157,7 @@ export const ServerManagerTab: React.FC = () => {
     setShowModal(true);
   };
 
-  // Lưu Server (Thêm mới / Cập nhật)
+  // Lưu Server
   const handleSaveServer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!serverName.trim() || !serverUrl.trim() || !selectedEpisodeId) return;
@@ -204,26 +229,100 @@ export const ServerManagerTab: React.FC = () => {
         </div>
       )}
 
-      {/* Thanh chọn Phim và chọn Tập */}
+      {/* Thanh chọn Phim (Searchable Combobox) và chọn Tập */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-2xl bg-[#131c2e]/80 border border-white/10 p-5">
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#9ca3af]">
-            1. Chọn bộ phim cần quản lý
-          </label>
-          <select
-            value={selectedMovieSlug}
+        {/* 1. Ô TÌM & CHỌN PHIM DẠNG COMBOBOX */}
+        <div className="space-y-1.5 relative" ref={movieDropdownRef}>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-[#9ca3af]">
+              1. Chọn bộ phim cần quản lý
+            </label>
+            <span className="text-[10px] text-[#00a3ff] font-semibold">
+              {movies.length} phim trong hệ thống
+            </span>
+          </div>
+
+          {/* Trigger Button */}
+          <button
+            type="button"
             disabled={isLoadingMovies}
-            onChange={(e) => setSelectedMovieSlug(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white focus:border-[#00a3ff] focus:outline-none"
+            onClick={() => setIsMovieDropdownOpen(!isMovieDropdownOpen)}
+            className="w-full flex items-center justify-between rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white focus:border-[#00a3ff] focus:outline-none cursor-pointer transition hover:bg-white/5 text-left"
           >
-            {movies.map((m) => (
-              <option key={m.id} value={m.slug}>
-                {m.title} ({m.type === "SINGLE" ? "Phim Lẻ" : "Phim Bộ"})
-              </option>
-            ))}
-          </select>
+            <span className="truncate">
+              {selectedMovie
+                ? `${selectedMovie.title} (${selectedMovie.type === "SINGLE" ? "Phim Lẻ" : "Phim Bộ"})`
+                : "Đang tải danh sách phim..."}
+            </span>
+            <span className="text-[#9ca3af] text-[10px] pl-2 shrink-0">▼</span>
+          </button>
+
+          {/* Dropdown Menu có thanh Search */}
+          {isMovieDropdownOpen && (
+            <div className="absolute top-full left-0 mt-2 w-full rounded-2xl bg-[#0f172a] border border-white/15 shadow-2xl z-50 p-2 space-y-2 animate-fade-in backdrop-blur-xl">
+              <div className="relative">
+                <input
+                  type="text"
+                  autoFocus
+                  value={movieSearchKeyword}
+                  onChange={(e) => setMovieSearchKeyword(e.target.value)}
+                  placeholder="🔍 Gõ tên phim hoặc slug để tìm nhanh..."
+                  className="w-full rounded-xl border border-white/10 bg-[#131c2e] px-3.5 py-2 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none"
+                />
+                {movieSearchKeyword && (
+                  <button
+                    type="button"
+                    onClick={() => setMovieSearchKeyword("")}
+                    className="absolute right-2.5 top-2 text-xs text-[#9ca3af] hover:text-white cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div className="max-h-60 overflow-y-auto space-y-1 custom-scrollbar pr-1">
+                {filteredMovies.length > 0 ? (
+                  filteredMovies.map((m) => {
+                    const isSelected = m.slug === selectedMovieSlug;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedMovieSlug(m.slug);
+                          setIsMovieDropdownOpen(false);
+                          setMovieSearchKeyword("");
+                        }}
+                        className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
+                          isSelected
+                            ? "bg-[#00a3ff] text-white shadow-md"
+                            : "text-[#cbd5e1] hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        <span className="truncate">{m.title}</span>
+                        <span
+                          className={`text-[10px] ml-2 px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                            isSelected
+                              ? "bg-white/20 text-white"
+                              : "bg-white/5 text-[#9ca3af]"
+                          }`}
+                        >
+                          {m.type === "SINGLE" ? "Lẻ" : "Bộ"}
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="p-4 text-center text-xs text-[#64748b] italic">
+                    Không tìm thấy phim phù hợp với "{movieSearchKeyword}"
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* 2. Ô CHỌN TẬP PHIM */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-[#9ca3af]">
             2. Chọn tập phim
@@ -232,14 +331,18 @@ export const ServerManagerTab: React.FC = () => {
             value={selectedEpisodeId || ""}
             disabled={isLoadingDetails || episodes.length === 0}
             onChange={(e) => setSelectedEpisodeId(Number(e.target.value))}
-            className="w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white focus:border-[#00a3ff] focus:outline-none"
+            className="w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white focus:border-[#00a3ff] focus:outline-none disabled:opacity-40"
           >
-            {episodes.map((ep) => (
-              <option key={ep.id} value={ep.id}>
-                Tập {ep.episode_number} {ep.title ? `- ${ep.title}` : ""} (
-                {ep.servers.length} servers)
-              </option>
-            ))}
+            {episodes.length > 0 ? (
+              episodes.map((ep) => (
+                <option key={ep.id} value={ep.id}>
+                  Tập {ep.episode_number} {ep.title ? `- ${ep.title}` : ""} (
+                  {ep.servers.length} servers)
+                </option>
+              ))
+            ) : (
+              <option value="">Chưa có tập phim nào</option>
+            )}
           </select>
         </div>
       </div>
@@ -252,8 +355,9 @@ export const ServerManagerTab: React.FC = () => {
               <span>📺</span> Danh Sách Nguồn Phát (Video Servers)
             </h3>
             <p className="text-xs text-[#9ca3af] mt-0.5">
-              Đang chọn: Tập {currentEpisode?.episode_number || 1} — Tổng cộng{" "}
-              {currentServers.length} nguồn khả dụng
+              Đang chọn: {selectedMovie?.title} — Tập{" "}
+              {currentEpisode?.episode_number || 1} ({currentServers.length}{" "}
+              nguồn khả dụng)
             </p>
           </div>
 
