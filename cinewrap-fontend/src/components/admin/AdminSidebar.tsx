@@ -1,4 +1,14 @@
 import React from "react";
+import {
+  BarChart3,
+  Bot,
+  Flag,
+  Film,
+  Sparkles,
+  Tv,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 export type AdminTabType =
   | "OVERVIEW"
@@ -22,15 +32,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const menuItems: Array<{
     id: AdminTabType;
     label: string;
-    icon: string;
+    icon: LucideIcon;
     adminOnly?: boolean;
   }> = [
-    { id: "OVERVIEW", label: "Tổng quan & Thống kê", icon: "📊" },
-    { id: "CRAWLER", label: "Bot Cào Phim", icon: "🕷️" },
-    { id: "SERVERS", label: "Quản lý Video Server", icon: "📺" },
-    { id: "MOVIES", label: "Quản lý Phim & Tập", icon: "🎬" },
-    { id: "REPORTS", label: "Báo lỗi tập phim", icon: "🚩" },
-    { id: "USERS", label: "Quản lý Người dùng", icon: "👥", adminOnly: true },
+    { id: "OVERVIEW", label: "Tổng quan & Thống kê", icon: BarChart3 },
+    { id: "CRAWLER", label: "Bot Cào Phim", icon: Bot },
+    { id: "SERVERS", label: "Quản lý Video Server", icon: Tv },
+    { id: "MOVIES", label: "Quản lý Phim & Tập", icon: Film },
+    { id: "REPORTS", label: "Báo lỗi tập phim", icon: Flag },
+    { id: "USERS", label: "Quản lý Người dùng", icon: Users, adminOnly: true },
   ];
 
   return (
@@ -39,7 +49,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Brand */}
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#00a3ff] to-[#0066ff] text-xl shadow-lg">
-            ⚡
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
             <h2 className="text-base font-black text-white tracking-wider">
@@ -56,6 +66,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           {menuItems.map((item) => {
             if (item.adminOnly && userRole !== "ADMIN") return null;
             const isActive = activeTab === item.id;
+            const Icon = item.icon;
+
             return (
               <button
                 key={item.id}
@@ -67,7 +79,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     : "text-[#9ca3af] hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <span className="text-base">{item.icon}</span>
+                <Icon
+                  className={`h-4 w-4 shrink-0 ${
+                    isActive ? "text-white" : "text-[#9ca3af]"
+                  }`}
+                  strokeWidth={2.2}
+                />
                 <span>{item.label}</span>
               </button>
             );
@@ -82,3 +99,5 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     </aside>
   );
 };
+
+export default AdminSidebar;
