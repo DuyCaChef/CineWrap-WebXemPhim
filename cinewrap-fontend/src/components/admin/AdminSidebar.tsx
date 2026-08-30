@@ -4,12 +4,12 @@ import {
   Bot,
   Flag,
   Film,
-  Sparkles,
   Tv,
   Users,
   X,
   type LucideIcon,
 } from "lucide-react";
+import logoCineWrap from "../../assets/images/logo_CineWrap.png";
 
 export type AdminTabType =
   | "OVERVIEW"
@@ -57,8 +57,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-3 px-2">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#00a3ff] to-[#0066ff] text-xl shadow-lg">
-              <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex h-15 w-15 items-center justify-center overflow-hidden  ">
+              <img
+                src={logoCineWrap}
+                alt="CineWrap logo"
+                className="h-full w-full object-cover"
+              />
             </div>
             <div>
               <h2 className="text-base font-black tracking-wider text-white">
