@@ -1,4 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
+import {
+  ChevronDown,
+  CircleCheck,
+  LoaderCircle,
+  Pencil,
+  Plus,
+  Search,
+  Server,
+  Trash2,
+  X,
+  Zap,
+} from "lucide-react";
 import { movieService } from "../../../services/movieService";
 import type {
   BackendMovie,
@@ -211,20 +223,24 @@ export const ServerManagerTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full h-full space-y-6 overflow-x-hidden">
       {toastMessage && (
-        <div className="fixed right-4 top-20 z-50 rounded-xl bg-[#00a3ff] px-4 py-2.5 text-xs font-bold text-white shadow-2xl animate-fade-in sm:right-8">
+        <div className="fixed left-3 right-3 top-20 z-50 flex min-h-11 items-center justify-center rounded-xl border border-[#7dd3fc]/30 bg-[#0f172a] px-4 py-2.5 text-center text-xs font-bold text-[#7dd3fc] shadow-2xl animate-fade-in sm:left-auto sm:right-8 sm:max-w-sm">
+          <CircleCheck
+            className="mr-2 h-4 w-4 shrink-0 text-[#34d399]"
+            strokeWidth={2.2}
+          />
           {toastMessage}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-white/10 bg-[#131c2e]/80 p-4 sm:p-5 md:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-4 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(19,28,46,0.96),rgba(13,20,37,0.92))] p-4 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:gap-5 sm:p-5 lg:grid-cols-2">
         <div className="relative space-y-1.5" ref={movieDropdownRef}>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="text-xs font-bold text-[#9ca3af]">
               1. Chọn bộ phim cần quản lý
             </label>
-            <span className="text-[10px] font-semibold text-[#00a3ff]">
+            <span className="text-[10px] font-semibold text-[#7dd3fc]">
               {movies.length} phim trong hệ thống
             </span>
           </div>
@@ -233,34 +249,49 @@ export const ServerManagerTab: React.FC = () => {
             type="button"
             disabled={isLoadingMovies}
             onClick={() => setIsMovieDropdownOpen(!isMovieDropdownOpen)}
-            className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-white/10 bg-[#0f172a] p-3 text-left text-xs font-bold text-white transition hover:bg-white/5 focus:border-[#00a3ff] focus:outline-none cursor-pointer"
+            className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-[#0f172a] p-3 text-left text-xs font-bold text-white transition hover:border-[#00a3ff]/40 hover:bg-white/5 focus:border-[#00a3ff] focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span className="truncate">
               {selectedMovie
                 ? `${selectedMovie.title} (${selectedMovie.type === "SINGLE" ? "Phim Lẻ" : "Phim Bộ"})`
                 : "Đang tải danh sách phim..."}
             </span>
-            <span className="shrink-0 pl-2 text-[10px] text-[#9ca3af]">▼</span>
+            {isLoadingMovies ? (
+              <LoaderCircle
+                className="h-4 w-4 shrink-0 animate-spin text-[#7dd3fc]"
+                strokeWidth={2.2}
+              />
+            ) : (
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-[#9ca3af] transition ${isMovieDropdownOpen ? "rotate-180" : ""}`}
+                strokeWidth={2.2}
+              />
+            )}
           </button>
 
           {isMovieDropdownOpen && (
-            <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-2xl border border-white/15 bg-[#0f172a] p-2 shadow-2xl backdrop-blur-xl animate-fade-in">
+            <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-2xl border border-[#00a3ff]/20 bg-[#0b1220] p-2 shadow-2xl shadow-black/40 backdrop-blur-xl animate-fade-in">
               <div className="relative">
+                <Search
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748b]"
+                  strokeWidth={2.2}
+                />
                 <input
                   type="text"
                   autoFocus
                   value={movieSearchKeyword}
                   onChange={(e) => setMovieSearchKeyword(e.target.value)}
-                  placeholder="🔍 Gõ tên phim hoặc slug để tìm nhanh..."
-                  className="w-full rounded-xl border border-white/10 bg-[#131c2e] px-3.5 py-2 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none"
+                  placeholder="Gõ tên phim hoặc slug để tìm nhanh..."
+                  className="min-h-11 w-full rounded-xl border border-white/10 bg-[#131c2e] py-2 pl-10 pr-11 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none"
                 />
                 {movieSearchKeyword && (
                   <button
                     type="button"
                     onClick={() => setMovieSearchKeyword("")}
-                    className="absolute right-2.5 top-2 cursor-pointer text-xs text-[#9ca3af] hover:text-white"
+                    aria-label="Xóa tìm kiếm"
+                    className="absolute right-1 top-1 flex h-9 w-9 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-white/5 hover:text-white cursor-pointer"
                   >
-                    ✕
+                    <X className="h-4 w-4" strokeWidth={2.2} />
                   </button>
                 )}
               </div>
@@ -278,7 +309,7 @@ export const ServerManagerTab: React.FC = () => {
                           setIsMovieDropdownOpen(false);
                           setMovieSearchKeyword("");
                         }}
-                        className={`flex w-full items-center justify-between rounded-xl p-2.5 text-left text-xs font-semibold transition cursor-pointer ${
+                        className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-xl p-2.5 text-left text-xs font-semibold transition cursor-pointer ${
                           isSelected
                             ? "bg-[#00a3ff] text-white shadow-md"
                             : "text-[#cbd5e1] hover:bg-white/10 hover:text-white"
@@ -315,7 +346,7 @@ export const ServerManagerTab: React.FC = () => {
             value={selectedEpisodeId || ""}
             disabled={isLoadingDetails || episodes.length === 0}
             onChange={(e) => setSelectedEpisodeId(Number(e.target.value))}
-            className="min-h-[44px] w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white transition focus:border-[#00a3ff] focus:outline-none disabled:opacity-40"
+            className="min-h-11 w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-bold text-white transition focus:border-[#00a3ff] focus:outline-none disabled:opacity-40"
           >
             {episodes.length > 0 ? (
               episodes.map((ep) => (
@@ -331,13 +362,17 @@ export const ServerManagerTab: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-4 rounded-2xl border border-white/10 bg-[#131c2e]/80 p-4 sm:p-6">
+      <div className="min-w-0 space-y-4 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(16,24,39,0.96),rgba(11,18,28,0.94))] p-4 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:p-6">
         <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+          <div className="min-w-0">
             <h3 className="flex items-center gap-2 text-base font-bold text-white">
-              <span>📺</span> Danh Sách Nguồn Phát (Video Servers)
+              <Server
+                className="h-5 w-5 shrink-0 text-[#7dd3fc]"
+                strokeWidth={2.2}
+              />
+              Danh Sách Nguồn Phát
             </h3>
-            <p className="mt-0.5 text-xs text-[#9ca3af]">
+            <p className="mt-1 wrap-break-word text-xs text-[#9ca3af]">
               Đang chọn: {selectedMovie?.title} — Tập{" "}
               {currentEpisode?.episode_number || 1} ({currentServers.length}{" "}
               nguồn khả dụng)
@@ -348,53 +383,68 @@ export const ServerManagerTab: React.FC = () => {
             type="button"
             disabled={!selectedEpisodeId}
             onClick={handleOpenAddModal}
-            className="min-h-[44px] w-full rounded-xl bg-[#00a3ff] px-4 py-2.5 text-xs font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-40 cursor-pointer sm:w-auto"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#00a3ff] px-4 py-2.5 text-xs font-bold text-white shadow-[0_10px_24px_rgba(0,163,255,0.2)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer sm:w-auto"
           >
-            + Thêm Link Server Mới
+            <Plus className="h-4 w-4" strokeWidth={2.4} />
+            Thêm Link Server Mới
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-[650px] w-full text-left text-xs">
+        <div className="max-w-full overflow-x-auto overscroll-x-contain">
+          <table className="w-full min-w-150 text-left text-xs">
             <thead className="bg-[#0f172a] text-[#64748b]">
               <tr>
-                <th className="rounded-l-xl p-3.5">Tên Máy Chủ</th>
-                <th className="p-3.5">Chất Lượng</th>
-                <th className="p-3.5">Đường Dẫn Stream (URL)</th>
-                <th className="rounded-r-xl p-3.5 text-right">Thao Tác</th>
+                <th className="whitespace-nowrap rounded-l-xl p-3.5">
+                  Tên Máy Chủ
+                </th>
+                <th className="whitespace-nowrap p-3.5">Chất Lượng</th>
+                <th className="whitespace-nowrap p-3.5">
+                  Đường Dẫn Stream (URL)
+                </th>
+                <th className="whitespace-nowrap rounded-r-xl p-3.5 text-right">
+                  Thao Tác
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-[#cbd5e1]">
               {currentServers.length > 0 ? (
                 currentServers.map((src) => (
                   <tr key={src.id} className="transition hover:bg-white/5">
-                    <td className="flex items-center gap-2 p-3.5 font-bold text-white">
-                      <span className="h-2 w-2 rounded-full bg-green-400" />
-                      {src.server_name}
+                    <td className="whitespace-nowrap p-3.5 font-bold text-white">
+                      <span className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-green-400" />
+                        {src.server_name}
+                      </span>
                     </td>
-                    <td className="p-3.5">
+                    <td className="whitespace-nowrap p-3.5">
                       <span className="rounded-md bg-[#00a3ff]/20 px-2 py-0.5 text-[11px] font-bold text-[#00a3ff]">
                         {src.quality || "HD"}
                       </span>
                     </td>
-                    <td className="max-w-md truncate p-3.5 font-mono text-[11px] text-[#9ca3af]">
+                    <td className="max-w-md truncate whitespace-nowrap p-3.5 font-mono text-[11px] text-[#9ca3af]">
                       {src.url}
                     </td>
-                    <td className="space-x-3 p-3.5 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(src)}
-                        className="cursor-pointer font-semibold text-[#00a3ff] hover:underline"
-                      >
-                        Sửa
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteServer(src.id)}
-                        className="cursor-pointer font-semibold text-red-400 hover:underline"
-                      >
-                        Xóa
-                      </button>
+                    <td className="p-3.5 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(src)}
+                          aria-label={`Sửa ${src.server_name}`}
+                          className="flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 font-semibold text-[#7dd3fc] transition hover:bg-[#00a3ff]/10 cursor-pointer"
+                        >
+                          <Pencil className="h-3.5 w-3.5" strokeWidth={2.2} />
+                          Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteServer(src.id)}
+                          aria-label={`Xóa ${src.server_name}`}
+                          className="flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 font-semibold text-red-400 transition hover:bg-red-500/10 cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={2.2} />
+                          Xóa
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -416,9 +466,9 @@ export const ServerManagerTab: React.FC = () => {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="max-h-[90vh] w-[92%] overflow-y-auto rounded-2xl border border-white/10 bg-[#131c2e] p-4 shadow-2xl sm:max-w-md sm:p-6">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#00a3ff]/20 bg-[linear-gradient(180deg,rgba(19,28,46,0.99),rgba(11,18,31,0.99))] p-4 shadow-2xl shadow-black/50 sm:p-6">
             <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-white">
-              <span>⚡</span>{" "}
+              <Zap className="h-5 w-5 text-[#fbbf24]" strokeWidth={2.2} />
               {editingServerId
                 ? "Cập Nhật Nguồn Phát"
                 : "Thêm Nguồn Stream Mới"}
@@ -434,7 +484,7 @@ export const ServerManagerTab: React.FC = () => {
                   value={serverName}
                   onChange={(e) => setServerName(e.target.value)}
                   placeholder="Ví dụ: Server VIP 1 (HLS), KKPhim..."
-                  className="min-h-[44px] w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs text-white focus:border-[#00a3ff] focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs text-white focus:border-[#00a3ff] focus:outline-none"
                 />
               </div>
 
@@ -447,7 +497,7 @@ export const ServerManagerTab: React.FC = () => {
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
                   placeholder="https://.../index.m3u8"
-                  className="w-full resize-none rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-mono text-white focus:border-[#00a3ff] focus:outline-none"
+                  className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs font-mono text-white focus:border-[#00a3ff] focus:outline-none"
                 />
               </div>
 
@@ -458,7 +508,7 @@ export const ServerManagerTab: React.FC = () => {
                 <select
                   value={quality}
                   onChange={(e) => setQuality(e.target.value)}
-                  className="min-h-[44px] w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs text-white focus:border-[#00a3ff] focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-white/10 bg-[#0f172a] p-3 text-xs text-white focus:border-[#00a3ff] focus:outline-none"
                 >
                   <option value="1080p">1080p Full HD</option>
                   <option value="720p">720p HD</option>
@@ -471,16 +521,26 @@ export const ServerManagerTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="min-h-[44px] flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-white transition hover:bg-white/10 cursor-pointer"
+                  className="min-h-11 flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-white transition hover:bg-white/10 cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={!serverName.trim() || !serverUrl.trim()}
-                  className="min-h-[44px] flex-1 rounded-xl bg-[#00a3ff] py-2.5 text-xs font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-50 cursor-pointer"
+                  className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#00a3ff] py-2.5 text-xs font-bold text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 >
-                  {editingServerId ? "Lưu Thay Đổi" : "Tạo Server"}
+                  {editingServerId ? (
+                    <>
+                      <Pencil className="h-4 w-4" strokeWidth={2.2} />
+                      Lưu Thay Đổi
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4" strokeWidth={2.2} />
+                      Tạo Server
+                    </>
+                  )}
                 </button>
               </div>
             </form>
