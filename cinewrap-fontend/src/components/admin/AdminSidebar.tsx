@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import logoCineWrap from "../../assets/images/logo_CineWrap.png";
+import Typo_CineWrap from "../../assets/images/Typo_CineWrap.png";
 
 export type AdminTabType =
   | "OVERVIEW"
@@ -64,11 +65,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 className="h-full w-full object-cover"
               />
             </div>
-            <div>
-              <h2 className="text-base font-black tracking-wider text-white">
-                CINEWRAP
-              </h2>
-              <span className="rounded-md bg-[#00a3ff]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#00a3ff]">
+            <div className="min-w-0">
+              <img
+                src={Typo_CineWrap}
+                alt="CineWrap"
+                className="h-5 w-auto max-w-30 object-contain drop-shadow-[0_0_10px_rgba(0,163,255,0.2)]"
+              />
+              <span className="mt-1.5 block rounded-md bg-[#00a3ff]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#00a3ff]">
                 {userRole} Portal
               </span>
             </div>
@@ -98,7 +101,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   onSelectTab(item.id);
                   onClose();
                 }}
-                className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-xs font-bold transition cursor-pointer min-h-[44px] ${
+                className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-xs font-bold transition cursor-pointer min-h-11 ${
                   isActive
                     ? "bg-[#00a3ff] text-white shadow-[0_0_20px_rgba(0,163,255,0.4)]"
                     : "text-[#9ca3af] hover:bg-white/5 hover:text-white"
