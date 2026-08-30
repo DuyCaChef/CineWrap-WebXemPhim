@@ -10,12 +10,12 @@ export const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTabType>("OVERVIEW");
 
   const tabTitles: Record<AdminTabType, string> = {
-    OVERVIEW: "📊 Bảng Điều Khiển Tổng Quan",
-    CRAWLER: "🕷️ Công Cụ Cào & Đồng Bộ Phim",
-    SERVERS: "📺 Quản Lý Video Server & Nguồn Phát",
-    MOVIES: "🎬 Quản Lý Danh Sách Phim & Tập",
-    REPORTS: "🚩 Danh Sách Báo Lỗi Từ Khán Giả",
-    USERS: "👥 Quản Lý Thành Viên & Phân Quyền",
+    OVERVIEW: "Bảng Điều Khiển Tổng Quan",
+    CRAWLER: "Công Cụ Cào & Đồng Bộ Phim",
+    SERVERS: "Quản Lý Video Server & Nguồn Phát",
+    MOVIES: "Quản Lý Danh Sách Phim & Tập",
+    REPORTS: "Danh Sách Báo Lỗi Từ Khán Giả",
+    USERS: "Quản Lý Thành Viên & Phân Quyền",
   };
 
   return (
