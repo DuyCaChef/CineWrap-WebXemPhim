@@ -59,9 +59,9 @@ export const CrawlerTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-2xl bg-[#131c2e]/80 border border-white/10 p-6 space-y-4">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="space-y-4 rounded-2xl border border-white/10 bg-[#131c2e]/80 p-4 sm:p-6">
+          <h2 className="flex items-center gap-2 text-sm font-bold text-white">
             <span>🎯</span> Cào Lẻ Theo Movie Slug
           </h2>
           <form onSubmit={handleCrawlSingle} className="space-y-4">
@@ -70,20 +70,20 @@ export const CrawlerTab: React.FC = () => {
               value={singleSlug}
               onChange={(e) => setSingleSlug(e.target.value)}
               placeholder="Ví dụ: avatar-dong-chay-cua-nuoc"
-              className="w-full rounded-xl border border-white/10 bg-[#0f172a] px-3.5 py-2.5 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none transition"
+              className="min-h-[44px] w-full rounded-xl border border-white/10 bg-[#0f172a] px-3.5 py-2.5 text-xs text-white placeholder-[#64748b] transition focus:border-[#00a3ff] focus:outline-none"
             />
             <button
               type="submit"
               disabled={isLoading || !singleSlug.trim()}
-              className="w-full rounded-xl bg-[#00a3ff] py-2.5 text-xs font-bold text-white shadow-lg hover:brightness-110 transition disabled:opacity-50 cursor-pointer"
+              className="min-h-[44px] w-full rounded-xl bg-[#00a3ff] py-2.5 text-xs font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? "Đang đồng bộ..." : "Bắt đầu cào phim"}
             </button>
           </form>
         </div>
 
-        <div className="rounded-2xl bg-[#131c2e]/80 border border-white/10 p-6 space-y-4">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="space-y-4 rounded-2xl border border-white/10 bg-[#131c2e]/80 p-4 sm:p-6">
+          <h2 className="flex items-center gap-2 text-sm font-bold text-white">
             <span>📚</span> Cào Hàng Loạt Theo Trang (24 phim/trang)
           </h2>
           <form onSubmit={handleCrawlPage} className="space-y-4">
@@ -93,12 +93,12 @@ export const CrawlerTab: React.FC = () => {
               max={500}
               value={pageNumber}
               onChange={(e) => setPageNumber(Number(e.target.value))}
-              className="w-full rounded-xl border border-white/10 bg-[#0f172a] px-3.5 py-2.5 text-xs text-white placeholder-[#64748b] focus:border-[#00a3ff] focus:outline-none transition"
+              className="min-h-[44px] w-full rounded-xl border border-white/10 bg-[#0f172a] px-3.5 py-2.5 text-xs text-white placeholder-[#64748b] transition focus:border-[#00a3ff] focus:outline-none"
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-purple-600 hover:bg-purple-500 py-2.5 text-xs font-bold text-white shadow-lg transition disabled:opacity-50 cursor-pointer"
+              className="min-h-[44px] w-full rounded-xl bg-purple-600 py-2.5 text-xs font-bold text-white shadow-lg transition hover:bg-purple-500 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? "Đang quét..." : `Cào Toàn Bộ Trang ${pageNumber}`}
             </button>
@@ -107,24 +107,24 @@ export const CrawlerTab: React.FC = () => {
       </div>
 
       {syncResults?.results && (
-        <div className="rounded-2xl bg-[#131c2e]/80 border border-white/10 p-5 space-y-3">
-          <h3 className="text-xs font-bold text-white flex justify-between">
+        <div className="space-y-3 rounded-2xl border border-white/10 bg-[#131c2e]/80 p-4 sm:p-5">
+          <h3 className="flex items-center justify-between gap-2 text-xs font-bold text-white">
             <span>Kết quả cào gần nhất</span>
             <span className="text-[#00a3ff]">
               Đã cào: {syncResults.totalSynced} phim
             </span>
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+          <div className="grid max-h-40 grid-cols-1 gap-2 overflow-y-auto pr-1 custom-scrollbar sm:grid-cols-3">
             {syncResults.results.map((item, idx) => (
               <div
                 key={idx}
-                className={`p-2 rounded-xl text-xs border flex justify-between ${
+                className={`flex items-center justify-between rounded-xl border p-2 text-xs ${
                   item.status === "SUCCESS"
                     ? "border-green-500/20 bg-green-500/10 text-green-300"
                     : "border-red-500/20 bg-red-500/10 text-red-300"
                 }`}
               >
-                <span className="truncate max-w-[150px]">
+                <span className="max-w-[150px] truncate">
                   {item.title || item.slug}
                 </span>
                 <span className="font-bold">
@@ -136,19 +136,18 @@ export const CrawlerTab: React.FC = () => {
         </div>
       )}
 
-      {/* Output Log */}
-      <div className="rounded-2xl bg-black/90 border border-white/10 p-4 font-mono text-xs space-y-2">
-        <div className="flex justify-between border-b border-white/10 pb-2 text-[#00a3ff] font-bold">
+      <div className="space-y-2 rounded-2xl border border-white/10 bg-black/90 p-4 font-mono text-[11px] sm:text-xs">
+        <div className="flex items-center justify-between border-b border-white/10 pb-2 font-bold text-[#00a3ff]">
           <span>Crawler Console Output</span>
           <button
             type="button"
             onClick={() => setLogs([])}
-            className="text-[#64748b] hover:text-white cursor-pointer"
+            className="cursor-pointer text-[#64748b] hover:text-white"
           >
             Xóa log
           </button>
         </div>
-        <div className="h-40 overflow-y-auto space-y-1 custom-scrollbar">
+        <div className="h-40 overflow-y-auto space-y-1 custom-scrollbar sm:h-52">
           {logs.map((log, i) => (
             <div
               key={i}
