@@ -5,6 +5,7 @@ import { AdminHeader } from "../../components/admin/AdminHeader";
 import { OverviewTab } from "../../components/admin/tabs/OverviewTab";
 import { CrawlerTab } from "../../components/admin/tabs/CrawlerTab";
 import { ServerManagerTab } from "../../components/admin/tabs/ServerManagerTab";
+import { MoviesTab } from "../../components/admin/tabs/MoviesTab";
 import { ReportTicketsTab } from "../../components/admin/tabs/ReportTicketsTab";
 
 export const AdminDashboardPage: React.FC = () => {
@@ -53,11 +54,7 @@ export const AdminDashboardPage: React.FC = () => {
             {activeTab === "OVERVIEW" && <OverviewTab />}
             {activeTab === "CRAWLER" && <CrawlerTab />}
             {activeTab === "SERVERS" && <ServerManagerTab />}
-            {activeTab === "MOVIES" && (
-              <div className="text-xs text-[#64748b] italic">
-                Phân hệ Quản lý Phim & Tập đang được tải...
-              </div>
-            )}
+            {activeTab === "MOVIES" && <MoviesTab />}
             {activeTab === "REPORTS" && <ReportTicketsTab />}
             {activeTab === "USERS" && (
               <div className="text-xs text-[#64748b] italic">

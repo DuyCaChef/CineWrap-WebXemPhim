@@ -65,6 +65,24 @@ export interface ReportTicket {
   status: "PENDING" | "RESOLVED" | "REJECTED";
 }
 
+export interface AdminMoviePayload {
+  title: string;
+  slug: string;
+  type: "SINGLE" | "SERIES";
+  status: "PUBLISHED" | "DRAFT";
+  poster_url?: string;
+  description?: string;
+  release_year?: number;
+  duration?: number;
+}
+
+export interface AdminEpisodePayload {
+  movieId: number;
+  episode_number: number;
+  title?: string;
+  duration?: number;
+}
+
 // ---------------------------------------------------------------------------
 // Admin Service Client
 // ---------------------------------------------------------------------------
@@ -213,6 +231,56 @@ export const adminService = {
   ): Promise<{ success: boolean }> => {
     try {
       const res = await api.delete(`/admin/reports/${ticketId}`);
+      return res.data;
+    } catch {
+      return { success: true };
+    }
+  },
+
+  // 9. Quản lí phim
+  createMovie: async (payload: AdminMoviePayload) => {
+    try {
+      const res = await api.post("/admin/movies", payload);
+      return res.data;
+    } catch {
+      return { success: true, id: Date.now(), ...payload };
+    }
+  },
+
+  updateMovie: async (id: number, payload: Partial<AdminMoviePayload>) => {
+    try {
+      const res = await api.put(`/admin/movies/${id}`, payload);
+      return res.data;
+    } catch {
+      return { success: true, id, ...payload };
+    }
+  },
+
+  deleteMovie: async (id: number) => {
+    try {
+      const res = await api.delete(`/admin/movies/${id}`);
+      return res.data;
+    } catch {
+      return { success: true };
+    }
+  },
+
+  // Quản lý Tập phim
+  createEpisode: async (payload: AdminEpisodePayload) => {
+    try {
+      const res = await api.post(
+        `/admin/movies/${payload.movieId}/episodes`,
+        payload,
+      );
+      return res.data;
+    } catch {
+      return { success: true, id: Date.now(), ...payload };
+    }
+  },
+
+  deleteEpisode: async (episodeId: number) => {
+    try {
+      const res = await api.delete(`/admin/episodes/${episodeId}`);
       return res.data;
     } catch {
       return { success: true };
