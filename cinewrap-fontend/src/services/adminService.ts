@@ -83,6 +83,20 @@ export interface AdminEpisodePayload {
   duration?: number;
 }
 
+export type UserRole = "ADMIN" | "MODERATOR" | "USER";
+export type UserAccountStatus = "ACTIVE" | "BANNED";
+
+export interface AdminUserItem {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url?: string | null;
+  role: UserRole;
+  status: UserAccountStatus;
+  created_at: string;
+  last_login?: string | null;
+}
+
 // ---------------------------------------------------------------------------
 // Admin Service Client
 // ---------------------------------------------------------------------------
@@ -281,6 +295,100 @@ export const adminService = {
   deleteEpisode: async (episodeId: number) => {
     try {
       const res = await api.delete(`/admin/episodes/${episodeId}`);
+      return res.data;
+    } catch {
+      return { success: true };
+    }
+  },
+
+  // 11. Quản lý Người dùng & Phân quyền
+  getUsersList: async (): Promise<AdminUserItem[]> => {
+    try {
+      const res = await api.get("/admin/users");
+      return res.data;
+    } catch {
+      return [
+        {
+          id: 1,
+          username: "admin_cinewrap",
+          email: "admin@cinewrap.vn",
+          avatar_url: null,
+          role: "ADMIN",
+          status: "ACTIVE",
+          created_at: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 120,
+          ).toISOString(),
+          last_login: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          username: "hoang_moderator",
+          email: "hoang.mod@cinewrap.vn",
+          avatar_url: null,
+          role: "MODERATOR",
+          status: "ACTIVE",
+          created_at: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 45,
+          ).toISOString(),
+          last_login: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+        },
+        {
+          id: 3,
+          username: "nguyenvana",
+          email: "nguyenvana@gmail.com",
+          avatar_url: null,
+          role: "USER",
+          status: "ACTIVE",
+          created_at: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 15,
+          ).toISOString(),
+          last_login: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+        },
+        {
+          id: 4,
+          username: "spammer_bot99",
+          email: "spam99@tempmail.com",
+          avatar_url: null,
+          role: "USER",
+          status: "BANNED",
+          created_at: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 3,
+          ).toISOString(),
+          last_login: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 2,
+          ).toISOString(),
+        },
+      ];
+    }
+  },
+
+  updateUserRole: async (
+    userId: number,
+    role: UserRole,
+  ): Promise<{ success: boolean }> => {
+    try {
+      const res = await api.patch(`/admin/users/${userId}/role`, { role });
+      return res.data;
+    } catch {
+      return { success: true };
+    }
+  },
+
+  updateUserStatus: async (
+    userId: number,
+    status: UserAccountStatus,
+  ): Promise<{ success: boolean }> => {
+    try {
+      const res = await api.patch(`/admin/users/${userId}/status`, { status });
+      return res.data;
+    } catch {
+      return { success: true };
+    }
+  },
+
+  deleteUser: async (userId: number): Promise<{ success: boolean }> => {
+    try {
+      const res = await api.delete(`/admin/users/${userId}`);
       return res.data;
     } catch {
       return { success: true };

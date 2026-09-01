@@ -7,6 +7,7 @@ import { CrawlerTab } from "../../components/admin/tabs/CrawlerTab";
 import { ServerManagerTab } from "../../components/admin/tabs/ServerManagerTab";
 import { MoviesTab } from "../../components/admin/tabs/MoviesTab";
 import { ReportTicketsTab } from "../../components/admin/tabs/ReportTicketsTab";
+import { UsersTab } from "../../components/admin/tabs/UsersTab";
 
 export const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTabType>("OVERVIEW");
@@ -56,11 +57,7 @@ export const AdminDashboardPage: React.FC = () => {
             {activeTab === "SERVERS" && <ServerManagerTab />}
             {activeTab === "MOVIES" && <MoviesTab />}
             {activeTab === "REPORTS" && <ReportTicketsTab />}
-            {activeTab === "USERS" && (
-              <div className="text-xs text-[#64748b] italic">
-                Phân hệ Quản lý User (Cấp quyền Moderator) đang mở...
-              </div>
-            )}
+            {activeTab === "USERS" && <UsersTab />}
           </main>
         </div>
       </div>
