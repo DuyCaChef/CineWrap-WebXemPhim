@@ -5,6 +5,7 @@ import { AdminHeader } from "../../components/admin/AdminHeader";
 import { OverviewTab } from "../../components/admin/tabs/OverviewTab";
 import { CrawlerTab } from "../../components/admin/tabs/CrawlerTab";
 import { ServerManagerTab } from "../../components/admin/tabs/ServerManagerTab";
+import { ReportTicketsTab } from "../../components/admin/tabs/ReportTicketsTab";
 
 export const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTabType>("OVERVIEW");
@@ -30,6 +31,7 @@ export const AdminDashboardPage: React.FC = () => {
           />
         )}
 
+        {/* Sidebar Điều Hướng */}
         <AdminSidebar
           activeTab={activeTab}
           onSelectTab={(tab) => {
@@ -56,11 +58,7 @@ export const AdminDashboardPage: React.FC = () => {
                 Phân hệ Quản lý Phim & Tập đang được tải...
               </div>
             )}
-            {activeTab === "REPORTS" && (
-              <div className="text-xs text-[#64748b] italic">
-                Hộp thư Báo lỗi tập phim đang được đồng bộ...
-              </div>
-            )}
+            {activeTab === "REPORTS" && <ReportTicketsTab />}
             {activeTab === "USERS" && (
               <div className="text-xs text-[#64748b] italic">
                 Phân hệ Quản lý User (Cấp quyền Moderator) đang mở...
