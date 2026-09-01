@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Activity,
   ArrowUpRight,
@@ -10,8 +10,35 @@ import {
   Tv,
   type LucideIcon,
 } from "lucide-react";
+import { adminService } from "../../../services/adminService";
+import type { AdminStatsResponse } from "../../../services/adminService";
 
 export const OverviewTab: React.FC = () => {
+  const [stats, setStats] = useState<AdminStatsResponse>({
+    totalMovies: 0,
+    totalViews: 0,
+    totalEpisodes: 0,
+    pendingReports: 0,
+    topMovies: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Lấy dữ liệu thống kê bảng điều khiển khi component mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setIsLoading(true);
+        const data = await adminService.getDashboardStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Lỗi khi tải thống kê tổng quan:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const kpis: Array<{
     label: string;
     value: string;
@@ -23,7 +50,7 @@ export const OverviewTab: React.FC = () => {
   }> = [
     {
       label: "Tổng số phim",
-      value: "1,248",
+      value: isLoading ? "..." : stats.totalMovies.toLocaleString("vi-VN"),
       icon: Clapperboard,
       change: "+12 tuần này",
       accent: "text-[#7dd3fc]",
@@ -31,7 +58,7 @@ export const OverviewTab: React.FC = () => {
     },
     {
       label: "Tổng lượt xem",
-      value: "482.9K",
+      value: isLoading ? "..." : `${(stats.totalViews / 1000).toFixed(1)}K`,
       icon: Eye,
       change: "+18.4%",
       accent: "text-[#34d399]",
@@ -39,7 +66,7 @@ export const OverviewTab: React.FC = () => {
     },
     {
       label: "Số lượng tập phim",
-      value: "8,920",
+      value: isLoading ? "..." : stats.totalEpisodes.toLocaleString("vi-VN"),
       icon: Tv,
       change: "+45 tập mới",
       accent: "text-[#fbbf24]",
@@ -47,10 +74,10 @@ export const OverviewTab: React.FC = () => {
     },
     {
       label: "Báo lỗi chưa duyệt",
-      value: "3",
+      value: isLoading ? "..." : String(stats.pendingReports),
       icon: Flag,
-      change: "Cần xử lý ngay",
-      alert: true,
+      change: stats.pendingReports > 0 ? "Cần xử lý ngay" : "Đã hoàn thành",
+      alert: stats.pendingReports > 0,
       accent: "text-[#f87171]",
       iconBg: "bg-[#ef4444]/12",
     },
@@ -69,10 +96,13 @@ export const OverviewTab: React.FC = () => {
       time: "5 phút trước",
     },
     {
-      label: 'Phim mới "Cá Chép Trong Nước" đã được xuất bản',
+      label: 'Phim mới "Avatar: Dòng Chảy Của Nước" đã được xuất bản',
       time: "24 phút trước",
     },
-    { label: "3 báo lỗi tập phim đang chờ xác minh", time: "1 giờ trước" },
+    {
+      label: `${stats.pendingReports} báo lỗi tập phim đang chờ xác minh`,
+      time: "1 giờ trước",
+    },
     {
       label: "Lượt xem hôm nay tăng 8.2% so với tuần trước",
       time: "2 giờ trước",
@@ -81,6 +111,7 @@ export const OverviewTab: React.FC = () => {
 
   return (
     <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+      {/* KPI Cards Grid */}
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi, idx) => {
           const Icon = kpi.icon;
@@ -125,7 +156,9 @@ export const OverviewTab: React.FC = () => {
         })}
       </div>
 
+      {/* Main Grid: Top Phim + Side Cards */}
       <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(16rem,0.9fr)]">
+        {/* Cột trái: Top Phim Xem Nhiều Nhất */}
         <div className="min-w-0 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(19,28,46,0.96),rgba(13,20,37,0.92))] p-4 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:p-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h3 className="flex items-center gap-2 text-sm font-bold text-white">
@@ -135,16 +168,13 @@ export const OverviewTab: React.FC = () => {
               />
               Top Phim Xem Nhiều Nhất
             </h3>
-            <button
-              type="button"
-              className="min-h-11 rounded-lg border border-[#00a3ff]/25 bg-[#0f172a] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7dd3fc] transition hover:border-[#00a3ff]/40 hover:bg-[#12213a]"
-            >
-              Xem thêm
-            </button>
+            <span className="text-xs text-[#00a3ff] font-semibold">
+              Cập nhật theo thời gian thực
+            </span>
           </div>
 
-          <div className="max-w-full overflow-x-auto overscroll-x-contain">
-            <table className="w-full min-w-150 text-left text-xs">
+          <div className="max-w-full overflow-x-auto overscroll-x-contain custom-scrollbar">
+            <table className="w-full min-w-[550px] text-left text-xs">
               <thead className="border-b border-white/10 text-[#64748b]">
                 <tr>
                   <th className="whitespace-nowrap pb-3">Tên Phim</th>
@@ -157,50 +187,41 @@ export const OverviewTab: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-[#cbd5e1]">
-                <tr className="transition hover:bg-white/3">
-                  <td className="whitespace-nowrap py-3 font-bold text-white">
-                    Avatar: Dòng Chảy Của Nước
-                  </td>
-                  <td className="whitespace-nowrap py-3">Phim Lẻ</td>
-                  <td className="whitespace-nowrap py-3 font-mono">124,500</td>
-                  <td className="whitespace-nowrap py-3 text-[#ffc107]">
-                    ★ 9.2
-                  </td>
-                  <td className="whitespace-nowrap py-3 text-right font-bold text-green-400">
-                    PUBLISHED
-                  </td>
-                </tr>
-                <tr className="transition hover:bg-white/3">
-                  <td className="whitespace-nowrap py-3 font-bold text-white">
-                    Đấu Phá Thương Khung (Phần 5)
-                  </td>
-                  <td className="whitespace-nowrap py-3">Phim Bộ</td>
-                  <td className="whitespace-nowrap py-3 font-mono">98,200</td>
-                  <td className="whitespace-nowrap py-3 text-[#ffc107]">
-                    ★ 8.8
-                  </td>
-                  <td className="whitespace-nowrap py-3 text-right font-bold text-green-400">
-                    PUBLISHED
-                  </td>
-                </tr>
-                <tr className="transition hover:bg-white/3">
-                  <td className="whitespace-nowrap py-3 font-bold text-white">
-                    Tiệm Bánh Kỳ Diệu
-                  </td>
-                  <td className="whitespace-nowrap py-3">Phim Lẻ</td>
-                  <td className="whitespace-nowrap py-3 font-mono">76,980</td>
-                  <td className="whitespace-nowrap py-3 text-[#ffc107]">
-                    ★ 9.0
-                  </td>
-                  <td className="whitespace-nowrap py-3 text-right font-bold text-amber-400">
-                    REVIEW
-                  </td>
-                </tr>
+                {stats.topMovies.map((movie) => (
+                  <tr key={movie.id} className="transition hover:bg-white/5">
+                    <td className="whitespace-nowrap py-3 font-bold text-white">
+                      {movie.title}
+                    </td>
+                    <td className="whitespace-nowrap py-3">
+                      <span className="rounded bg-white/5 px-2 py-0.5 text-[10px] font-bold text-[#94a3b8]">
+                        {movie.type === "SINGLE" ? "Phim Lẻ" : "Phim Bộ"}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap py-3 font-mono">
+                      {movie.view_count.toLocaleString("vi-VN")}
+                    </td>
+                    <td className="whitespace-nowrap py-3 text-[#ffc107]">
+                      ★ {movie.average_rating.toFixed(1)}
+                    </td>
+                    <td className="whitespace-nowrap py-3 text-right font-bold">
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-[10px] ${
+                          movie.status === "PUBLISHED"
+                            ? "bg-green-500/10 text-green-400"
+                            : "bg-amber-500/10 text-amber-400"
+                        }`}
+                      >
+                        {movie.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
+        {/* Cột phải: Quick Actions & Recent Activity */}
         <div className="min-w-0 space-y-6">
           <div className="min-w-0 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(16,24,39,0.96),rgba(11,18,28,0.94))] p-4 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:p-5">
             <div className="mb-4 flex items-center justify-between">
@@ -209,7 +230,7 @@ export const OverviewTab: React.FC = () => {
                   className="h-4 w-4 text-[#7dd3fc]"
                   strokeWidth={2.2}
                 />
-                Quick Actions
+                Lối Tắt Nhanh
               </h4>
             </div>
 
@@ -218,7 +239,7 @@ export const OverviewTab: React.FC = () => {
                 <button
                   key={action}
                   type="button"
-                  className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 text-left text-xs font-semibold text-[#dfeafc] transition hover:border-[#00a3ff]/30 hover:bg-[#0d1b2d]"
+                  className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left text-xs font-semibold text-[#dfeafc] transition hover:border-[#00a3ff]/30 hover:bg-[#0d1b2d] cursor-pointer"
                 >
                   <span>{action}</span>
                   <ArrowUpRight
@@ -237,15 +258,15 @@ export const OverviewTab: React.FC = () => {
                   className="h-4 w-4 text-[#34d399]"
                   strokeWidth={2.2}
                 />
-                Recent Activity
+                Hoạt Động Gần Đây
               </h4>
             </div>
 
             <div className="space-y-3">
-              {activities.map((activity) => (
+              {activities.map((activity, i) => (
                 <div
-                  key={activity.label}
-                  className="rounded-xl border border-white/10 bg-white/3 p-2.5"
+                  key={i}
+                  className="rounded-xl border border-white/10 bg-white/5 p-2.5"
                 >
                   <p className="text-xs font-medium text-[#e2e8f0]">
                     {activity.label}
@@ -262,3 +283,5 @@ export const OverviewTab: React.FC = () => {
     </div>
   );
 };
+
+export default OverviewTab;
